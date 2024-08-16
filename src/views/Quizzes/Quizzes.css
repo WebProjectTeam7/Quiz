@@ -2,42 +2,145 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    padding: 20px;
 }
 
 .search-bar {
     margin-bottom: 20px;
 }
 
-.search-bar input {
-    padding: 8px;
-    width: 300px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
-
 .navigation-buttons {
     margin-bottom: 20px;
 }
 
-.navigation-buttons button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    border-radius: 4px;
-    border: none;
-    background-color: #3498db;
-    color: white;
-    cursor: pointer;
-}
-
 .hexagon-grid {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .hexagon-group {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.hexagon-group.easy {
+    margin-left: 0;
+}
+
+.hexagon-group.medium {
+    margin-left: 30px;
+}
+
+.hexagon-group.hard {
+    margin-left: 60px;
+}
+
+.hexagon {
+    position: relative;
+    width: 120px;
+    height: 138px;
+    cursor: pointer;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: linear-gradient(145deg, #dcdcdc, #b8b8b8);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6),
+                inset 0 6px 12px rgba(0, 0, 0, 0.4);
+    display: flex;
     align-items: center;
-    margin: 0 10px;
+    justify-content: center;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    margin: 15px;
+}
+
+.hexagon:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7),
+                inset 0 8px 16px rgba(0, 0, 0, 0.5);
+}
+
+.hexagon.clicked {
+    background: linear-gradient(145deg, #333333, #555555);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8),
+                inset 0 8px 16px rgba(0, 0, 0, 0.7);
+}
+
+.hexagon.easy {
+    background: linear-gradient(145deg, #30b960, #19861c);
+}
+
+.hexagon.medium {
+    background: linear-gradient(145deg, #9e9eeb, #6a1b9a);
+}
+
+.hexagon.hard {
+    background: linear-gradient(145deg, #e64343, #da2727);
+}
+
+.hexagon-in {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.hexagon-content {
+    color: #ffffff;
+    text-align: center;
+    font-size: 16px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.navigation-buttons button {
+    background-color: #4c2757;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navigation-buttons button:hover {
+    background-color: #357abd;
+    transform: scale(1.05);
+}
+
+.navigation-buttons button:active {
+    background-color: #2c6aa0;
+}
+
+/* Search */
+.search-bar {
+    margin: 20px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: rgb(201, 200, 200);
+}
+
+.search-bar input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
 }
