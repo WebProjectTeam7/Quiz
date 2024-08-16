@@ -44,14 +44,7 @@ export default function App() {
             >
                 <Header />
                 <Routes>
-                    <Route path="/search-results" element={<SearchResultPage />} />
-                    <Route path="/register" element={<RedirectIfAuthenticated><Register /></RedirectIfAuthenticated>} />
-                    <Route path="/login" element={<RedirectIfAuthenticated><Login /></RedirectIfAuthenticated>} />
-                    <Route path="/my-profile" element={<Authenticated><MyProfile /></Authenticated>} />
-                    <Route path="/quizzes" element={<Authenticated><Quizzes /></Authenticated>} />
-                    <Route path="/quiz-of-the-week" element={<Authenticated><QuizOfTheWeek /></Authenticated>} />
-                    <Route path="/ranking" element={<Authenticated><Ranking /></Authenticated>} />
-                    <Route path="/tournaments" element={<Authenticated><Tournaments /></Authenticated>} />
+                    <Route path="/quizzes" element={<Quizzes />} />
                     <Route path="/" element={<Home />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
