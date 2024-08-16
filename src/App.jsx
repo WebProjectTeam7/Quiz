@@ -12,6 +12,10 @@ import useModal from './custum-hooks/useModal';
 import RegistrationModal from './components/RegistrationModal/RegistrationModal';
 import LoginModal from './components/LoginModal/LoginModal';
 import { ChakraProvider, Button } from '@chakra-ui/react';
+import Authenticated from './hoc/Authenticated';
+import Quizzes from './views/Quizzes/Quizzes';
+import SearchResultPage from './views/SearchResultPage/SearchResultPage';
+import RedirectIfAuthenticated from './hoc/RedirectIfAuthenticated';
 
 export default function App() {
     const [appState, setAppState] = useState({
@@ -45,7 +49,7 @@ export default function App() {
     }, [user]);
 
     return (
-        <ChakraProvider>
+        <><ChakraProvider>
             <BrowserRouter>
                 <AppContext.Provider
                     value={{ ...appState, setAppState, searchQuery, setSearchQuery }}
@@ -72,6 +76,23 @@ export default function App() {
                     <footer>&copy;Team7Forum</footer>
                 </AppContext.Provider>
             </BrowserRouter>
-        </ChakraProvider>
+        </ChakraProvider><BrowserRouter>
+            <AppContext.Provider
+                value={{ ...appState, setAppState, searchQuery, setSearchQuery }}
+            >
+                <Header />
+                <Routes>
+                    <Route path="/search-results" element={<SearchResultPage />} />
+                    <Route path="/my-profile" element={<Authenticated><MyProfile /></Authenticated>} />
+                    <Route path="/quizzes" element={<Authenticated><Quizzes /></Authenticated>} />
+                    <Route path="/quiz-of-the-week" element={<Authenticated><QuizOfTheWeek /></Authenticated>} />
+                    <Route path="/ranking" element={<Authenticated><Ranking /></Authenticated>} />
+                    <Route path="/tournaments" element={<Authenticated><Tournaments /></Authenticated>} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="*" element={<NotFound />} />
+                </Routes>
+                <footer>&copy;Team7Forum</footer>
+            </AppContext.Provider>
+        </BrowserRouter></>
     );
 }
