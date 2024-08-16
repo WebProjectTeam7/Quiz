@@ -56,15 +56,12 @@ export default function App() {
                 >
                     <Header />
                     <div className="main-content">
-                        {/* Buttons to trigger modals */}
                         <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
                             Register
                         </Button>
                         <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
                             Login
                         </Button>
-
-                        {/* Render Modals */}
                         <RegistrationModal isVisible={registrationModal.isModalVisible} onClose={registrationModal.closeModal} />
                         <LoginModal isVisible={loginModal.isModalVisible} onClose={loginModal.closeModal} />
 
