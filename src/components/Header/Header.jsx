@@ -19,10 +19,11 @@ export default function Header() {
 
     return (
         <header>
-            <h1>Quiz Battle</h1>
+            <h1>Bee Champion</h1>
             {userData && <span>Welcome, {userData.username}</span>}
             <nav>
                 <NavLink to="/">Home</NavLink>
+                <NavLink to="/quizzes">Quizzes</NavLink>
             </nav>
         </header>
     );
