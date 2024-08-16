@@ -1,8 +1,7 @@
-import PropTypes from "prop-types";
-import { useContext } from "react";
-import { AppContext } from "../state/app.context";
-import { Navigate, useLocation } from "react-router-dom";
-import UserRoleEnum from "../common/role.enum";
+import PropTypes from 'prop-types';
+import { useContext } from 'react';
+import { AppContext } from '../state/app.context';
+import { Navigate, useLocation } from 'react-router-dom';
 
 export default function Authenticated({ children, requiredRole }) {
   const { user, userData } = useContext(AppContext);
