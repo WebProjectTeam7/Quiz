@@ -1,0 +1,79 @@
+
+.registration-username {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.registration-email {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.registration-firstname {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.registration-lastname {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.registration-password {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.registration-confirm-password {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+}
+
+.registration-register-button {
+    width: 80px;
+    background-color: rgb(49, 49, 114) !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.registration-cancel-button {
+    background-color: rgb(241, 72, 72) !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    margin-left: 12px;
+}
+
+.registration-cancel-button:hover {
+    background-color: #e53e3e !important;
+}
+
+.registration-cancel-button:active {
+    background-color: #c53030 !important;
+}
