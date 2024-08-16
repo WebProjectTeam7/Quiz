@@ -1,6 +1,4 @@
 import { useLocation } from 'react-router-dom';
-import ThreadItem from '../components/ThreadItem';
-import UserInfo from '../components/UserInfo';
 import './SearchResultPage.css';
 
 export default function SearchResultPage() {

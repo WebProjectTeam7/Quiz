@@ -10,7 +10,8 @@ import Home from './views/Home/Home';
 import NotFound from './views/NotFound/NotFound';
 import Authenticated from './hoc/Authenticated';
 import Quizzes from './views/Quizzes/Quizzes';
-
+import SearchResultPage from './views/SearchResultPage/SearchResultPage';
+import RedirectIfAuthenticated from './hoc/RedirectIfAuthenticated';
 
 export default function App() {
     const [appState, setAppState] = useState({
