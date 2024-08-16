@@ -8,10 +8,10 @@ import { getUserData } from './services/user.service';
 import Header from './components/Header/Header';
 import Home from './views/Home/Home';
 import NotFound from './views/NotFound/NotFound';
-import Authenticated from './hoc/Authenticated';
 import Quizzes from './views/Quizzes/Quizzes';
-import SearchResultPage from './views/SearchResultPage/SearchResultPage';
-import RedirectIfAuthenticated from './hoc/RedirectIfAuthenticated';
+import QuizOfTheWeek from './views/QuizOfTheWeek/QuizOfTheWeek';
+import QuizOfTheWeekDetail from './views/QuizOfTheWeekDetail/QuizOfTheWeekDetail';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App() {
     const [appState, setAppState] = useState({
@@ -45,6 +45,8 @@ export default function App() {
                 <Header />
                 <Routes>
                     <Route path="/quizzes" element={<Quizzes />} />
+                    <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
+                    <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />
                     <Route path="/" element={<Home />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
