@@ -1,0 +1,42 @@
+
+.login-email {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+}
+
+.login-password {
+    border-color: rgb(165, 165, 236) !important;
+    padding: 8px;
+    font-size: 1rem;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+}
+
+.login-login-button {
+    width: 80px;
+    background-color: rgb(49, 49, 114) !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.login-cancel-button {
+    background-color: rgb(241, 72, 72) !important;
+    color: white !important;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 4px;
+    margin-left: 12px;
+}
+
+.login-cancel-button:hover {
+    background-color: #e53e3e !important;
+}
+
+.login-cancel-button:active {
+    background-color: #c53030 !important;
+}

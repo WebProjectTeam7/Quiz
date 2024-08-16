@@ -17,6 +17,20 @@ export const createUser = async (username, uid, email, firstName, lastName, role
 };
 
 // RETRIEVE
+export const getUserByUsername = async (username) => {
+    const userRef = ref(db, `users/${username}`);
+    try {
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+            return null;
+        }
+        return snapshot.val();
+    } catch (error) {
+        console.error('Error retrieving user by username:', error);
+        throw new Error('Failed to retrieve user: ' + error.message);
+    }
+};
+
 
 export const getUserData = async (username) => {
     try {

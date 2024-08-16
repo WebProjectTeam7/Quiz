@@ -8,9 +8,16 @@ import { getUserData } from './services/user.service';
 import Header from './components/Header/Header';
 import Home from './views/Home/Home';
 import NotFound from './views/NotFound/NotFound';
+
+
+
+
+
+
+
+import Authenticated from './hoc/Authenticated';
 import Quizzes from './views/Quizzes/Quizzes';
 import QuizOfTheWeek from './views/QuizOfTheWeek/QuizOfTheWeek';
-import QuizOfTheWeekDetail from './views/QuizOfTheWeekDetail/QuizOfTheWeekDetail';
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function App() {
@@ -21,12 +28,19 @@ export default function App() {
     const [user, loading, error] = useAuthState(auth);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const registrationModal = useModal();
+    const loginModal = useModal();
+
     if (appState.user !== user) {
         setAppState({ ...appState, user });
     }
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            setAppState((prevState) => ({ ...prevState, userData: null }));
+            return;
+        }
+
         getUserData(appState.user.uid)
             .then((data) => {
                 const userData = data[Object.keys(data)[0]];
@@ -38,20 +52,49 @@ export default function App() {
     }, [user]);
 
     return (
-        <BrowserRouter>
+        <><ChakraProvider>
+            <BrowserRouter>
+                <AppContext.Provider
+                    value={{ ...appState, setAppState, searchQuery, setSearchQuery }}
+                >
+                    <Header />
+                    <div className="main-content">
+                        <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
+                            Register
+                        </Button>
+                        <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
+                            Login
+                        </Button>
+                        <RegistrationModal isVisible={registrationModal.isModalVisible} onClose={registrationModal.closeModal} />
+                        <LoginModal isVisible={loginModal.isModalVisible} onClose={loginModal.closeModal} />
+
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                    </div>
+                    <footer>&copy;Team7Forum</footer>
+                </AppContext.Provider>
+            </BrowserRouter>
+        </ChakraProvider><BrowserRouter>
             <AppContext.Provider
                 value={{ ...appState, setAppState, searchQuery, setSearchQuery }}
             >
                 <Header />
                 <Routes>
-                    <Route path="/quizzes" element={<Quizzes />} />
-                    <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
-                    <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />
+                    <Route path="/search-results" element={<SearchResultPage />} />
+                    <Route path="/register" element={<RedirectIfAuthenticated><Register /></RedirectIfAuthenticated>} />
+                    <Route path="/login" element={<RedirectIfAuthenticated><Login /></RedirectIfAuthenticated>} />
+                    <Route path="/my-profile" element={<Authenticated><MyProfile /></Authenticated>} />
+                    <Route path="/quizzes" element={<Authenticated><Quizzes /></Authenticated>} />
+                    <Route path="/quiz-of-the-week" element={<Authenticated><QuizOfTheWeek /></Authenticated>} />
+                    <Route path="/ranking" element={<Authenticated><Ranking /></Authenticated>} />
+                    <Route path="/tournaments" element={<Authenticated><Tournaments /></Authenticated>} />
                     <Route path="/" element={<Home />} />
                     <Route path="*" element={<NotFound />} />
                 </Routes>
                 <footer>&copy;Team7Forum</footer>
             </AppContext.Provider>
-        </BrowserRouter >
+        </BrowserRouter></>
     );
 }
