@@ -28,19 +28,19 @@ export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
         setLoading(true);
         try {
             await loginUser(email, password);
-            Swal.fire({
-                icon: 'success',
-                title: 'Login Successful',
-                confirmButtonText: 'OK',
-            });
+            // Swal.fire({                                   //Strange error when
+            //     icon: 'success',
+            //     title: 'Login Successful',
+            //     confirmButtonText: 'OK',
+            // });
             onClose();
         } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Login Failed',
-                text: error.message,
-                confirmButtonText: 'OK',
-            });
+            // Swal.fire({
+            //     icon: 'error',                            //Strange error when
+            //     title: 'Login Failed',
+            //     text: error.message,
+            //     confirmButtonText: 'OK',
+            // });
         } finally {
             setLoading(false);
         }

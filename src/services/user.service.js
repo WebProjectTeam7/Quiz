@@ -48,4 +48,31 @@ export const getUserData = async (uid) => {
 
 // UPDATE
 
+export const updateUser = async (uid, updatedData) => {
+    const userRef = query(ref(db, 'users'), orderByChild('uid'), equalTo(uid));
+    try {
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+            throw new Error('User not found');
+        }
+        const userId = Object.keys(snapshot.val())[0];
+        await update(ref(db, `users/${userId}`), updatedData);
+    } catch (error) {
+        console.error('Error updating user:', error);
+        throw new Error('Failed to update user: ' + error.message);
+    }
+};
+
+export const uploadUserAvatar = async (uid, imageFile) => {
+    try {
+        const avatarRef = storageRef(storage, `avatars/${uid}`);
+        const snapshot = await uploadBytes(avatarRef, imageFile);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        return downloadURL;
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        throw new Error('Failed to upload image');
+    }
+};
+
 // DELETE
