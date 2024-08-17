@@ -1,5 +1,5 @@
 /* src/pages/Header.css */
-header {
+.site-header {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -13,7 +13,7 @@ header {
     overflow: hidden;
 }
 
-header::before {
+.site-header::before {
     content: "";
     position: absolute;
     top: 0;
@@ -24,12 +24,12 @@ header::before {
     z-index: 1;
 }
 
-header h1, header span {
+.site-header h1, .site-header span {
     position: relative;
     z-index: 2;
 }
 
-header h1 {
+.site-header h1 {
     margin: 0;
     font-size: 5rem;
     margin-bottom: 20px;
@@ -37,18 +37,18 @@ header h1 {
     font-family: cursive;
 }
 
-header span {
+.site-header span {
     font-size: 1.5rem;
     margin-top: 10px;
 }
 
-nav {
+.site-header nav {
     display: flex;
     gap: 25px;
     margin-top: 15px;
 }
 
-nav a {
+.site-header nav a {
     color: white;
     text-decoration: none;
     font-size: 1.4rem;
@@ -60,14 +60,33 @@ nav a {
     z-index: 2;
 }
 
-nav a:hover {
+.site-header nav a:hover {
     background-color: #4c2757;
     color: #ffffff;
     transform: scale(1.05);
 }
 
-nav a.active {
+.site-header nav a.active {
     background-color: #2a5c9f;
     color: #ffffff;
     border-bottom: 2px solid #4c2757b7;
+}
+
+.site-header nav button {
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding: 12px 25px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+}
+
+.site-header nav button:hover {
+    background-color: #4c2757;
+    color: #ffffff;
+    transform: scale(1.05);
 }

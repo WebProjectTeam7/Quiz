@@ -29,17 +29,14 @@ export default function App() {
 
     useEffect(() => {
         if (appState.user !== user) {
-            setAppState({ ...appState, user });
+            setAppState((prevState) => ({ ...prevState, user }));
         }
     }, [user, appState.user]);
 
     useEffect(() => {
-        if (!user) {
-            setAppState((prevState) => ({ ...prevState, userData: null }));
-            return;
-        }
-
-        getUserData(user.uid)
+        if (!user) return;
+        if (!appState.user) return;
+        getUserData(appState.user.uid)
             .then((data) => {
                 const userData = data[Object.keys(data)[0]];
                 setAppState({ ...appState, userData });
@@ -47,7 +44,8 @@ export default function App() {
             .catch((e) => {
                 console.error(e.message);
             });
-    }, [user]);
+    }, [user, appState.user]);
+
 
     return (
         <ChakraProvider>
@@ -57,15 +55,23 @@ export default function App() {
                 >
                     <Header />
                     <div className="main-content">
-                        <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
-                            Register
-                        </Button>
-                        <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
-                            Login
-                        </Button>
+                        {!user && (
+                            <>
+                                <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
+                                    Register
+                                </Button>
+                                <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
+                                    Login
+                                </Button>
+                            </>
+                        )}
 
                         <RegistrationModal isVisible={registrationModal.isModalVisible} onClose={registrationModal.closeModal} />
-                        <LoginModal isVisible={loginModal.isModalVisible} onClose={loginModal.closeModal} />
+                        <LoginModal
+                            isVisible={loginModal.isModalVisible}
+                            onClose={loginModal.closeModal}
+                            openRegisterModal={registrationModal.openModal}
+                        />
 
                         <Routes>
                             <Route path="/" element={<Home />} />

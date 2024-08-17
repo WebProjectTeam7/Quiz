@@ -9,12 +9,43 @@ import {
     Button,
     FormControl,
     FormLabel,
-    Input
+    Input,
+    Text,
+    Link
 } from '@chakra-ui/react';
 import propTypes from 'prop-types';
 import './LoginModal.css';
+import { loginUser } from '../../services/auth.service';
+import Swal from 'sweetalert2';
+import { useState } from 'react';
 
-export default function LoginModal({ isVisible, onClose }) {
+export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
+        setLoading(true);
+        try {
+            await loginUser(email, password);
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Successful',
+                confirmButtonText: 'OK',
+            });
+            onClose();
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Login Failed',
+                text: error.message,
+                confirmButtonText: 'OK',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Modal isOpen={isVisible} onClose={onClose}>
             <ModalOverlay />
@@ -24,17 +55,46 @@ export default function LoginModal({ isVisible, onClose }) {
                 <ModalBody>
                     <FormControl id="email" isRequired>
                         <FormLabel>Email</FormLabel>
-                        <Input type="email" placeholder="Email" className="login-email" borderColor="blue.400"/>
+                        <Input
+                            type="email"
+                            placeholder="Email"
+                            className="login-email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            borderColor="blue.400"
+                        />
                     </FormControl>
 
                     <FormControl id="password" isRequired mt={4}>
                         <FormLabel>Password</FormLabel>
-                        <Input type="password" placeholder="Password" className="login-password" borderColor="blue.400"/>
+                        <Input
+                            type="password"
+                            placeholder="Password"
+                            className="login-password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            borderColor="blue.400"
+                        />
                     </FormControl>
+                    <Text mt={4}>
+                        Don't have an account?{' '}
+                        <Link color="teal.500" onClick={() => {
+                            onClose();
+                            openRegisterModal();
+                        }}>
+                            Register here
+                        </Link>
+                    </Text>
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme="blue" onClick={onClose} className="login-login-button"w="80px">
+                    <Button
+                        colorScheme="blue"
+                        onClick={handleLogin}
+                        className="login-login-button"
+                        w="80px"
+                        isLoading={loading}
+                    >
                         Login
                     </Button>
                     <Button variant="ghost" onClick={onClose} className="login-cancel-button">Cancel</Button>
@@ -47,4 +107,5 @@ export default function LoginModal({ isVisible, onClose }) {
 LoginModal.propTypes = {
     isVisible: propTypes.bool.isRequired,
     onClose: propTypes.func.isRequired,
+    openRegisterModal: propTypes.func.isRequired,
 };

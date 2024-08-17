@@ -18,13 +18,14 @@ export default function Header() {
 
 
     return (
-        <header>
+        <header className="site-header">
             <h1>Bee Champion</h1>
             {userData && <span>Welcome, {userData.username}</span>}
             <nav>
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/quizzes">Quizzes</NavLink>
                 <NavLink to="/my-profile">My Profile</NavLink>
+                {user && <button onClick={logout}>Logout</button>}
             </nav>
         </header>
     );

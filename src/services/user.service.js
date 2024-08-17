@@ -32,9 +32,14 @@ export const getUserByUsername = async (username) => {
 };
 
 
-export const getUserData = async (username) => {
+export const getUserData = async (uid) => {
+    const userRef = query(ref(db, 'users'), orderByChild('uid'), equalTo(uid));
     try {
-        // TODO
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+            throw new Error('User not found');
+        }
+        return snapshot.val();
     } catch (error) {
         console.error('Error retrieving user data:', error);
         throw new Error('Failed to retrieve user data: ' + error.message);
