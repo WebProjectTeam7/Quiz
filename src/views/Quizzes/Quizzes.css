@@ -52,10 +52,11 @@
     font-weight: bold;
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     margin: 15px;
+    gap: 16px;
 }
 
 .hexagon:hover {
-    transform: translateY(-15px);
+    transform:  rotate(93deg) scale(1.2);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7),
                 inset 0 8px 16px rgba(0, 0, 0, 0.5);
 }
