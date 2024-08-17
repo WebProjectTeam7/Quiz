@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
 import { logoutUser } from '../../services/auth.service';
+import MyProfile from '../../views/MyProfile/MyProfile';
 import './Header.css';
 
 
@@ -25,6 +26,7 @@ export default function Header() {
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/quizzes">Quizzes</NavLink>
                 <NavLink to="/my-profile">My Profile</NavLink>
+                <NavLink to="/my-profile" element={<MyProfile />} />
                 {user && <button onClick={logout}>Logout</button>}
             </nav>
         </header>
