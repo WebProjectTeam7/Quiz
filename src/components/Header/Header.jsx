@@ -24,6 +24,7 @@ export default function Header() {
             <nav>
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/quizzes">Quizzes</NavLink>
+                <NavLink to="/my-profile">My Profile</NavLink>
             </nav>
         </header>
     );
