@@ -4,8 +4,8 @@ import { db, storage } from '../config/firebase-config';
 
 // CREATE
 
-export const createUser = async (username, uid, email, firstName, lastName, role) => {
-    const user = { username, uid, email, firstName, lastName, role, points: 1000, createdOn: new Date().toString() };
+export const createUser = async (username, uid, email, firstName, lastName, role, phoneNumber) => {
+    const user = { username, uid, email, firstName, lastName, role, phoneNumber, points: 1000, createdOn: new Date().toString() };
     const userRef = ref(db, `users/${username}`);
     try {
         await set(userRef, user);
@@ -43,6 +43,28 @@ export const getUserData = async (uid) => {
     } catch (error) {
         console.error('Error retrieving user data:', error);
         throw new Error('Failed to retrieve user data: ' + error.message);
+    }
+};
+
+export const getPhoneNumber = async (phoneNumber) => {
+    const phoneRef = query(ref(db, 'users'), orderByChild('phoneNumber'), equalTo(phoneNumber));
+    try {
+        const snapshot = await get(phoneRef);
+        return snapshot.exists();
+    } catch (error) {
+        console.error('Error checking phone number:', error);
+        throw new Error('Failed to check phone number: ' + error.message);
+    }
+};
+
+export const getEmail = async (email) => {
+    const emailRef = query(ref(db, 'users'), orderByChild('email'), equalTo(email));
+    try {
+        const snapshot = await get(emailRef);
+        return snapshot.exists();
+    } catch (error) {
+        console.error('Error checking email:', error);
+        throw new Error('Failed to check email: ' + error.message);
     }
 };
 

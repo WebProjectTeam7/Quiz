@@ -5,7 +5,8 @@
     font-size: 1rem;
     background-color: #f7f7f7;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    margin-top: -7px;
 }
 
 .registration-email {
@@ -14,7 +15,8 @@
     font-size: 1rem;
     background-color: #f7f7f7;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    margin-top: -7px;
 }
 
 .registration-firstname {
@@ -23,7 +25,8 @@
     font-size: 1rem;
     background-color: #f7f7f7;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    margin-top: -7px;
 }
 
 .registration-lastname {
@@ -32,7 +35,41 @@
     font-size: 1rem;
     background-color: #f7f7f7;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    margin-top: -7px;
+}
+
+.registration-phone-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-top: -7px;
+}
+
+.phone-left-addon {
+    background-color: #f7f7f728 !important;
+    border-color: rgb(165, 165, 236) !important;
+    border-radius: 4px 0 0 4px !important;
+    height: 42px !important;
+    display: flex;
+    align-items: center;
+    padding: 8px !important;
+    font-size: 1rem !important;
+    margin-top: -7px;
+}
+
+.registration-phone {
+    border-radius: 0 4px 4px 0 !important;
+    height: 42px !important;
+    padding: 8px !important;
+    font-size: 1rem !important;
+    background-color: #f7f7f7;
+    border-color: rgb(165, 165, 236) !important;
+    margin-top: -7px;
+}
+
+.phone-left-addon, .registration-phone {
+    margin-bottom: 1px !important;
 }
 
 .registration-password {
@@ -42,6 +79,7 @@
     background-color: #f7f7f7;
     border-radius: 4px;
     margin-bottom: 10px;
+    margin-top: -7px;
 }
 
 .registration-confirm-password {
@@ -50,12 +88,13 @@
     font-size: 1rem;
     background-color: #f7f7f7;
     border-radius: 4px;
+    margin-top: -7px;
 }
 
 .registration-register-button {
     width: 80px;
     background-color: rgb(49, 49, 114) !important;
-    color: white !important;
+    color: white;
     font-weight: bold;
     text-align: center;
     border-radius: 4px;
@@ -76,4 +115,8 @@
 
 .registration-cancel-button:active {
     background-color: #c53030 !important;
+}
+
+.swal2-container {
+    z-index: 2000 !important;
 }
