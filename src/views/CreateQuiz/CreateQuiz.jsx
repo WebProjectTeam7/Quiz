@@ -16,7 +16,7 @@ import { AppContext } from '../../state/app.context';
 import QuizAccessEnum from '../../common/access-enum';
 import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
-import CreateQuestion from '../../components/CreateQuestion/CreateQuestion'; // Assuming this is the path to the CreateQuestion component
+import CreateQuestion from '../../components/CreateQuestion/CreateQuestion';
 
 export default function CreateQuiz() {
     const { userData } = useContext(AppContext);
