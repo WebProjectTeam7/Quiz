@@ -69,9 +69,9 @@
 }
 
 .site-header nav a.active {
-    background-color: #2a5c9f;
+    /* background-color: #2a5c9f; */
     color: #ffffff;
-    border-bottom: 2px solid #4c2757b7;
+    /* border-bottom: 2px solid #4c2757b7; */
 }
 
 .site-header nav button {

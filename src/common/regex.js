@@ -17,3 +17,5 @@ export const HAS_SPECIAL_CHAR = /[^A-Za-z0-9]+/;
 export const TITLE_REGEX = /^(.){3,64}$/;
 
 export const CONTENT_REGEX = /^(.){3,8192}$/;
+
+export const PHONE_REGEX = /^\d{10}$/;
