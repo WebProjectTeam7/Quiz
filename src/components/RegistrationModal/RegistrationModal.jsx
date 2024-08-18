@@ -12,9 +12,12 @@ import {
     Input,InputGroup,
     InputLeftAddon,
     Stack,
+    HStack,
+    RadioGroup,
+    Radio,
 } from '@chakra-ui/react';
 import { registerUser } from '../../services/auth.service';
-import { createUser, getEmail, getPhoneNumber, getUserByUsername } from '../../services/user.service';
+import { createUser, getOrganizerCodes, getEmail, getPhoneNumber, getUserByUsername, deleteOrganizerCode } from '../../services/user.service';
 import { useContext, useState } from 'react';
 import { AppContext } from '../../state/app.context';
 import { useNavigate } from 'react-router-dom';
@@ -36,16 +39,24 @@ export default function RegistrationModal({ isVisible, onClose }) {
         password: '',
         confirmPassword: '',
         role: RoleEnum.STUDENT,
+        phoneNumber: '',
+        organizerCode: '',
     });
 
     const [hidePassword, setHidePassword] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [isOrganizer, setIsOrganizer] = useState(false);
 
     const togglePasswordVisibility = () => {
         setHidePassword(!hidePassword);
     };
 
     const navigate = useNavigate();
+
+    const handleRoleChange = (role) => {
+        setUser({ ...user, role });
+        setIsOrganizer(role === RoleEnum.ORGANIZER);
+    };
 
     const updateUser = (prop) => (e) => {
         setUser({
@@ -86,6 +97,11 @@ export default function RegistrationModal({ isVisible, onClose }) {
 
         if (!PHONE_REGEX.test(user.phoneNumber)) {
             alertArr.push('Phone number must be 10 digits!');
+        }
+
+        const validOrganizerCodes = await getOrganizerCodes();
+        if (isOrganizer && !validOrganizerCodes.includes(user.organizerCode)) {
+            alertArr.push('Invalid Organizer code!');
         }
 
         if (alertArr.length > 0) {
@@ -137,7 +153,20 @@ export default function RegistrationModal({ isVisible, onClose }) {
             }
 
             const credential = await registerUser(user.email, user.password);
-            await createUser(user.username, credential.user.uid, user.email, user.firstName, user.lastName, user.role, user.phoneNumber);
+            await createUser(user.username,
+                credential.user.uid,
+                user.email,
+                user.firstName,
+                user.lastName,
+                user.role,
+                user.phoneNumber,
+                isOrganizer ? user.organizerCode : null
+            );
+
+            if (isOrganizer) {
+                await deleteOrganizerCode(user.organizerCode);
+            }
+
             setAppState({ user: credential.user, userData: null });
 
             Swal.fire({
@@ -180,7 +209,14 @@ export default function RegistrationModal({ isVisible, onClose }) {
                 <ModalCloseButton />
                 <ModalBody>
                     <form onSubmit={register}>
-                        <Stack spacing={1}>
+                        <Stack spacing={3}>
+                            <RadioGroup defaultValue={user.role} onChange={handleRoleChange}>
+                                <HStack spacing="24px">
+                                    <Radio value={RoleEnum.STUDENT}>Student</Radio>
+                                    <Radio value={RoleEnum.ORGANIZER}>Organizer</Radio>
+                                </HStack>
+                            </RadioGroup>
+
                             <FormControl id="username" isRequired>
                                 <FormLabel>Username</FormLabel>
                                 <Input
@@ -263,6 +299,20 @@ export default function RegistrationModal({ isVisible, onClose }) {
                     </form>
                 </ModalBody>
                 <ModalFooter>
+                    {isOrganizer && (
+                        <HStack className="register-code" spacing={4} mr={4} mb={4} mt={-4}>
+                            <FormControl id="organizerCode" isRequired>
+                                <FormLabel>Organizer Code</FormLabel>
+                                <Input
+                                    value={user.organizerCode}
+                                    onChange={updateUser('organizerCode')}
+                                    type="text"
+                                    maxLength={5}
+                                    className="organizer-code"
+                                />
+                            </FormControl>
+                        </HStack>
+                    )}
                     <Button
                         colorScheme="blue"
                         type="submit"
