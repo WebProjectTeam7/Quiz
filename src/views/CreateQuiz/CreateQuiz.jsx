@@ -9,7 +9,6 @@ import {
     Stack,
     Heading,
     Divider,
-    useDisclosure,
     Checkbox,
 } from '@chakra-ui/react';
 import { useState, useContext } from 'react';
@@ -32,15 +31,12 @@ export default function CreateQuiz() {
         imageFile: null,
         title: '',
         description: '',
-        timesTried: 0,
-        scoreboard: [],
         category: QuizCategoryEnum.GENERAL,
         totalPoints: 100,
         difficulty: QuizDifficultyEnum.MEDIUM,
         dateBegins: null,
         dateEnds: null,
         timeLimit: null,
-        questions: [],
     });
 
     const handleInputChange = (prop) => (e) => {
@@ -66,7 +62,7 @@ export default function CreateQuiz() {
                 dateBegins: useDateRange ? quiz.dateBegins : null,
                 dateEnds: useDateRange ? quiz.dateEnds : null,
                 timeLimit: useTimeLimit ? quiz.timeLimit : null,
-                author: userData ? userData.username : 'anonymous author',
+                author: userData ? userData.username : 'anonymous',
             };
             const quizId = await createQuiz(newQuiz);
             navigate(`/quiz-preview/${quizId}`);

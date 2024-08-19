@@ -86,7 +86,7 @@ export default function App() {
                             <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
                             <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />
                             <Route path="/create-quiz" element={<CreateQuiz />} />
-                            <Route path="/quiz-preview" element={<QuizPreview />} />
+                            <Route path="/quiz-preview/:quizId" element={<QuizPreview />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </div>
