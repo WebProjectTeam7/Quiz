@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Avatar, Text, Heading, Spinner, Icon} from '@chakra-ui/react';
+import { Box, VStack, HStack, Avatar, Text, Heading, Spinner, Icon } from '@chakra-ui/react';
 import { ref, onValue } from 'firebase/database';
 import { db } from '../../config/firebase-config';
 import './Ranking.css';
