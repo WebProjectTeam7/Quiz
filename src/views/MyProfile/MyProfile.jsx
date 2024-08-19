@@ -1,47 +1,303 @@
 import './MyProfile.css';
-import { useState } from 'react';
+import {
+    Box,
+    Button,
+    Editable,
+    EditableInput,
+    EditablePreview,
+    Input,
+    Stack,
+    Avatar,
+    Text,
+    Flex,
+    Divider,
+} from '@chakra-ui/react';
+import { useContext, useState, useEffect } from 'react';
+import { AppContext } from '../../state/app.context';
+import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser } from '../../services/user.service';
+import Swal from 'sweetalert2';
+import EditableControls from '../../components/EditableControls/EditableControls';
 
-const MyProfile = () => {
+export default function MyProfile() {
+    const { user, userData, setAppState } = useContext(AppContext);
+    const [formData, setFormData] = useState(null);
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [avatarPreviewUrl, setAvatarPreviewUrl] = useState(null);
     const [showPasswordChange, setShowPasswordChange] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
-    const togglePasswordChange = () => {
-        setShowPasswordChange(!showPasswordChange);
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const fetchedData = await getUserData(user.uid);
+                if (fetchedData) {
+                    setFormData(fetchedData);
+                    setAvatarPreviewUrl(fetchedData.avatar);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        if (user && user.uid) {
+            fetchUserData();
+        }
+    }, [user]);
+
+    const updateUserData = (prop) => (value) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [prop]: value,
+        }));
     };
 
-    return (
-        <div className='profile-container'>
-            <h2>My Profile</h2>
-            <div className='profile-image'>
-                <button className='image-button'>Add Image +</button>
-            </div>
-            <form>
-                <input type='text' placeholder='Username' />
-                <input type='text' placeholder='First Name' />
-                <input type='text' placeholder='Last Name' />
-                <input type='email' placeholder='Email' />
-                <input type='tel' placeholder='Phone Number' />
-                <div className='button-container'>
-                    <button type='button' className='change-password' onClick={togglePasswordChange}>
-                        Change Password
-                    </button>
-                    <button type='submit' className='save-button'>
-                        Save
-                    </button>
-                    <button type='button' className='discard-button'>
-                        Discard Changes
-                    </button>
-                </div>
-            </form>
-            {showPasswordChange && (
-                <div className='password-change-container'>
-                    <input type='password' placeholder='Old password' />
-                    <input type='password' placeholder='New password' />
-                    <input type='password' placeholder='Confirm new password' />
-                    <button className='save-button'>Save</button>
-                </div>
-            )}
-        </div>
-    );
-};
+    const saveChanges = async (e) => {
+        e.preventDefault();
+        if (!formData) return;
 
-export default MyProfile;
+        try {
+            const updatedData = { ...formData };
+
+            if (avatarFile) {
+                const avatarURL = await uploadUserAvatar(formData.uid, avatarFile);
+                updatedData.avatar = avatarURL;
+            }
+
+            await updateUser(user.uid, updatedData);
+            setAppState((prev) => ({
+                ...prev,
+                userData: updatedData,
+            }));
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Profile Updated',
+                text: 'Your profile has been updated successfully!',
+                confirmButtonText: 'OK',
+            });
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: `Error updating profile: ${error.message}`,
+                confirmButtonText: 'OK',
+            });
+        }
+    };
+
+    const discardChanges = () => {
+        setFormData({ ...userData });
+        setAvatarPreviewUrl(userData.avatar);
+    };
+
+    const handleChangePassword = async () => {
+        if (newPassword !== confirmNewPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'New password and confirmation do not match.',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        const { value: currentPassword } = await Swal.fire({
+            title: 'Re-authentication Required',
+            input: 'password',
+            inputLabel: 'Enter your current password',
+            inputPlaceholder: 'Your current password',
+            inputAttributes: {
+                autocapitalize: 'off',
+                autocorrect: 'off',
+            },
+            showCancelButton: true,
+        });
+
+        if (!currentPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cancelled',
+                text: 'Password change was cancelled.',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        try {
+            await reauthenticateUser(currentPassword);
+            await changeUserPassword(newPassword);
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Changed',
+                text: 'Your password has been changed successfully!',
+                confirmButtonText: 'OK',
+            });
+
+            setNewPassword('');
+            setConfirmNewPassword('');
+            setShowPasswordChange(false);
+        } catch (error) {
+            console.error('Error changing password:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Change Failed',
+                text: `Error changing password: ${error.message}`,
+                confirmButtonText: 'OK',
+            });
+        }
+    };
+
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (file.size > 200 * 1024) {
+            setAvatarFile(null);
+            setAvatarPreviewUrl(null);
+            Swal.fire({
+                icon: 'warning',
+                title: 'File Too Large',
+                text: 'The selected file is too large. Please choose a file under 200KB.',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        setAvatarFile(file);
+        setAvatarPreviewUrl(URL.createObjectURL(file));
+    };
+
+    if (!formData) return <div>Loading...</div>;
+
+    return (
+        <Box className="profile-container">
+            <Text fontSize="2xl" mb={4}>My Profile</Text>
+            <Box className="profile-content">
+                <Box className="left-section">
+                    <Avatar src={avatarPreviewUrl || formData.avatar} boxSize="200px" mb={2} />
+                    <Input
+                        type="file"
+                        onChange={handleAvatarChange}
+                        display="none"
+                        id="avatar-upload"
+                    />
+                    <Button
+                        colorScheme="blue"
+                        onClick={() => document.getElementById('avatar-upload').click()}
+                    >
+                    Choose File
+                    </Button>
+                    <Button variant="solid" colorScheme="yellow" onClick={() => setShowPasswordChange(!showPasswordChange)}>
+                        {showPasswordChange ? 'Cancel Password Change' : 'Change Password'}
+                    </Button>
+                    {showPasswordChange && (
+                        <Box mt={4} className="password-change-container">
+                            <Input
+                                type="password"
+                                placeholder="New Password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                                mb={2}
+                            />
+                            <Input
+                                type="password"
+                                placeholder="Confirm New Password"
+                                value={confirmNewPassword}
+                                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                mb={2}
+                            />
+                            <Button colorScheme="blue" onClick={handleChangePassword}>
+                                Update Password
+                            </Button>
+                        </Box>
+                    )}
+                </Box>
+                <Box className="right-section">
+                    <form onSubmit={saveChanges}>
+                        <Stack spacing={3}>
+                            <Box>
+                                <Flex alignItems="center">
+                                    <Text className="right-section-label">Username:</Text>
+                                    <Editable defaultValue={formData.username} isDisabled>
+                                        <EditablePreview className="right-section-data" />
+                                        <EditableInput />
+                                    </Editable>
+                                </Flex>
+                            </Box>
+                            <Divider my={2} />
+                            <Box>
+                                <Flex alignItems="center">
+                                    <Text className="right-section-label">First Name:</Text>
+                                    <Editable
+                                        defaultValue={formData.firstName}
+                                        onSubmit={(value) => updateUserData('firstName')(value)}
+                                    >
+                                        <EditablePreview className="right-section-data" />
+                                        <EditableInput />
+                                        <EditableControls />
+                                    </Editable>
+                                </Flex>
+                            </Box>
+                            <Divider my={2} />
+                            <Box>
+                                <Flex alignItems="center">
+                                    <Text className="right-section-label">Last Name:</Text>
+                                    <Editable
+                                        defaultValue={formData.lastName}
+                                        onSubmit={(value) => updateUserData('lastName')(value)}
+                                    >
+                                        <EditablePreview className="right-section-data" />
+                                        <EditableInput />
+                                        <EditableControls />
+                                    </Editable>
+                                </Flex>
+                            </Box>
+                            <Divider my={2} />
+                            <Box>
+                                <Flex alignItems="center">
+                                    <Text className="right-section-label">Email:</Text>
+                                    <Editable defaultValue={formData.email} isDisabled>
+                                        <EditablePreview className="right-section-data" />
+                                        <EditableInput />
+                                    </Editable>
+                                </Flex>
+                            </Box>
+                            <Divider my={2} />
+                            <Box>
+                                <Flex alignItems="center">
+                                    <Text className="right-section-label">Phone Number:</Text>
+                                    <Editable
+                                        defaultValue={formData.phoneNumber}
+                                        onSubmit={(value) => updateUserData('phoneNumber')(value)}
+                                    >
+                                        <EditablePreview className="right-section-data" />
+                                        <EditableInput />
+                                        <EditableControls />
+                                    </Editable>
+                                </Flex>
+                            </Box>
+                            <Divider my={2} />
+                            <Box>
+                                <Flex alignItems="center">
+                                    <Text className="right-section-label">Role:</Text>
+                                    <Text className="right-section-data">
+                                        {formData.role}
+                                    </Text>
+                                </Flex>
+                            </Box>
+                        </Stack>
+                        <Divider my={2} />
+                        <Box className="button-container" mt={4}>
+                            <Button colorScheme="green" type="submit" className="right-section-save-button">
+                                Save
+                            </Button>
+                            <Button variant="solid" colorScheme="red" ml={2} onClick={discardChanges}>
+                                Discard Changes
+                            </Button>
+                        </Box>
+                    </form>
+                </Box>
+            </Box>
+        </Box>
+    );
+}

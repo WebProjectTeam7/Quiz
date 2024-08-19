@@ -17,6 +17,7 @@ import QuizOfTheWeekDetail from './views/QuizOfTheWeekDetail/QuizOfTheWeekDetail
 import Quizzes from './views/Quizzes/Quizzes';
 import CreateQuiz from './views/CreateQuiz/CreateQuiz';
 import MyProfile from './views/MyProfile/MyProfile';
+import QuizPreview from './views/QuizPreview/QuizPreview';
 
 
 export default function App() {
@@ -84,7 +85,8 @@ export default function App() {
                             <Route path="/my-profile" element={<MyProfile />} />
                             <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
                             <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />
-                            <Route path="/create-quiz" element={<CreateQuiz />}></Route>
+                            <Route path="/create-quiz" element={<CreateQuiz />} />
+                            <Route path="/quiz-preview" element={<QuizPreview />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </div>
