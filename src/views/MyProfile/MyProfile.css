@@ -11,12 +11,48 @@
 }
 
 .profile-content {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
+    border-radius: 10px;
+    box-shadow: 0px 5px 40px rgb(0, 0, 0);
+    position: relative;
+    font-family: Arial, sans-serif;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: 'Comic Sans MS', sans-serif;
+    color: white;
+    font-size: 30px;
+}
+
+.profile-image {
     display: flex;
     justify-content: space-between;
 }
 
 .left-section {
     flex: 1;
+}
+.image-button {
+    padding: 10px 20px;
+    border: 1px solid #ffffff;
+    background-color: rgba(255, 255, 255, 0.76);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #f7fafc;
+}
+
+.buttons-container {
     display: flex;
     flex-direction: column;
     align-items: center;

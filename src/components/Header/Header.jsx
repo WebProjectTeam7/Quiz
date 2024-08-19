@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
 import { logoutUser } from '../../services/auth.service';
@@ -24,6 +24,8 @@ export default function Header() {
             <nav>
                 <NavLink to="/">Home</NavLink>
                 <NavLink to="/quizzes">Quizzes</NavLink>
+                <NavLink to="/ranking">Ranking</NavLink>
+                <NavLink to="/tournament">Tournament</NavLink>
                 <NavLink to="/my-profile">My Profile</NavLink>
                 <NavLink to="/create-quiz">Create Quiz</NavLink>
                 {user && <button onClick={logout}>Logout</button>}

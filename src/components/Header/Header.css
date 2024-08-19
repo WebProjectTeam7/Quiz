@@ -11,6 +11,7 @@
     width: 100vw;
     height: 300px;
     overflow: hidden;
+    margin-bottom: 60px;
 }
 
 .site-header::before {
@@ -69,9 +70,7 @@
 }
 
 .site-header nav a.active {
-    /* background-color: #2a5c9f; */
     color: #ffffff;
-    /* border-bottom: 2px solid #4c2757b7; */
 }
 
 .site-header nav button {
