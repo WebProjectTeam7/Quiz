@@ -1,6 +1,6 @@
-<<<<<<< HEAD
-import { ref, get, query } from 'firebase/database';
-import { db } from '../config/firebase-config';
+import { ref as dbRef, push, get, update, set, remove, ref, query } from 'firebase/database';
+import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../config/firebase-config';
 
 export const getQuizCount = async () => {
     try {
@@ -14,10 +14,7 @@ export const getQuizCount = async () => {
         throw new Error('Failed to retrieve threads count: ' + error.message);
     }
 };
-=======
-import { ref as dbRef, push, get, update, set, remove } from 'firebase/database';
-import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../config/firebase-config';
+
 
 // CREATE
 
@@ -120,4 +117,3 @@ export const deleteQuiz = async (quizId) => {
         throw new Error('Failed to delete quiz', { cause: error });
     }
 };
->>>>>>> b71da20d0aeb7ed66a767afdd21e36486bcebc2f
