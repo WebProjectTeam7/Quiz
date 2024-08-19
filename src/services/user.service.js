@@ -4,8 +4,8 @@ import { db, storage } from '../config/firebase-config';
 
 // CREATE
 
-export const createUser = async (username, uid, email, firstName, lastName, role) => {
-    const user = { username, uid, email, firstName, lastName, role, points: 1000, createdOn: new Date().toString() };
+export const createUser = async (username, uid, email, firstName, lastName, role, phoneNumber, organizerCode = null) => {
+    const user = { username, uid, email, firstName, lastName, role, phoneNumber, points: 1000, organizerCode, createdOn: new Date().toString() };
     const userRef = ref(db, `users/${username}`);
     try {
         await set(userRef, user);
@@ -46,6 +46,42 @@ export const getUserData = async (uid) => {
     }
 };
 
+export const getPhoneNumber = async (phoneNumber) => {
+    const phoneRef = query(ref(db, 'users'), orderByChild('phoneNumber'), equalTo(phoneNumber));
+    try {
+        const snapshot = await get(phoneRef);
+        return snapshot.exists();
+    } catch (error) {
+        console.error('Error checking phone number:', error);
+        throw new Error('Failed to check phone number: ' + error.message);
+    }
+};
+
+export const getEmail = async (email) => {
+    const emailRef = query(ref(db, 'users'), orderByChild('email'), equalTo(email));
+    try {
+        const snapshot = await get(emailRef);
+        return snapshot.exists();
+    } catch (error) {
+        console.error('Error checking email:', error);
+        throw new Error('Failed to check email: ' + error.message);
+    }
+};
+
+export const getOrganizerCodes = async () => {
+    const codesRef = ref(db, 'organizerCodes');
+    try {
+        const snapshot = await get(codesRef);
+        if (!snapshot.exists()) {
+            return [];
+        }
+        return Object.keys(snapshot.val());
+    } catch (error) {
+        console.error('Error retrieving organizer codes:', error);
+        throw new Error('Failed to retrieve organizer codes: ' + error.message);
+    }
+};
+
 // UPDATE
 
 export const updateUser = async (uid, updatedData) => {
@@ -75,6 +111,7 @@ export const uploadUserAvatar = async (uid, imageFile) => {
     }
 };
 
+<<<<<<< HEAD
 export const getUserCount = async () => {
     try {
         const usersRef = query(ref(db, 'users'));
@@ -89,3 +126,16 @@ export const getUserCount = async () => {
     }
 };
 // DELETE
+=======
+// DELETE
+
+export const deleteOrganizerCode = async (code) => {
+    const codeRef = ref(db, `organizerCodes/${code}`);
+    try {
+        await remove(codeRef);
+    } catch (error) {
+        console.error('Error deleting organizer code:', error);
+        throw new Error('Failed to delete organizer code: ' + error.message);
+    }
+};
+>>>>>>> b71da20d0aeb7ed66a767afdd21e36486bcebc2f

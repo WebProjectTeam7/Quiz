@@ -15,8 +15,8 @@ import { ChakraProvider, Button } from '@chakra-ui/react';
 import QuizOfTheWeek from './views/QuizOfTheWeek/QuizOfTheWeek';
 import QuizOfTheWeekDetail from './views/QuizOfTheWeekDetail/QuizOfTheWeekDetail';
 import Quizzes from './views/Quizzes/Quizzes';
+
 import MyProfile from './views/MyProfile/MyProfile';
-import Ranking  from './views/Ranking/Ranking';
 
 
 export default function App() {
@@ -84,7 +84,7 @@ export default function App() {
                             <Route path="/my-profile" element={<MyProfile />} />
                             <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
                             <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />
-                            <Route path="/ranking" element={<Ranking />} />
+                            <Route path="/create-quiz" element={<CreateQuiz />}></Route>
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </div>
