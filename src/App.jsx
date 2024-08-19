@@ -15,8 +15,8 @@ import { ChakraProvider, Button } from '@chakra-ui/react';
 import QuizOfTheWeek from './views/QuizOfTheWeek/QuizOfTheWeek';
 import QuizOfTheWeekDetail from './views/QuizOfTheWeekDetail/QuizOfTheWeekDetail';
 import Quizzes from './views/Quizzes/Quizzes';
-import MyProfile from './views/MyProfile/MyProfile';
 import CreateQuiz from './views/CreateQuiz/CreateQuiz';
+import MyProfile from './views/MyProfile/MyProfile';
 import QuizPreview from './views/QuizPreview/QuizPreview';
 
 

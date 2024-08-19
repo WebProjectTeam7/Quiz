@@ -1,3 +1,20 @@
+<<<<<<< HEAD
+import { ref, get, query } from 'firebase/database';
+import { db } from '../config/firebase-config';
+
+export const getQuizCount = async () => {
+    try {
+        const threadsRef = query(ref(db, 'threads'));
+        const snapshot = await get(threadsRef);
+        if (!snapshot.exists()) {
+            return 0;
+        }
+        return Object.keys(snapshot.val()).length;
+    } catch (error) {
+        throw new Error('Failed to retrieve threads count: ' + error.message);
+    }
+};
+=======
 import { ref as dbRef, push, get, update, set, remove } from 'firebase/database';
 import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
@@ -101,3 +118,4 @@ export const deleteQuiz = async (quizId) => {
         throw new Error('Failed to delete quiz');
     }
 };
+>>>>>>> b71da20d0aeb7ed66a767afdd21e36486bcebc2f

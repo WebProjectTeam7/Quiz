@@ -2,16 +2,14 @@
     width: 400px;
     margin: 0 auto;
     padding: 20px;
-    background-image: url('../../images//header.jpg');
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0px 5px 40px rgb(0, 0, 0);
     position: relative;
     font-family: Arial, sans-serif;
-    background: rgb(27, 14, 31, 0.9);
 }
 
 h2 {
-
     text-align: center;
     margin-bottom: 20px;
     font-family: 'Comic Sans MS', sans-serif;
@@ -27,8 +25,8 @@ h2 {
 
 .image-button {
     padding: 10px 20px;
-    border: 1px solid #333;
-    background-color: rgb(168, 168, 168);
+    border: 1px solid #ffffff;
+    background-color: rgba(255, 255, 255, 0.76);
     border-radius: 5px;
     cursor: pointer;
 }
@@ -40,7 +38,7 @@ form input {
     border: 1px solid #ddd;
     border-radius: 5px;
     box-sizing: border-box;
-    background-color: rgb(82, 76, 83);
+    background-color: #f7fafc;
 }
 
 .buttons-container {
@@ -63,12 +61,11 @@ form input {
     position: absolute;
     right: -380px;
     top: 100px;
-    background: rgb(27, 14, 31, 0.9);
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.15);
-    background-image: linear-gradient(145deg, rgba(50, 50, 50, 0.7), rgba(0, 0, 0, 0.5));
+    box-shadow: 0px 5px 40px rgb(0, 0, 0);
     width: 350px;
     height: 300px;
     display: flex;
@@ -83,7 +80,7 @@ form input {
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 5px;
-    background-color: rgb(82, 76, 83);
+    background-color: rgba(255, 255, 255, 0.973);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -122,6 +119,6 @@ form input {
     background-color:  #e25568;
 }
 
-.discard-button:hover{
+.discard-button:hover {
     background-color:  #af3142;
 }
