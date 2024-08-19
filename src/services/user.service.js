@@ -1,6 +1,7 @@
 import { get, set, ref, query, equalTo, orderByChild, update, remove } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../config/firebase-config';
+import { auth, db, storage } from '../config/firebase-config';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
 
 // CREATE
 
@@ -39,12 +40,16 @@ export const getUserData = async (uid) => {
         if (!snapshot.exists()) {
             throw new Error('User not found');
         }
-        return snapshot.val();
+
+        const userData = snapshot.val();
+        const userKey = Object.keys(userData)[0];
+        return userData[userKey];
     } catch (error) {
         console.error('Error retrieving user data:', error);
         throw new Error('Failed to retrieve user data: ' + error.message);
     }
 };
+
 
 export const getPhoneNumber = async (phoneNumber) => {
     const phoneRef = query(ref(db, 'users'), orderByChild('phoneNumber'), equalTo(phoneNumber));
@@ -108,6 +113,36 @@ export const uploadUserAvatar = async (uid, imageFile) => {
     } catch (error) {
         console.error('Error uploading image:', error);
         throw new Error('Failed to upload image');
+    }
+};
+
+export const changeUserPassword = async (newPassword) => {
+    try {
+        const user = auth.currentUser;
+        if (user) {
+            await updatePassword(user, newPassword);
+        } else {
+            throw new Error('User is not authenticated');
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        throw new Error('Failed to change password: ' + error.message);
+    }
+};
+
+export const reauthenticateUser = async (password) => {
+    const user = auth.currentUser;
+    if (!user) {
+        throw new Error('User is not authenticated');
+    }
+
+    const credential = EmailAuthProvider.credential(user.email, password);
+
+    try {
+        await reauthenticateWithCredential(user, credential);
+    } catch (error) {
+        console.error('Error re-authenticating user:', error);
+        throw new Error('Failed to re-authenticate user: ' + error.message);
     }
 };
 
