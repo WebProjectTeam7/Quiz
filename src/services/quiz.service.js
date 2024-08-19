@@ -22,8 +22,6 @@ export const createQuiz = async (quiz) => {
     }
 };
 
-// UPLOAD IMAGE
-
 export const uploadQuizImage = async (quizId, file) => {
     try {
         const imageRef = storageRef(storage, `quizzes/${quizId}/${file.name}`);
@@ -48,7 +46,7 @@ export const getQuizById = async (quizId) => {
         return snapshot.val();
     } catch (error) {
         console.error('Error fetching quiz by ID:', error);
-        throw new Error('Failed to retrieve quiz', { cause: error });
+        throw new Error('Failed to retrieve quiz');
     }
 };
 
@@ -69,17 +67,17 @@ export const editQuiz = async (quizId, updatedData, newImageFile) => {
             }
             imageUrl = await uploadQuizImage(quizId, newImageFile);
         }
-        const updateQuiz = {
+        const updatedQuiz = {
             ...snapshot.val(),
             ...updatedData,
             imageUrl,
             updatedAt: new Date().toISOString(),
         };
-        await update(quizRef, updateQuiz);
-        return updateQuiz;
+        await update(quizRef, updatedQuiz);
+        return updatedQuiz;
     } catch (error) {
         console.error('Error updating quiz:', error);
-        throw new Error('Failed to update quiz', { cause: error });
+        throw new Error('Failed to update quiz');
     }
 };
 
@@ -99,7 +97,7 @@ export const deleteQuiz = async (quizId) => {
         }
         await remove(quizRef);
     } catch (error) {
-        console.error('Error deleting quiz', error);
-        throw new Error('Failed to delete quiz', { cause: error });
+        console.error('Error deleting quiz:', error);
+        throw new Error('Failed to delete quiz');
     }
 };
