@@ -75,4 +75,17 @@ export const uploadUserAvatar = async (uid, imageFile) => {
     }
 };
 
+export const getUserCount = async () => {
+    try {
+        const usersRef = query(ref(db, 'users'));
+        const snapshot = await get(usersRef);
+        if (!snapshot.exists()) {
+            return 0;
+        }
+        return Object.keys(snapshot.val()).length;
+    } catch (error) {
+        console.error('Error retrieving users count:', error);
+        throw new Error('Failed to retrieve users count: ' + error.message);
+    }
+};
 // DELETE
