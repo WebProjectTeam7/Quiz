@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -14,16 +13,32 @@ import {
     Heading,
     VStack,
     useDisclosure,
+    HStack,
 } from '@chakra-ui/react';
 import { AppContext } from '../../state/app.context';
 import CreateQuizModal from '../../components/CreateQuiz/CreateQuiz';
+import CreateOrganizationModal from '../../components/CreateOrganization/CreateOrganizationModal';
 import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/quiz.service';
+// import { createOrganization, joinOrganization, leaveOrganization } from '../../services/organization.service';
 
 export default function OrganizerDashboard() {
-    const { userData } = useContext(AppContext);
-    const [quizzes, setQuizzes] = useState([]);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { userData, setUserData } = useContext(AppContext);
     const navigate = useNavigate();
+
+    const {
+        isOpen: isQuizModalOpen,
+        onOpen: onQuizModalOpen,
+        onClose: onQuizModalClose,
+    } = useDisclosure();
+
+    const {
+        isOpen: isOrganizationModalOpen,
+        onOpen: onOrganizationModalOpen,
+        onClose: onOrganizationModalClose,
+    } = useDisclosure();
+
+    const [quizzes, setQuizzes] = useState([]);
+    const [organization, setOrganization] = useState(null);
 
     useEffect(() => {
         if (userData) {
@@ -55,15 +70,67 @@ export default function OrganizerDashboard() {
         navigate(`/quiz-preview/${quizId}`);
     };
 
+    const handleCreateOrganization = async () => {
+        try {
+            // const newOrg = await createOrganization({ name: "New Organization" });
+            // setUserData({ ...userData, organizationId: newOrg.id });
+        } catch (error) {
+            console.error('Error creating organization:', error);
+        }
+    };
+
+    const handleJoinOrganization = async () => {
+        try {
+            // await joinOrganization(orgId, userData.id);
+            // setUserData({ ...userData, organizationId: orgId });
+        } catch (error) {
+            console.error('Error joining organization:', error);
+        }
+    };
+
+    const handleLeaveOrganization = async () => {
+        try {
+            // await leaveOrganization(userData.organizationId, userData.id);
+            // setUserData({ ...userData, organizationId: null });
+        } catch (error) {
+            console.error('Error leaving organization:', error);
+        }
+    };
+
+    const handleOrganizationCreated = (newOrg) => {
+        setOrganization(newOrg);
+        // Update userData or other state if necessary
+    };
+
     return (
         <Box maxW="1200px" mx="auto" py={8} px={4}>
             <VStack spacing={4} align="start">
                 <Heading as="h2" size="lg">
                     Organizer Dashboard
                 </Heading>
-                <Button colorScheme="blue" onClick={onOpen}>
-                    Create New Quiz
-                </Button>
+                <HStack>
+                    <Button colorScheme="blue" onClick={onQuizModalOpen}>
+                        Create New Quiz
+                    </Button>
+
+                    {userData && userData.organizationId ? (
+                        <>
+                            <Button colorScheme="red" onClick={handleLeaveOrganization}>
+                                Leave Organization
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <Button colorScheme="green" onClick={onOrganizationModalOpen}>
+                                Create Organization
+                            </Button>
+                            <Button colorScheme="blue" onClick={handleJoinOrganization}>
+                                Join Organization
+                            </Button>
+
+                        </>
+                    )}
+                </HStack>
 
                 <Box w="full" mt={8}>
                     <Heading as="h3" size="md" mb={4}>
@@ -105,8 +172,14 @@ export default function OrganizerDashboard() {
 
             <CreateQuizModal
                 userId={userData?.id}
-                isOpen={isOpen}
-                onClose={onClose}
+                isOpen={isQuizModalOpen}
+                onClose={onQuizModalClose}
+            />
+            <CreateOrganizationModal
+                isOpen={isOrganizationModalOpen}
+                onClose={onOrganizationModalClose}
+                userId={userData?.id}
+                onOrganizationCreated={handleOrganizationCreated}
             />
         </Box>
     );
