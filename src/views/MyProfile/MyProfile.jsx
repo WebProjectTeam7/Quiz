@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../state/app.context';
-import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser } from '../../services/user.service';
+import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser, getOrganizerCodes, deleteOrganizerCode } from '../../services/user.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
@@ -26,6 +26,7 @@ export default function MyProfile() {
     const [showPasswordChange, setShowPasswordChange] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [organizerCode, setOrganizerCode] = useState('');
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -167,6 +168,55 @@ export default function MyProfile() {
         setAvatarPreviewUrl(URL.createObjectURL(file));
     };
 
+    const handleUseCode = async () => {
+        if (!organizerCode) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Code Entered',
+                text: 'Please enter an organizer code.',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
+        try {
+            const validCodes = await getOrganizerCodes();
+            if (validCodes.includes(organizerCode)) {
+                const updatedData = { ...formData, role: 'organizer' };
+                await updateUser(user.uid, updatedData);
+                await deleteOrganizerCode(organizerCode);
+                setAppState((prev) => ({
+                    ...prev,
+                    userData: updatedData,
+                }));
+                setFormData(updatedData);
+                setOrganizerCode('');
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Organizer Code Accepted',
+                    text: 'Your role has been upgraded to organizer!',
+                    confirmButtonText: 'OK',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Code',
+                    text: 'The organizer code is invalid.',
+                    confirmButtonText: 'OK',
+                });
+            }
+        } catch (error) {
+            console.error('Error using organizer code:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Code Error',
+                text: `Error using organizer code: ${error.message}`,
+                confirmButtonText: 'OK',
+            });
+        }
+    };
+
     if (!formData) return <div>Loading...</div>;
 
     return (
@@ -174,7 +224,7 @@ export default function MyProfile() {
             <Text fontSize="2xl" mb={4}>My Profile</Text>
             <Box className="profile-content">
                 <Box className="left-section">
-                    <StatusAvatar uid={user.uid} src={avatarPreviewUrl || formData.avatar} boxSize="100px" size="2xl" sx={{ width: '200px', height: '200px' }}mb={2} />
+                    <StatusAvatar uid={user.uid} src={avatarPreviewUrl || formData.avatar} boxSize="100px" size="2xl" sx={{ width: '200px', height: '200px' }} mb={2} />
                     <Input
                         type="file"
                         onChange={handleAvatarChange}
@@ -183,11 +233,12 @@ export default function MyProfile() {
                     />
                     <Button
                         colorScheme="blue"
+                        mt={4}
                         onClick={() => document.getElementById('avatar-upload').click()}
                     >
-                    Choose File
+                        Choose File
                     </Button>
-                    <Button variant="solid" colorScheme="yellow" onClick={() => setShowPasswordChange(!showPasswordChange)}>
+                    <Button variant="solid" colorScheme="yellow" mt={2} onClick={() => setShowPasswordChange(!showPasswordChange)}>
                         {showPasswordChange ? 'Cancel Password Change' : 'Change Password'}
                     </Button>
                     {showPasswordChange && (
@@ -211,6 +262,19 @@ export default function MyProfile() {
                             </Button>
                         </Box>
                     )}
+                    <Box display="flex" alignItems="center" mt="auto">
+                        <Input
+                            placeholder="Code"
+                            maxLength={5}
+                            value={organizerCode}
+                            onChange={(e) => setOrganizerCode(e.target.value)}
+                            width="120px"
+                            mr={2}
+                        />
+                        <Button colorScheme="blue" onClick={handleUseCode} size="sm">
+                                    Use Code
+                        </Button>
+                    </Box>
                 </Box>
                 <Box className="right-section">
                     <form onSubmit={saveChanges}>
@@ -287,13 +351,15 @@ export default function MyProfile() {
                             </Box>
                         </Stack>
                         <Divider my={2} />
-                        <Box className="button-container" mt={4}>
-                            <Button colorScheme="green" type="submit" className="right-section-save-button">
-                                Save
-                            </Button>
-                            <Button variant="solid" colorScheme="red" ml={2} onClick={discardChanges}>
-                                Discard Changes
-                            </Button>
+                        <Box className="button-container" mt={4} display="flex" justifyContent="space-between">
+                            <Box>
+                                <Button colorScheme="green" type="submit" className="right-section-save-button" size="sm">
+                                    Save
+                                </Button>
+                                <Button variant="solid" colorScheme="red" ml={2} onClick={discardChanges} size="sm">
+                                    Discard Changes
+                                </Button>
+                            </Box>
                         </Box>
                     </form>
                 </Box>
