@@ -3,7 +3,7 @@
 import './Quizzes.css';
 import { useNavigate } from 'react-router-dom';
 import Hexagon from '../../components/Hexagon/Hexagon';
-import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverFooter, Portal, Button, Input,Box, Flex, PopoverBody } from '@chakra-ui/react';
+import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverFooter, Portal, Button, Box, Flex, PopoverBody } from '@chakra-ui/react';
 import { useState } from 'react';
 
 export default function Quizzes() {

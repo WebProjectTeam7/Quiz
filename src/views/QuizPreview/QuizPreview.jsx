@@ -13,18 +13,23 @@ import {
     EditablePreview,
     useDisclosure,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { EditIcon, DeleteIcon, ArrowUpIcon, ArrowDownIcon } from '@chakra-ui/icons';
 import QuizAccessEnum from '../../common/access-enum';
 import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
 import CreateQuestion from '../../components/CreateQuestion/CreateQuestion';
+import QuestionPreview from '../../components/QuestionPreview/QuestionPreview';
+import { addQuestionToQuiz, getQuizById, removeQuestionFromQuiz } from '../../services/quiz.service';
+import { getQuestionById } from '../../services/question.service';
 
 export default function QuizPreview() {
+    const { quizId } = useParams();
     const [quiz, setQuiz] = useState({
         author: 'John Doe',
         type: QuizAccessEnum.PUBLIC,
-        imageFile: null,
+        imageUrl: null,
         title: 'Sample Quiz',
         description: 'This is a sample quiz description.',
         timesTried: 0,
@@ -35,52 +40,59 @@ export default function QuizPreview() {
         dateBegins: null,
         dateEnds: null,
         timeLimit: null,
-        questions: [
-            { id: 1, title: 'Question 1' },
-            { id: 2, title: 'Question 2' },
-        ],
     });
-    const [editField, setEditField] = useState('');
+    const [questions, setQuestions] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const handleEditField = (field) => {
-        setEditField(field);
+    useEffect(() => {
+        if (quizId) {
+            fetchQuiz(quizId);
+        }
+    }, [quizId]);
+
+    const fetchQuiz = async (quizId) => {
+        try {
+            const quiz = await getQuizById(quizId);
+            setQuiz(quiz);
+            const questionPromises = quiz.questions
+                ? quiz.questions.map(async (questionId) => await getQuestionById(questionId))
+                : [];
+            const fetchedQuestions = await Promise.all(questionPromises);
+            setQuestions(fetchedQuestions);
+        } catch (error) {
+            console.error('Failed to fetch quiz:', error);
+        }
     };
 
-    const handleSaveEditField = (field, value) => {
-        setQuiz((prevQuiz) => ({
-            ...prevQuiz,
-            [field]: value,
-        }));
-        setEditField('');
+    const handleAddQuestion = async (questionId) => {
+        try {
+            await addQuestionToQuiz(quizId, questionId);
+            const newQuestion = await getQuestionById(questionId);
+            setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
+        } catch (error) {
+            console.error('Error adding question:', error);
+        } finally {
+            onClose();
+        }
     };
 
-    const handleAddQuestion = (newQuestion) => {
-        setQuiz((prevQuiz) => ({
-            ...prevQuiz,
-            questions: [...prevQuiz.questions, newQuestion],
-        }));
-        onClose();
-    };
-
-    const handleRemoveQuestion = (questionId) => {
-        setQuiz((prevQuiz) => ({
-            ...prevQuiz,
-            questions: prevQuiz.questions.filter((q) => q.id !== questionId),
-        }));
+    const handleRemoveQuestion = async (questionId) => {
+        try {
+            await removeQuestionFromQuiz(quizId, questionId);
+            setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== questionId));
+        } catch (error) {
+            console.error('Error removing question:', error);
+        }
     };
 
     const handleMoveQuestion = (index, direction) => {
-        const updatedQuestions = [...quiz.questions];
+        const updatedQuestions = [...questions];
         const targetIndex = direction === 'up' ? index - 1 : index + 1;
 
         if (targetIndex >= 0 && targetIndex < updatedQuestions.length) {
             const [movedQuestion] = updatedQuestions.splice(index, 1);
             updatedQuestions.splice(targetIndex, 0, movedQuestion);
-            setQuiz((prevQuiz) => ({
-                ...prevQuiz,
-                questions: updatedQuestions,
-            }));
+            setQuestions(updatedQuestions);
         }
     };
 
@@ -90,31 +102,31 @@ export default function QuizPreview() {
                 <Heading as="h2" size="lg">Quiz Preview</Heading>
                 <Divider />
 
-                {quiz.imageFile && <Image src={URL.createObjectURL(quiz.imageFile)} alt="Quiz Image" />}
+                {quiz.imageUrl && <Image src={quiz.imageUrl} alt="Quiz Image" />}
 
                 <Editable
                     defaultValue={quiz.title}
-                    onSubmit={(value) => handleSaveEditField('title', value)}
+                    onSubmit={(value) => setQuiz({ ...quiz, title: value })}
                     isPreviewFocusable={false}
                 >
                     <HStack>
                         <Text fontSize="xl" fontWeight="bold">Title:</Text>
                         <EditablePreview />
                         <EditableInput />
-                        <IconButton icon={<EditIcon />} onClick={() => handleEditField('title')} />
+                        <IconButton icon={<EditIcon />} />
                     </HStack>
                 </Editable>
 
                 <Editable
                     defaultValue={quiz.description}
-                    onSubmit={(value) => handleSaveEditField('description', value)}
+                    onSubmit={(value) => setQuiz({ ...quiz, description: value })}
                     isPreviewFocusable={false}
                 >
                     <HStack>
                         <Text fontSize="xl" fontWeight="bold">Description:</Text>
                         <EditablePreview />
                         <EditableInput />
-                        <IconButton icon={<EditIcon />} onClick={() => handleEditField('description')} />
+                        <IconButton icon={<EditIcon />} />
                     </HStack>
                 </Editable>
 
@@ -132,26 +144,28 @@ export default function QuizPreview() {
 
                 <Heading as="h3" size="md">Questions</Heading>
                 <VStack align="start" w="full" spacing={4}>
-                    {quiz.questions.map((question, index) => (
-                        <HStack key={question.id} w="full" justify="space-between">
-                            <Text>{question.title}</Text>
-                            <HStack>
-                                <IconButton
-                                    icon={<ArrowUpIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'up')}
-                                    isDisabled={index === 0}
-                                />
-                                <IconButton
-                                    icon={<ArrowDownIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'down')}
-                                    isDisabled={index === quiz.questions.length - 1}
-                                />
-                                <IconButton
-                                    icon={<DeleteIcon />}
-                                    onClick={() => handleRemoveQuestion(question.id)}
-                                />
+                    {questions.map((question, index) => (
+                        <Box key={question.id} w="full">
+                            <QuestionPreview question={question} />
+                            <HStack justify="space-between" mt={2}>
+                                <HStack>
+                                    <IconButton
+                                        icon={<ArrowUpIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'up')}
+                                        isDisabled={index === 0}
+                                    />
+                                    <IconButton
+                                        icon={<ArrowDownIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'down')}
+                                        isDisabled={index === questions.length - 1}
+                                    />
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        onClick={() => handleRemoveQuestion(question.id)}
+                                    />
+                                </HStack>
                             </HStack>
-                        </HStack>
+                        </Box>
                     ))}
                 </VStack>
 
