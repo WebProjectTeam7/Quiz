@@ -1,4 +1,4 @@
-import { ref as dbRef, push, get, update, set, remove, query } from 'firebase/database';
+import { ref as dbRef, push, get, update, set, remove, query, orderByChild, equalTo } from 'firebase/database';
 import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
 
@@ -81,8 +81,8 @@ export const getQuizQuestionsIds = async (quizId) => {
 
 export const getQuizCount = async () => {
     try {
-        const threadsRef = query(dbRef(db, 'quizzes'));
-        const snapshot = await get(threadsRef);
+        const quizRef = query(dbRef(db, 'quizzes'));
+        const snapshot = await get(quizRef);
         if (!snapshot.exists()) {
             return 0;
         }
@@ -90,6 +90,36 @@ export const getQuizCount = async () => {
     } catch (error) {
         console.error('Error retrieving quizzes count:', error);
         throw new Error('Failed to retrieve quizzes count: ' + error.message);
+    }
+};
+
+export const getQuizzesByAuthor = async (username) => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const authorQuery = query(quizRef, orderByChild('author'), equalTo(username));
+        const snapshot = await get(authorQuery);
+        if (!snapshot.exists()) {
+            return [];
+        }
+        return snapshot.val();
+    } catch (error) {
+        console.error('Error retrieving quizzes by username:', error);
+        throw new Error('Failed to retrieve quizzes by username');
+    }
+};
+
+export const getQuizzesByOrganizationId = async (organizationId) => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const organizationQuery = query(quizRef, orderByChild('organizationId'), equalTo(organizationId));
+        const snapshot = await get(organizationQuery);
+        if (!snapshot.exists()) {
+            return [];
+        }
+        return snapshot.val();
+    } catch (error) {
+        console.error('Error retrieving quizzes by organization ID:', error);
+        throw new Error('Failed to retrieve quizzes by organization ID');
     }
 };
 

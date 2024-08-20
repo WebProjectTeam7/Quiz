@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -16,6 +17,7 @@ import {
 } from '@chakra-ui/react';
 import { AppContext } from '../../state/app.context';
 import CreateQuizModal from '../../components/CreateQuiz/CreateQuiz';
+import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/quiz.service';
 
 export default function OrganizerDashboard() {
     const { userData } = useContext(AppContext);
@@ -24,15 +26,26 @@ export default function OrganizerDashboard() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userData?.organizationId) {
+        if (userData) {
             fetchQuizzes();
         }
     }, [userData]);
 
     const fetchQuizzes = async () => {
         try {
-            // const fetchedQuizzes = await getOrganizationQuizzes(userData.organizationId);
-            // setQuizzes(fetchedQuizzes);
+            let fetchedQuizzes = [];
+
+            if (userData.organizationId) {
+                const quizzesByOrg = await getQuizzesByOrganizationId(userData.organizationId);
+                fetchedQuizzes = quizzesByOrg;
+            }
+            const quizzesByAuthor = await getQuizzesByAuthor(userData.username);
+            fetchedQuizzes = [...fetchedQuizzes, ...quizzesByAuthor];
+
+            const uniqueQuizzes = Array.from(
+                new Map(fetchedQuizzes.map(quiz => [quiz.id, quiz])).values()
+            );
+            setQuizzes(uniqueQuizzes);
         } catch (error) {
             console.error('Failed to fetch quizzes:', error);
         }
@@ -61,6 +74,7 @@ export default function OrganizerDashboard() {
                             <Tr>
                                 <Th>Title</Th>
                                 <Th>Description</Th>
+                                <Th>Author</Th>
                                 <Th>Category</Th>
                                 <Th>Created At</Th>
                                 <Th>Actions</Th>
@@ -71,6 +85,7 @@ export default function OrganizerDashboard() {
                                 <Tr key={quiz.id}>
                                     <Td>{quiz.title}</Td>
                                     <Td>{quiz.description}</Td>
+                                    <Td>{quiz.author}</Td>
                                     <Td>{quiz.category}</Td>
                                     <Td>{new Date(quiz.createdAt).toLocaleDateString()}</Td>
                                     <Td>
