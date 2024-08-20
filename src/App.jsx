@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppContext } from './state/app.context';
 import { auth } from './config/firebase-config';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { getUserData } from './services/user.service';
+import { getUserData, monitorUserStatus } from './services/user.service';
 import Header from './components/Header/Header';
 import Home from './views/Home/Home';
 import NotFound from './views/NotFound/NotFound';
@@ -52,6 +52,23 @@ export default function App() {
                 console.error(e.message);
             });
     }, [user, appState.user]);
+
+    useEffect(() => {
+        if (user) {
+            getUserData(user.uid)
+                .then((data) => {
+                    setAppState((prevState) => ({
+                        ...prevState,
+                        user,
+                        userData: data,
+                    }));
+                    monitorUserStatus(user.uid);
+                })
+                .catch((e) => {
+                    console.error('Error fetching user data:', e);
+                });
+        }
+    }, [user]);
 
 
     return (

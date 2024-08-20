@@ -3,12 +3,11 @@ import { Avatar, AvatarBadge } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 import { getUserStatus } from '../../services/user.service';
 
-const StatusAvatar = ({ uid, src, size }) => {
+const StatusAvatar = ({ uid, src = '', size = 'md' }) => {
     const [isOnline, setIsOnline] = useState(false);
 
     useEffect(() => {
         const unsubscribe = getUserStatus(uid, setIsOnline);
-
         return () => unsubscribe();
     }, [uid]);
 
@@ -23,10 +22,6 @@ StatusAvatar.propTypes = {
     uid: PropTypes.string.isRequired,
     src: PropTypes.string,
     size: PropTypes.string,
-};
-
-StatusAvatar.defaultProps = {
-    src: '',
 };
 
 export default StatusAvatar;

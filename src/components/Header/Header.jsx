@@ -11,7 +11,7 @@ export default function Header() {
 
 
     const logout = async () => {
-        await logoutUser();
+        await logoutUser(user.uid);
         setAppState({ user: null, userData: null });
         navigate('/login');
     };
@@ -26,7 +26,7 @@ export default function Header() {
                 <NavLink to="/quizzes">Quizzes</NavLink>
                 <NavLink to="/ranking">Ranking</NavLink>
                 <NavLink to="/tournament">Tournament</NavLink>
-                <NavLink to="/my-profile">My Profile</NavLink>
+                {user && <NavLink to="/my-profile">My Profile</NavLink>}
                 <NavLink to="organizer-dashboard">Organizer Dashboard</NavLink>
                 {user && <button onClick={logout}>Logout</button>}
             </nav>
