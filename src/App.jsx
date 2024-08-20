@@ -15,10 +15,10 @@ import { ChakraProvider, Button } from '@chakra-ui/react';
 import QuizOfTheWeek from './views/QuizOfTheWeek/QuizOfTheWeek';
 import QuizOfTheWeekDetail from './views/QuizOfTheWeekDetail/QuizOfTheWeekDetail';
 import Quizzes from './views/Quizzes/Quizzes';
-import CreateQuiz from './views/CreateQuiz/CreateQuiz';
 import MyProfile from './views/MyProfile/MyProfile';
 import QuizPreview from './views/QuizPreview/QuizPreview';
 import Ranking from './views/Ranking/Ranking';
+import OrganizerDashboard from './views/OrganizerDashboard/OrganizerDashboard';
 import Tournament from './views/Tournament/Tournament';
 
 export default function App() {
@@ -86,8 +86,8 @@ export default function App() {
                             <Route path="/my-profile" element={<MyProfile />} />
                             <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
                             <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />
-                            <Route path="/create-quiz" element={<CreateQuiz />} />
-                            <Route path="/quiz-preview" element={<QuizPreview />} />
+                            <Route path="/organizer-dashboard" element={<OrganizerDashboard />} />
+                            <Route path="/quiz-preview/:quizId" element={<QuizPreview />} />
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/tournament" element={<Tournament />} />
                             <Route path="*" element={<NotFound />} />

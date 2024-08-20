@@ -5,10 +5,14 @@ import { ref, onValue } from 'firebase/database';
 import { db } from '../../config/firebase-config';
 import './Ranking.css';
 import { FaCrown } from 'react-icons/fa';
+import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
+import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 
 const Ranking = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isModalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     const usersRef = ref(db, 'users');
@@ -38,8 +42,18 @@ const Ranking = () => {
     return null;
   };
 
+  const handleUserClick = (user) => {
+    setSelectedUser(user);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedUser(null);
+    setModalOpen(false);
+  };
+
   return (
-<VStack spacing={4} align="center" className="ranking-container">
+    <VStack spacing={4} align="center" className="ranking-container">
       <Heading as="h2" size="lg" className="ranking-title">
         Who is the best BI*CHES?
       </Heading>
@@ -49,6 +63,8 @@ const Ranking = () => {
           className={`ranking-box ${index < 3 ? 'top-three' : ''}`}
           borderColor={index < 3 ? 'purple.500' : 'gray.200'}
           borderWidth={index < 3 ? '2px' : '1px'}
+          onClick={() => handleUserClick(user)}
+          cursor="pointer"
         >
           <HStack spacing={4} className="ranking-item">
             <Text fontWeight="bold" fontSize="lg" className="ranking-index">
@@ -57,7 +73,7 @@ const Ranking = () => {
             {index < 3 && (
               <Icon as={FaCrown} color={getCrownColor(index)} w={6} h={6} />
             )}
-            <Avatar name={user.username} src={user.avatarUrl || ''} className="ranking-avatar" />
+            <StatusAvatar uid={user.uid} src={user.avatar || user.avatarUrl || ''} size="lg" />
             <VStack align="start" spacing={1} flex="1">
               <Text fontWeight="bold" className="ranking-name">
                 {user.username}
@@ -69,6 +85,13 @@ const Ranking = () => {
           </HStack>
         </Box>
       ))}
+      {selectedUser && (
+        <UserProfileModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          username={selectedUser.username}
+        />
+      )}
     </VStack>
   );
 };

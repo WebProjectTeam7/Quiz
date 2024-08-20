@@ -7,7 +7,6 @@ import {
     EditablePreview,
     Input,
     Stack,
-    Avatar,
     Text,
     Flex,
     Divider,
@@ -17,6 +16,7 @@ import { AppContext } from '../../state/app.context';
 import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser } from '../../services/user.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
+import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 
 export default function MyProfile() {
     const { user, userData, setAppState } = useContext(AppContext);
@@ -174,7 +174,7 @@ export default function MyProfile() {
             <Text fontSize="2xl" mb={4}>My Profile</Text>
             <Box className="profile-content">
                 <Box className="left-section">
-                    <Avatar src={avatarPreviewUrl || formData.avatar} boxSize="200px" mb={2} />
+                    <StatusAvatar uid={user.uid} src={avatarPreviewUrl || formData.avatar} boxSize="100px" size="2xl" sx={{ width: '200px', height: '200px' }}mb={2} />
                     <Input
                         type="file"
                         onChange={handleAvatarChange}

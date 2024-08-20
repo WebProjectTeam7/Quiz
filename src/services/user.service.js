@@ -1,4 +1,4 @@
-import { get, set, ref, query, equalTo, orderByChild, update, remove } from 'firebase/database';
+import { get, set, ref, query, equalTo, orderByChild, update, remove, onValue, onDisconnect } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '../config/firebase-config';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
@@ -85,6 +85,42 @@ export const getOrganizerCodes = async () => {
         console.error('Error retrieving organizer codes:', error);
         throw new Error('Failed to retrieve organizer codes: ' + error.message);
     }
+};
+
+export const monitorUserStatus = (uid) => {
+    const userStatusDatabaseRef = ref(db, `status/${uid}`);
+
+    const isOfflineForDatabase = {
+        state: 'offline',
+        last_changed: Date.now(),
+    };
+
+    const isOnlineForDatabase = {
+        state: 'online',
+        last_changed: Date.now(),
+    };
+
+    onValue(ref(db, '.info/connected'), (snapshot) => {
+        if (snapshot.val() === false) {
+            return;
+        }
+
+        onDisconnect(userStatusDatabaseRef).set(isOfflineForDatabase).then(() => {
+            set(userStatusDatabaseRef, isOnlineForDatabase);
+        });
+    });
+};
+
+export const getUserStatus = (uid, callback) => {
+    const userStatusDatabaseRef = ref(db, `status/${uid}`);
+
+    const unsubscribe = onValue(userStatusDatabaseRef, (snapshot) => {
+        const status = snapshot.val();
+        const isOnline = status && status.state === 'online';
+        callback(isOnline);
+    });
+
+    return unsubscribe;
 };
 
 // UPDATE

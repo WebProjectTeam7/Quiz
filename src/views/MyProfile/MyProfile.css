@@ -24,6 +24,7 @@
     background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
     border-radius: 10px;
     margin-right: 20px;
+    width: 100%;
 }
 
 .right-section {
@@ -58,4 +59,14 @@
 .password-change-container {
     margin-top: 20px;
     width: 100%;
+}
+
+.left-section .my-profile-avatar {
+    width: 200px !important;
+    height: 200px !important;
+    border-radius: 50%; /* Ensures it's a perfect circle */
+    object-fit: cover; /* Ensures the image scales properly */
+    margin-bottom: 16px; /* Space below the avatar */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow */
+    border: 3px solid #f2a900; /* Optional: Add a border to the avatar */
 }

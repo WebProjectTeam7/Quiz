@@ -18,6 +18,8 @@ import './LoginModal.css';
 import { loginUser } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { useState } from 'react';
+import { monitorUserStatus } from '../../services/user.service';
+import { auth } from '../../config/firebase-config';
 
 export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
     const [email, setEmail] = useState('');
@@ -28,11 +30,13 @@ export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
         setLoading(true);
         try {
             await loginUser(email, password);
+            const uid = auth.currentUser.uid;
             // Swal.fire({                                   //Strange error when
             //     icon: 'success',
             //     title: 'Login Successful',
             //     confirmButtonText: 'OK',
             // });
+            monitorUserStatus(uid);
             onClose();
         } catch (error) {
             // Swal.fire({

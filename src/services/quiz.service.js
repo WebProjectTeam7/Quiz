@@ -2,6 +2,7 @@ import { ref as dbRef, push, get, update, set, remove, query } from 'firebase/da
 import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
 
+
 // CREATE
 
 export const createQuiz = async (quiz) => {
@@ -10,7 +11,17 @@ export const createQuiz = async (quiz) => {
         const quizId = quizRef.key;
         const imageUrl = quiz.imageFile ? await uploadQuizImage(quizId, quiz.imageFile) : null;
         const newQuiz = {
-            ...quiz,
+            author: quiz.author,
+            type: quiz.type,
+            title: quiz.title,
+            description: quiz.description,
+            category: quiz.category,
+            timesPlayed: 0,
+            totalPoints: quiz.totalPoints,
+            difficulty: quiz.difficulty,
+            dateBegins: quiz.dateBegins,
+            dateEnds: quiz.dateEnds,
+            timeLimit: quiz.timeLimit,
             imageUrl,
             createdAt: new Date().toISOString(),
         };
@@ -34,6 +45,7 @@ export const uploadQuizImage = async (quizId, file) => {
     }
 };
 
+
 // RETRIEVE
 
 export const getQuizById = async (quizId) => {
@@ -47,6 +59,23 @@ export const getQuizById = async (quizId) => {
     } catch (error) {
         console.error('Error fetching quiz by ID:', error);
         throw new Error('Failed to retrieve quiz');
+    }
+};
+
+export const getQuizQuestionsIds = async (quizId) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+        const snapshot = await get(quizRef);
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+        const quizData = snapshot.val();
+        const questions = quizData.questions || [];
+
+        return questions;
+    } catch (error) {
+        console.error('Error fetching questions ids from quiz', error);
+        throw new Error('Failed to retrieve questions ids from quiz');
     }
 };
 
@@ -95,6 +124,43 @@ export const editQuiz = async (quizId, updatedData, newImageFile) => {
         throw new Error('Failed to update quiz');
     }
 };
+
+export const addQuestionToQuiz = async (quizId, questionId) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+        const snapshot = await get(quizRef);
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+        const quizData = snapshot.val();
+        const questions = quizData.questions || [];
+        if (!questions.includes(questionId)) {
+            questions.push(questionId);
+        }
+        await update(quizRef, { questions });
+    } catch (error) {
+        console.error('Error adding question to quiz:', error);
+        throw new Error('Failed to add question to quiz');
+    }
+};
+
+export const removeQuestionFromQuiz = async (quizId, questionId) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+        const snapshot = await get(quizRef);
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+        const quizData = snapshot.val();
+        const questions = quizData.questions || [];
+        const updatedQuestions = questions.filter(id => id !== questionId);
+        await update(quizRef, { questions: updatedQuestions });
+    } catch (error) {
+        console.error('Error removing question from quiz:', error);
+        throw new Error('Failed to remove question from quiz');
+    }
+};
+
 
 // DELETE
 
