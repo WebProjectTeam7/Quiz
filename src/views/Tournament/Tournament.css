@@ -1,45 +1,137 @@
-/* src/components/Tournament/Tournament.css */
-
 .tournament-container {
-    padding: 20px;
-    text-align: center;
-  }
-  
-  .tournament-details {
-    margin-top: 20px;
-    padding: 20px;
-    border: 2px solid #3182CE;
-    border-radius: 10px;
-    background-color: #f7fafc;
-  }
-  
-  .tournament-title {
-    font-size: 24px;
-    font-weight: bold;
-    color: #2D3748;
-    margin-bottom: 20px;
-  }
-  
-  .players-list {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-  }
-  
-  .player-card {
-    background-color: #68D391;
-    padding: 15px;
-    border-radius: 10px;
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    width: 100px;
-    text-align: center;
-  }
-  
-  .quiz-title {
-    font-size: 20px;
-    color: #2D3748;
-    margin-bottom: 20px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.tournament-details {
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tournament-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.player-card {
+  padding: 1rem;
+  margin: 0.5rem;
+  border-radius: 8px;
+  width: 80%;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #4a90e2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.player-card:nth-child(1) {
+  background-color: #ff5722;
+}
+
+.player-card:nth-child(2) {
+  background-color: #4caf50;
+}
+
+.player-card:nth-child(3) {
+  background-color: #2196f3;
+}
+
+.player-card:nth-child(4) {
+  background-color: #9c27b0;
+}
+
+.player-card::after {
+  content: "Player " attr(data-index) ": " attr(data-username);
+  display: block;
+  font-weight: normal;
+  margin-top: 0.5rem;
+}
+
+.quiz-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin: 1.5rem 0;
+  text-align: center;
+  color: #333;
+}
+
+button {
+  border-radius: 8px;
+  font-weight: bold;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button[colorScheme="blue"] {
+  background-color: #3182ce;
+  color: #ffffff;
+  border: 2px solid #3182ce;
+  margin-bottom: 1rem;
+}
+
+button[colorScheme="blue"]:hover {
+  background-color: #2b6cb0;
+  border-color: #2b6cb0;
+}
+
+button[colorScheme="blue"]:active {
+  background-color: #2c5282;
+  border-color: #2c5282;
+}
+
+button[colorScheme="teal"] {
+  background-color: #38a169;
+  color: #ffffff;
+  border: 2px solid #38a169;
+  margin-bottom: 1rem;
+}
+
+button[colorScheme="teal"]:hover {
+  background-color: #2f855a;
+  border-color: #2f855a;
+}
+
+button[colorScheme="teal"]:active {
+  background-color: #276749;
+  border-color: #276749;
+}
+
+button[colorScheme="red"] {
+  background-color: #e53e3e;
+  color: #ffffff;
+  border: 2px solid #e53e3e;
+}
+
+button[colorScheme="red"]:hover {
+  background-color: #c53030;
+  border-color: #c53030;
+}
+
+button[colorScheme="red"]:active {
+  background-color: #a13a3a;
+  border-color: #a13a3a;
+}
+
+button[colorScheme="red"].back-button {
+  margin-top: 1rem;
+}

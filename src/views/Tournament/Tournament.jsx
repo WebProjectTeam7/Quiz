@@ -1,28 +1,55 @@
+/* eslint-disable spaced-comment */
 /* eslint-disable indent */
-/* eslint-disable quotes */
-// src/components/Tournament/Tournament.js
 import { useState, useEffect } from 'react';
-import { Box, Button, Flex, Text, useToast } from '@chakra-ui/react';
+import { Box, Button, Flex, Text, useToast, Spinner } from '@chakra-ui/react';
+import { ref, get } from 'firebase/database';
+import { db } from '../../config/firebase-config';
 import './Tournament.css';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Tournament() {
   const [players, setPlayers] = useState([]);
   const [tournamentGroup, setTournamentGroup] = useState(null);
   const [quiz, setQuiz] = useState(null);
   const [isTournamentStarted, setIsTournamentStarted] = useState(false);
+  const [loading, setLoading] = useState(true);
   const toast = useToast();
+  const navigate = useNavigate();
+
+  const fetchUsers = async () => {
+    try {
+      const usersRef = ref(db, 'users');
+      const snapshot = await get(usersRef);
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const usersArray = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
+        usersArray.sort((a, b) => b.points - a.points);
+        setPlayers(usersArray);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRandomQuiz = async () => {
+    try {
+      const response = await fetch(''); // will add the path after create all quizzes
+      const quizzes  = await response.json();
+      const randomQuiz = quizzes[Math.floor(Math.random() * quizzes.length)];
+      setQuiz(randomQuiz.title);
+    } catch (error) {
+      console.error('Error fetching random quiz:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchedPlayers = ['Player1', 'Player2', 'Player3', 'Player4', 'Player5', 'Player6', 'Player7', 'Player8'];
-    setPlayers(fetchedPlayers);
+    fetchUsers();
   }, []);
-
-  const fetchRandomQuiz = () => {
-    const quizzes = ['Quiz A', 'Quiz B', 'Quiz C', 'Quiz D'];
-    const randomQuiz = quizzes[Math.floor(Math.random() * quizzes.length)];
-    setQuiz(randomQuiz);
-  };
 
   const startTournament = () => {
     const group = players.slice(0, 4);
@@ -33,37 +60,43 @@ export default function Tournament() {
 
   const handleQuizStart = () => {
     toast({
-      title: "Quiz started!",
-      description: "You have started the assigned quiz.",
-      status: "success",
+      title: 'Quiz started!',
+      description: 'You have started the assigned quiz.',
+      status: 'success',
       duration: 3000,
       isClosable: true,
     });
   };
 
-  return  (
-        <Box className="tournament-container">
-          {!isTournamentStarted && (
-            <Button colorScheme="blue" onClick={startTournament}>Start Tournament</Button>
-          )}
+  if (loading) {
+    return <Spinner size="xl" />;
+  }
 
-          {isTournamentStarted && tournamentGroup && (
-            <Box className="tournament-details">
-              <Text className="tournament-title">Are you ready?</Text>
-              <Flex className="players-list">
-                {tournamentGroup.map((player, index) => (
-                  <Box key={index} className="player-card">
-                    {player}
-                  </Box>
-                ))}
-              </Flex>
-              <Text className="quiz-title">Assigned Quiz: {quiz}</Text>
-              <Button colorScheme="teal" onClick={handleQuizStart}>Start</Button>
-              <Button colorScheme="red" onClick={() => Navigate('/quizzes')} mt={4}>
-                Back
-              </Button>
-            </Box>
-          )}
+  return (
+    <Box className="tournament-container">
+      {!isTournamentStarted && (
+        <Button colorScheme="blue" onClick={startTournament}>Start Tournament</Button>
+      )}
+
+      {isTournamentStarted && tournamentGroup && (
+        <Box className="tournament-details">
+          <Text className="tournament-title">Are you ready?</Text>
+          <Flex className="players-list">
+            {tournamentGroup.map((player) => (
+              <Box key={player.id}
+              className="player-card"
+              data-index={tournamentGroup.indexOf(player) + 1}>
+                {player.username}
+              </Box>
+            ))}
+          </Flex>
+          <Text className="quiz-title">Assigned Quiz: Трябва да се добави съответния куиз{/*{quiz ? quiz : 'Loading...'}*/}</Text>
+          <Button colorScheme="teal" onClick={handleQuizStart}>Start</Button>
+          <Button colorScheme="red" onClick={() => navigate('/tournament')} mt={4}>
+            Back
+          </Button>
         </Box>
-      );
+      )}
+    </Box>
+  );
 }
