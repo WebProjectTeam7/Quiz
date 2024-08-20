@@ -1,0 +1,45 @@
+/* src/components/Tournament/Tournament.css */
+
+.tournament-container {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .tournament-details {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px solid #3182CE;
+    border-radius: 10px;
+    background-color: #f7fafc;
+  }
+  
+  .tournament-title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2D3748;
+    margin-bottom: 20px;
+  }
+  
+  .players-list {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  
+  .player-card {
+    background-color: #68D391;
+    padding: 15px;
+    border-radius: 10px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    width: 100px;
+    text-align: center;
+  }
+  
+  .quiz-title {
+    font-size: 20px;
+    color: #2D3748;
+    margin-bottom: 20px;
+  }
+  

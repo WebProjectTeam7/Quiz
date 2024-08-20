@@ -19,6 +19,7 @@ import CreateQuiz from './views/CreateQuiz/CreateQuiz';
 import MyProfile from './views/MyProfile/MyProfile';
 import QuizPreview from './views/QuizPreview/QuizPreview';
 import Ranking from './views/Ranking/Ranking';
+import Tournament from './views/Tournament/Tournament';
 
 export default function App() {
 
@@ -88,6 +89,7 @@ export default function App() {
                             <Route path="/create-quiz" element={<CreateQuiz />} />
                             <Route path="/quiz-preview" element={<QuizPreview />} />
                             <Route path="/ranking" element={<Ranking />} />
+                            <Route path="/tournament" element={<Tournament />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </div>
