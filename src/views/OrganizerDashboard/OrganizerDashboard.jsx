@@ -22,7 +22,7 @@ import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/q
 // import { createOrganization, joinOrganization, leaveOrganization } from '../../services/organization.service';
 
 export default function OrganizerDashboard() {
-    const { userData, setUserData } = useContext(AppContext);
+    const { userData } = useContext(AppContext);
     const navigate = useNavigate();
 
     const {
@@ -99,7 +99,6 @@ export default function OrganizerDashboard() {
 
     const handleOrganizationCreated = (newOrg) => {
         setOrganization(newOrg);
-        // Update userData or other state if necessary
     };
 
     return (
@@ -171,14 +170,14 @@ export default function OrganizerDashboard() {
             </VStack>
 
             <CreateQuizModal
-                userId={userData?.id}
+                username={userData?.username}
                 isOpen={isQuizModalOpen}
                 onClose={onQuizModalClose}
             />
             <CreateOrganizationModal
                 isOpen={isOrganizationModalOpen}
                 onClose={onOrganizationModalClose}
-                userId={userData?.id}
+                username={userData?.username}
                 onOrganizationCreated={handleOrganizationCreated}
             />
         </Box>

@@ -101,13 +101,16 @@ export const getQuizzesByAuthor = async (username) => {
         if (!snapshot.exists()) {
             return [];
         }
-        return snapshot.val();
+        const quizzes = snapshot.val();
+        return Object.keys(quizzes).map(key => ({
+            id: key,
+            ...quizzes[key]
+        }));
     } catch (error) {
         console.error('Error retrieving quizzes by username:', error);
         throw new Error('Failed to retrieve quizzes by username');
     }
 };
-
 export const getQuizzesByOrganizationId = async (organizationId) => {
     try {
         const quizRef = dbRef(db, 'quizzes');
@@ -126,25 +129,16 @@ export const getQuizzesByOrganizationId = async (organizationId) => {
 
 // UPDATE
 
-export const editQuiz = async (quizId, updatedData, newImageFile) => {
+export const editQuiz = async (quizId, updatedData) => {
     try {
         const quizRef = dbRef(db, `quizzes/${quizId}`);
         const snapshot = await get(quizRef);
         if (!snapshot.exists()) {
             throw new Error('Quiz not found');
         }
-        let imageUrl = snapshot.val().imageUrl;
-        if (newImageFile) {
-            if (imageUrl) {
-                const oldImageRef = storageRef(storage, imageUrl);
-                await deleteObject(oldImageRef);
-            }
-            imageUrl = await uploadQuizImage(quizId, newImageFile);
-        }
         const updatedQuiz = {
             ...snapshot.val(),
             ...updatedData,
-            imageUrl,
             updatedAt: new Date().toISOString(),
         };
         await update(quizRef, updatedQuiz);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -23,13 +23,13 @@ import QuizDifficultyEnum from '../../common/difficulty.enum';
 import { createQuiz } from '../../services/quiz.service';
 import { useNavigate } from 'react-router-dom';
 
-export default function CreateQuiz({ userId, isOpen, onClose }) {
+export default function CreateQuiz({ username, isOpen, onClose }) {
     const navigate = useNavigate();
 
     const [useDateRange, setUseDateRange] = useState(false);
     const [useTimeLimit, setUseTimeLimit] = useState(false);
     const [quiz, setQuiz] = useState({
-        author: '',
+        author: username,
         type: QuizAccessEnum.PUBLIC,
         imageFile: null,
         title: '',
@@ -65,7 +65,7 @@ export default function CreateQuiz({ userId, isOpen, onClose }) {
                 dateBegins: useDateRange ? quiz.dateBegins : null,
                 dateEnds: useDateRange ? quiz.dateEnds : null,
                 timeLimit: useTimeLimit ? quiz.timeLimit : null,
-                author: userId || 'anonymous',
+                author: username || 'anonymous',
             };
             const quizId = await createQuiz(newQuiz);
             navigate(`/quiz-preview/${quizId}`);

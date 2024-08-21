@@ -2,7 +2,6 @@ import {
     Box,
     Text,
     VStack,
-    HStack,
     RadioGroup,
     Radio,
     Input,
@@ -19,7 +18,7 @@ export default function QuestionPreview({ question }) {
     const [isCorrect, setIsCorrect] = useState(null);
 
     const handleCheckAnswer = () => {
-        if (question.options.length > 0) {
+        if (question.options && question.options.length > 1) {
             setIsCorrect(selectedOption === question.answer);
         } else {
             setIsCorrect(userInput.trim().toLowerCase() === question.answer.trim().toLowerCase());
@@ -40,17 +39,15 @@ export default function QuestionPreview({ question }) {
                         />
                     </Box>
                 )}
-                {question.options.length > 0 ? (
+                {question.options && question.options.length > 1 ? (
                     <FormControl as="fieldset">
                         <FormLabel as="legend">Choose the correct option:</FormLabel>
                         <RadioGroup onChange={setSelectedOption} value={selectedOption}>
-                            <VStack align="start">
-                                {question.options.map((option, index) => (
-                                    <Radio key={index} value={option}>
-                                        {String.fromCharCode(97 + index)}. {option}
-                                    </Radio>
-                                ))}
-                            </VStack>
+                            {question.options.map((option, index) => (
+                                <Radio key={index} value={option}>
+                                    {String.fromCharCode(97 + index)}. {option}
+                                </Radio>
+                            ))}
                         </RadioGroup>
                     </FormControl>
                 ) : (
@@ -80,8 +77,8 @@ QuestionPreview.propTypes = {
     question: PropTypes.shape({
         title: PropTypes.string.isRequired,
         description: PropTypes.string.isRequired,
-        imageUrl: PropTypes.object,
-        options: PropTypes.arrayOf(PropTypes.string).isRequired,
+        imageUrl: PropTypes.string,
+        options: PropTypes.arrayOf(PropTypes.string),
         answer: PropTypes.string.isRequired,
     }).isRequired,
 };
