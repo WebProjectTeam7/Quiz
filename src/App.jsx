@@ -45,7 +45,7 @@ export default function App() {
         if (!appState.user) return;
         getUserData(appState.user.uid)
             .then((data) => {
-                const userData = data[Object.keys(data)[0]];
+                const userData = data;
                 setAppState({ ...appState, userData });
             })
             .catch((e) => {
