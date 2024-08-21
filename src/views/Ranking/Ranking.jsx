@@ -7,12 +7,15 @@ import './Ranking.css';
 import { FaCrown } from 'react-icons/fa';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
+import Pagination from '../../components/Pagination/Pagination';
+import { PER_PAGE } from '../../common/components.constants';
 
 const Ranking = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const usersRef = ref(db, 'users');
@@ -52,12 +55,21 @@ const Ranking = () => {
     setModalOpen(false);
   };
 
+  const totalPages = Math.ceil(users.length / PER_PAGE);
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
+  const startIndex = (currentPage - 1) * PER_PAGE;
+  const currentUsers = users.slice(startIndex, startIndex + PER_PAGE);
+
   return (
     <VStack spacing={4} align="center" className="ranking-container">
       <Heading as="h2" size="lg" className="ranking-title">
         Who is the best BI*CHES?
       </Heading>
-      {users.map((user, index) => (
+      {currentUsers.map((user, index) => (
         <Box
           key={user.id}
           className={`ranking-box ${index < 3 ? 'top-three' : ''}`}
@@ -68,9 +80,9 @@ const Ranking = () => {
         >
           <HStack spacing={4} className="ranking-item">
             <Text fontWeight="bold" fontSize="lg" className="ranking-index">
-              {index + 1}.
+              {startIndex + index + 1}.
             </Text>
-            {index < 3 && (
+            {startIndex + index < 3 && (
               <Icon as={FaCrown} color={getCrownColor(index)} w={6} h={6} />
             )}
             <StatusAvatar uid={user.uid} src={user.avatar || user.avatarUrl || ''} size="lg" />
@@ -85,6 +97,11 @@ const Ranking = () => {
           </HStack>
         </Box>
       ))}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
       {selectedUser && (
         <UserProfileModal
           isOpen={isModalOpen}
