@@ -25,7 +25,7 @@ import QuizDifficultyEnum from '../../common/difficulty.enum';
 import CreateQuestion from '../../components/CreateQuestion/CreateQuestion';
 import QuestionPreview from '../../components/QuestionPreview/QuestionPreview';
 import { addQuestionToQuiz, getQuizById, removeQuestionFromQuiz, editQuiz } from '../../services/quiz.service';
-import { getQuestionById } from '../../services/question.service';
+import { getQuestionById, getQuestionsByQuizId } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 
@@ -40,11 +40,11 @@ export default function QuizPreview() {
         timesTried: 0,
         scoreboard: [],
         category: QuizCategoryEnum.GENERAL,
-        totalPoints: 100,
+        totalPoints: 0,
         difficulty: QuizDifficultyEnum.MEDIUM,
         dateBegins: null,
         dateEnds: null,
-        timeLimit: null,
+        timeLimit: 0,
     });
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
@@ -58,13 +58,12 @@ export default function QuizPreview() {
 
     const fetchQuiz = async (quizId) => {
         try {
-            const quiz = await getQuizById(quizId);
-            setQuiz(quiz);
-            const questionPromises = quiz.questions
-                ? quiz.questions.map(async (questionId) => await getQuestionById(questionId))
-                : [];
-            const fetchedQuestions = await Promise.all(questionPromises);
-            setQuestions(fetchedQuestions);
+            const fetchedQuiz = await getQuizById(quizId);
+            setQuiz(fetchedQuiz);
+            if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
+                const fetchedQuestions = await getQuestionsByQuizId(quizId);
+                setQuestions(fetchedQuestions);
+            }
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
         }
@@ -136,7 +135,7 @@ export default function QuizPreview() {
                 {quiz.imageUrl && <Image src={quiz.imageUrl} alt="Quiz Image" />}
 
                 <Editable
-                    defaultValue={quiz.title}
+                    value={quiz.title}
                     onSubmit={(value) => setQuiz({ ...quiz, title: value })}
                     isPreviewFocusable={false}
                 >
@@ -149,7 +148,7 @@ export default function QuizPreview() {
                 </Editable>
 
                 <Editable
-                    defaultValue={quiz.description}
+                    value={quiz.description}
                     onSubmit={(value) => setQuiz({ ...quiz, description: value })}
                     isPreviewFocusable={false}
                 >
@@ -212,13 +211,15 @@ export default function QuizPreview() {
                 <HStack>
                     <Text fontSize="xl" fontWeight="bold">Total Points:</Text>
                     <Editable
-                        defaultValue={quiz.totalPoints.toString()}
+                        value={quiz.totalPoints.toString()}
                         onSubmit={(value) => setQuiz({ ...quiz, totalPoints: parseInt(value, 10) })}
                         isPreviewFocusable={false}
                     >
-                        <EditablePreview />
-                        <EditableInput type="number" />
-                        <EditableControls />
+                        <HStack>
+                            <EditablePreview />
+                            <EditableInput type="number" />
+                            <EditableControls />
+                        </HStack>
                     </Editable>
                 </HStack>
 
@@ -240,13 +241,15 @@ export default function QuizPreview() {
                 <HStack>
                     <Text fontSize="xl" fontWeight="bold">Time Limit (minutes):</Text>
                     <Editable
-                        defaultValue={quiz.timeLimit ? quiz.timeLimit.toString() : ''}
-                        onSubmit={(value) => setQuiz({ ...quiz, timeLimit: parseInt(value, 10) })}
+                        value={quiz.timeLimit ? quiz.timeLimit.toString() : ''}
+                        onSubmit={(value) => setQuiz({ ...quiz, timeLimit: value })}
                         isPreviewFocusable={false}
                     >
-                        <EditablePreview />
-                        <EditableInput type="number" />
-                        <EditableControls />
+                        <HStack>
+                            <EditablePreview />
+                            <EditableInput type="number" />
+                            <EditableControls />
+                        </HStack>
                     </Editable>
                 </HStack>
 
@@ -259,7 +262,7 @@ export default function QuizPreview() {
                 </Button>
 
                 <VStack spacing={4} align="start">
-                    {questions.map((question, index) => (
+                    {questions.length > 0  && questions.map((question, index) => (
                         <Box key={question.id} borderWidth={1} p={4} borderRadius="md">
                             <HStack spacing={4} align="center">
                                 <IconButton
@@ -284,7 +287,7 @@ export default function QuizPreview() {
                 </VStack>
             </VStack>
 
-            <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} />
+            <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
         </Box>
     );
 }
