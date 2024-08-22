@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
 import { logoutUser } from '../../services/auth.service';
 import './Header.css';
-
+import Swal from 'sweetalert2';
 
 export default function Header() {
     const { user, userData, setAppState } = useContext(AppContext);
@@ -11,9 +11,20 @@ export default function Header() {
 
 
     const logout = async () => {
-        await logoutUser(user.uid);
-        setAppState({ user: null, userData: null });
-        navigate('/login');
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You will be logged out of your account.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, log me out!',
+            cancelButtonText: 'Cancel',
+        });
+
+        if (result.isConfirmed) {
+            await logoutUser(user.uid);
+            setAppState({ user: null, userData: null });
+            navigate('/login');
+        }
     };
 
 
