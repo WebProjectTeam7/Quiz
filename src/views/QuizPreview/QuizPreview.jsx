@@ -15,6 +15,7 @@ import {
     Input,
     Image,
     EditableTextarea,
+    Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
@@ -136,27 +137,27 @@ export default function QuizPreview() {
 
                 <Editable
                     value={quiz.title}
-                    onSubmit={(value) => setQuiz({ ...quiz, title: value })}
+                    onChange={(value) => setQuiz({ ...quiz, title: value })}
                     isPreviewFocusable={false}
                 >
                     <HStack>
                         <Text fontSize="xl" fontWeight="bold">Title:</Text>
                         <EditablePreview />
                         <EditableInput />
-                        <EditableControls />
+                        <EditableControls/>
                     </HStack>
                 </Editable>
 
                 <Editable
                     value={quiz.description}
-                    onSubmit={(value) => setQuiz({ ...quiz, description: value })}
+                    onChange={(value) => setQuiz({ ...quiz, description: value })}
                     isPreviewFocusable={false}
                 >
                     <HStack>
                         <Text fontSize="xl" fontWeight="bold">Description:</Text>
                         <EditablePreview />
                         <EditableTextarea />
-                        <EditableControls />
+                        <EditableControls/>
                     </HStack>
                 </Editable>
 
@@ -212,12 +213,12 @@ export default function QuizPreview() {
                     <Text fontSize="xl" fontWeight="bold">Total Points:</Text>
                     <Editable
                         value={quiz.totalPoints.toString()}
-                        onSubmit={(value) => setQuiz({ ...quiz, totalPoints: parseInt(value, 10) })}
+                        onChange={(value) => setQuiz({ ...quiz, totalPoints: parseInt(value, 10) })}
                         isPreviewFocusable={false}
                     >
                         <HStack>
                             <EditablePreview />
-                            <EditableInput type="number" />
+                            <EditableInput type='number'/>
                             <EditableControls />
                         </HStack>
                     </Editable>
@@ -242,7 +243,7 @@ export default function QuizPreview() {
                     <Text fontSize="xl" fontWeight="bold">Time Limit (minutes):</Text>
                     <Editable
                         value={quiz.timeLimit ? quiz.timeLimit.toString() : ''}
-                        onSubmit={(value) => setQuiz({ ...quiz, timeLimit: value })}
+                        onChange={(value) => setQuiz({ ...quiz, timeLimit: value })}
                         isPreviewFocusable={false}
                     >
                         <HStack>
@@ -262,9 +263,10 @@ export default function QuizPreview() {
                 </Button>
 
                 <VStack spacing={4} align="start">
-                    {questions.length > 0  && questions.map((question, index) => (
-                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md">
-                            <HStack spacing={4} align="center">
+                    {questions.length > 0 ? questions.map((question, index) => (
+                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
+                            <QuestionPreview question={question} />
+                            <HStack mt={2} spacing={4}>
                                 <IconButton
                                     icon={<ArrowUpIcon />}
                                     onClick={() => handleMoveQuestion(index, 'up')}
@@ -275,15 +277,14 @@ export default function QuizPreview() {
                                     onClick={() => handleMoveQuestion(index, 'down')}
                                     isDisabled={index === questions.length - 1}
                                 />
-                                <Text>{question.text}</Text>
                                 <IconButton
                                     icon={<DeleteIcon />}
+                                    colorScheme="red"
                                     onClick={() => handleRemoveQuestion(question.id)}
                                 />
                             </HStack>
-                            <QuestionPreview question={question} />
                         </Box>
-                    ))}
+                    )) : <Text>No questions added yet.</Text>}
                 </VStack>
             </VStack>
 
