@@ -75,7 +75,7 @@ export default function Tournament() {
   return (
     <Box className="tournament-container">
       {!isTournamentStarted && (
-        <Button colorScheme="blue" onClick={startTournament}>Start Tournament</Button>
+        <Button colorScheme="blue" onClick={startTournament}>Start Game</Button>
       )}
 
       {isTournamentStarted && tournamentGroup && (
