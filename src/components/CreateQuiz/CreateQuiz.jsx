@@ -31,7 +31,6 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
     const [quiz, setQuiz] = useState({
         author: username,
         type: QuizAccessEnum.PUBLIC,
-        imageFile: null,
         title: '',
         description: '',
         category: QuizCategoryEnum.GENERAL,
@@ -47,13 +46,6 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
             ...quiz,
             [prop]: e.target.value,
         });
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setQuiz({ ...quiz, imageFile: file });
-        }
     };
 
     const handleSubmit = async (e) => {
@@ -84,10 +76,6 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={4}>
-                            <FormControl id="imageFile">
-                                <FormLabel>Quiz Image</FormLabel>
-                                <input type="file" onChange={handleFileChange} />
-                            </FormControl>
 
                             <FormControl id="title" isRequired>
                                 <FormLabel>Title</FormLabel>

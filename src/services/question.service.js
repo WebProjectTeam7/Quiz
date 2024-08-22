@@ -1,4 +1,4 @@
-import { ref as dbRef, push, get, update, set, remove } from 'firebase/database';
+import { ref as dbRef, push, get, update, set, remove, query, orderByChild, equalTo } from 'firebase/database';
 import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
 
@@ -44,6 +44,27 @@ export const getQuestionById = async (questionId) => {
             return null;
         }
         return snapshot.val();
+    } catch (error) {
+        console.error('Error fetching question by ID:', error);
+        throw new Error('Failed to retrieve question', { cause: error });
+    }
+};
+
+export const getQuestionsByQuizId = async (quizId) => {
+    try {
+        const questionsRef = dbRef(db, 'questions');
+        const questionsQuery = query(questionsRef, orderByChild('quizId'), equalTo(quizId));
+        const snapshot = await get(questionsRef, questionsQuery);
+        if (!snapshot.exists()) {
+            return null;
+        }
+        const questionsObject = snapshot.val();
+        const questionsArray = Object.keys(questionsObject).map((key) => ({
+            id: key,
+            ...questionsObject[key]
+        }));
+
+        return questionsArray;
     } catch (error) {
         console.error('Error fetching question by ID:', error);
         throw new Error('Failed to retrieve question', { cause: error });

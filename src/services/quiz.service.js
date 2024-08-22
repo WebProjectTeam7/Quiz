@@ -1,5 +1,5 @@
 import { ref as dbRef, push, get, update, set, remove, query, orderByChild, equalTo } from 'firebase/database';
-import { ref as storageRef, uploadBytes, deleteObject, getDownloadURL } from 'firebase/storage';
+import { ref as storageRef, deleteObject } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
 
 
@@ -9,20 +9,8 @@ export const createQuiz = async (quiz) => {
     try {
         const quizRef = push(dbRef(db, 'quizzes'));
         const quizId = quizRef.key;
-        const imageUrl = quiz.imageFile ? await uploadQuizImage(quizId, quiz.imageFile) : null;
         const newQuiz = {
-            author: quiz.author,
-            type: quiz.type,
-            title: quiz.title,
-            description: quiz.description,
-            category: quiz.category,
-            timesPlayed: 0,
-            totalPoints: quiz.totalPoints,
-            difficulty: quiz.difficulty,
-            dateBegins: quiz.dateBegins,
-            dateEnds: quiz.dateEnds,
-            timeLimit: quiz.timeLimit,
-            imageUrl,
+            ...quiz,
             createdAt: new Date().toISOString(),
         };
         await set(quizRef, newQuiz);
@@ -30,18 +18,6 @@ export const createQuiz = async (quiz) => {
     } catch (error) {
         console.error('Error creating quiz:', error);
         throw new Error('Failed to create quiz');
-    }
-};
-
-export const uploadQuizImage = async (quizId, file) => {
-    try {
-        const imageRef = storageRef(storage, `quizzes/${quizId}/${file.name}`);
-        await uploadBytes(imageRef, file);
-        const imageUrl = await getDownloadURL(imageRef);
-        return imageUrl;
-    } catch (error) {
-        console.error('Error uploading quiz image:', error);
-        throw new Error('Failed to upload quiz image');
     }
 };
 
