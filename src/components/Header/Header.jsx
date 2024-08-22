@@ -4,11 +4,12 @@ import { AppContext } from '../../state/app.context';
 import { logoutUser } from '../../services/auth.service';
 import './Header.css';
 import Swal from 'sweetalert2';
+import { Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/react';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 
 export default function Header() {
     const { user, userData, setAppState } = useContext(AppContext);
     const navigate = useNavigate();
-
 
     const logout = async () => {
         const result = await Swal.fire({
@@ -27,19 +28,24 @@ export default function Header() {
         }
     };
 
-
     return (
         <header className="site-header">
             <h1>Bee Champion</h1>
-            {userData && <span>Welcome, {userData.username}</span>}
+            {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
             <nav>
-                <NavLink to="/">Home</NavLink>
-                <NavLink to="/quizzes">Quizzes</NavLink>
-                <NavLink to="/ranking">Ranking</NavLink>
-                <NavLink to="/tournament">Tournament</NavLink>
-                {user && <NavLink to="/my-profile">My Profile</NavLink>}
-                <NavLink to="organizer-dashboard">Organizer Dashboard</NavLink>
-                {user && <button onClick={logout}>Logout</button>}
+                <Menu>
+                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />} className="chakra-menu__menu-button">
+                        Actions
+                    </MenuButton>
+                    <MenuList className="chakra-menu__menu-list">
+                        <MenuItem as={NavLink} to="/quizzes">Quizzes</MenuItem>
+                        <MenuItem as={NavLink} to="/ranking">Ranking</MenuItem>
+                        <MenuItem as={NavLink} to="/tournament">Quiz Battle</MenuItem>
+                        {user && <MenuItem as={NavLink} to="/my-profile">My Profile</MenuItem>}
+                        <MenuItem as={NavLink} to="/organizer-dashboard">Organizer Dashboard</MenuItem>
+                        {user && <MenuItem onClick={logout}>Logout</MenuItem>}
+                    </MenuList>
+                </Menu>
             </nav>
         </header>
     );
