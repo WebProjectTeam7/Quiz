@@ -1,4 +1,4 @@
-import { get, set, ref, query, equalTo, orderByChild, update, remove, onValue, onDisconnect } from 'firebase/database';
+import { get, set, ref, query, equalTo, orderByChild, update, remove, onValue, onDisconnect, push } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '../config/firebase-config';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
@@ -206,4 +206,59 @@ export const deleteOrganizerCode = async (code) => {
         console.error('Error deleting organizer code:', error);
         throw new Error('Failed to delete organizer code: ' + error.message);
     }
+};
+
+// NOTIFICATIONS
+
+export const sendNotification = async (uid, notificationData) => {
+    const notificationRef = ref(db, `notifications/${uid}`);
+    const newNotificationRef = push(notificationRef);
+    await set(newNotificationRef, {
+        ...notificationData,
+        status: 'unread',
+        timestamp: Date.now(),
+    });
+};
+
+export const getNotifications = (uid, callback) => {
+    const notificationsRef = ref(db, `notifications/${uid}`);
+    const unsubscribe = onValue(notificationsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            const notificationsArray = Object.keys(data).map((key) => ({
+                id: key,
+                ...data[key],
+            }));
+            callback(notificationsArray);
+        } else {
+            callback([]);
+        }
+    });
+    return unsubscribe;
+};
+
+export const markNotificationAsRead = async (uid, notificationId) => {
+    const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
+    await update(notificationRef, {
+        status: 'read',
+    });
+};
+
+export const sendNotificationToUser = async (uid, message) => {
+    const notificationsRef = ref(db, `notifications/${uid}`);
+    const newNotificationRef = push(notificationsRef);
+
+    const notificationData = {
+        id: newNotificationRef.key,
+        message,
+        status: 'unread',
+        timestamp: Date.now(),
+    };
+
+    await set(newNotificationRef, notificationData);
+};
+
+export const deleteNotification = async (uid, notificationId) => {
+    const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
+    await remove(notificationRef);
 };
