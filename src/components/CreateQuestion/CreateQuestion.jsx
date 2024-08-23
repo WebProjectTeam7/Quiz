@@ -27,14 +27,15 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import QuizAccessEnum from '../../common/access-enum';
 import { createQuestion } from '../../services/question.service';
 
-export default function CreateQuestion({ isVisible, onClose, onAddQuestion }) {
+export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quizId }) {
     const { userData } = useContext(AppContext);
     const [question, setQuestion] = useState({
         author: userData?.username || 'anonymous',
+        quizId: quizId && null,
         title: '',
         imageFile: null,
         description: '',
-        options: [''],
+        options: [],
         answer: '',
         points: 0,
         category: '',
@@ -286,4 +287,5 @@ CreateQuestion.propTypes = {
     isVisible: propTypes.bool.isRequired,
     onClose: propTypes.func.isRequired,
     onAddQuestion: propTypes.func.isRequired,
+    quizId: propTypes.string,
 };
