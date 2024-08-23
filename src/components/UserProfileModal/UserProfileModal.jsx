@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -9,13 +9,20 @@ import {
     Text,
     Box,
     Flex,
+    Button,
+    Input,
 } from '@chakra-ui/react';
-import { getUserByUsername } from '../../services/user.service';
+import { getUserByUsername, sendNotificationToUser } from '../../services/user.service';
 import PropTypes from 'prop-types';
 import StatusAvatar from '../StatusAvatar/StatusAvatar';
+import { AppContext } from '../../state/app.context';
+import Swal from 'sweetalert2';
 
 export default function UserProfileModal({ isOpen, onClose, username }) {
     const [userData, setUserData] = useState(null);
+    const [notification, setNotification] = useState('');
+    const [sending, setSending] = useState(false);
+    const { userData: currentUserData } = useContext(AppContext);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -33,6 +40,32 @@ export default function UserProfileModal({ isOpen, onClose, username }) {
             fetchUserData();
         }
     }, [username]);
+
+    const handleSendNotification = async () => {
+        if (!notification.trim()) return;
+
+        setSending(true);
+        try {
+            await sendNotificationToUser(userData.uid, notification);
+            setNotification('');
+            Swal.fire({
+                icon: 'success',
+                title: 'Notification Sent',
+                text: 'The notification was sent successfully!',
+                confirmButtonText: 'OK',
+            });
+        } catch (error) {
+            console.error('Error sending notification:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Notification Failed',
+                text: 'There was an error sending the notification.',
+                confirmButtonText: 'OK',
+            });
+        } finally {
+            setSending(false);
+        }
+    };
 
     if (!userData) return null;
 
@@ -65,6 +98,24 @@ export default function UserProfileModal({ isOpen, onClose, username }) {
                             <Text>{userData.points}</Text>
                         </Flex>
                     </Box>
+                    {currentUserData?.role === 'organizer' && (
+                        <Box mt={4}>
+                            <Text fontWeight="bold" mb={2}>Send Notification</Text>
+                            <Input
+                                placeholder="Enter your notification message"
+                                value={notification}
+                                onChange={(e) => setNotification(e.target.value)}
+                                mb={2}
+                            />
+                            <Button
+                                colorScheme="blue"
+                                onClick={handleSendNotification}
+                                isLoading={sending}
+                            >
+                                Send Notification
+                            </Button>
+                        </Box>
+                    )}
                 </ModalBody>
             </ModalContent>
         </Modal>
