@@ -1,13 +1,25 @@
-/* Ranking.css */
-
 .ranking-container {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+  margin-bottom: 60px;
+  margin-top: 60px;
   padding: 20px;
   background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
   border-radius: 10px;
   box-shadow: 0px 5px 40px rgb(0, 0, 0);
+}
+
+.main-content {
+  background: url('..//../images/header.jpg') no-repeat center center fixed, linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
+  background-size: cover;
+  background-blend-mode: overlay;
+  margin-top: 10px;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ranking-title {
