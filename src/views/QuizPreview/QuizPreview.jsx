@@ -18,20 +18,22 @@ import {
     Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { DeleteIcon, ArrowUpIcon, ArrowDownIcon } from '@chakra-ui/icons';
 import QuizAccessEnum from '../../common/access-enum';
 import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
 import CreateQuestion from '../../components/CreateQuestion/CreateQuestion';
 import QuestionPreview from '../../components/QuestionPreview/QuestionPreview';
-import { addQuestionToQuiz, getQuizById, removeQuestionFromQuiz, editQuiz } from '../../services/quiz.service';
-import { getQuestionById, getQuestionsByQuizId } from '../../services/question.service';
+import { getQuizById, editQuiz, updateQuestionsIdsArray } from '../../services/quiz.service';
+import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
+    const navigate = useNavigate();
+
     const [quiz, setQuiz] = useState({
         author: 'John Doe',
         type: QuizAccessEnum.PUBLIC,
@@ -62,7 +64,9 @@ export default function QuizPreview() {
             const fetchedQuiz = await getQuizById(quizId);
             setQuiz(fetchedQuiz);
             if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
-                const fetchedQuestions = await getQuestionsByQuizId(quizId);
+                const fetchedQuestions = await Promise.all(fetchedQuiz.questions
+                    .map(async (questionId) => await getQuestionById(questionId))
+                    .filter(q => q !== null));
                 setQuestions(fetchedQuestions);
             }
         } catch (error) {
@@ -70,11 +74,24 @@ export default function QuizPreview() {
         }
     };
 
+    const updateQuestions = async (updatedQuestions) => {
+        try {
+            const updatedQuestionsIdsArray = updatedQuestions.map(q => q.id);
+            await updateQuestionsIdsArray(quizId, updatedQuestionsIdsArray);
+            await fetchQuiz(quizId);
+        } catch (error) {
+            console.error('Error updating questions', error);
+        }
+    };
+
     const handleAddQuestion = async (questionId) => {
         try {
-            await addQuestionToQuiz(quizId, questionId);
             const newQuestion = await getQuestionById(questionId);
-            setQuestions((prevQuestions) => [...prevQuestions, newQuestion]);
+            setQuestions((prevQuestions) => {
+                const updatedQuestions = [...prevQuestions, newQuestion];
+                updateQuestions(updatedQuestions);
+                return updatedQuestions;
+            });
         } catch (error) {
             console.error('Error adding question:', error);
         } finally {
@@ -84,23 +101,28 @@ export default function QuizPreview() {
 
     const handleRemoveQuestion = async (questionId) => {
         try {
-            await removeQuestionFromQuiz(quizId, questionId);
             setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== questionId));
+            await updateQuestions(questions);
         } catch (error) {
             console.error('Error removing question:', error);
         }
     };
 
-    const handleMoveQuestion = (index, direction) => {
+    const handleMoveQuestion = async (index, direction) => {
         const updatedQuestions = [...questions];
         const targetIndex = direction === 'up' ? index - 1 : index + 1;
-
         if (targetIndex >= 0 && targetIndex < updatedQuestions.length) {
             const [movedQuestion] = updatedQuestions.splice(index, 1);
             updatedQuestions.splice(targetIndex, 0, movedQuestion);
             setQuestions(updatedQuestions);
+            await updateQuestions(updatedQuestions);
         }
     };
+
+    const handleTestQuiz = () => {
+        navigate(`/play-quiz/${quizId}`);
+    };
+
 
     const handleSaveChanges = async () => {
         setIsSaving(true);
@@ -144,7 +166,7 @@ export default function QuizPreview() {
                         <Text fontSize="xl" fontWeight="bold">Title:</Text>
                         <EditablePreview />
                         <EditableInput />
-                        <EditableControls/>
+                        <EditableControls />
                     </HStack>
                 </Editable>
 
@@ -157,7 +179,7 @@ export default function QuizPreview() {
                         <Text fontSize="xl" fontWeight="bold">Description:</Text>
                         <EditablePreview />
                         <EditableTextarea />
-                        <EditableControls/>
+                        <EditableControls />
                     </HStack>
                 </Editable>
 
@@ -218,7 +240,7 @@ export default function QuizPreview() {
                     >
                         <HStack>
                             <EditablePreview />
-                            <EditableInput type='number'/>
+                            <EditableInput type='number' />
                             <EditableControls />
                         </HStack>
                     </Editable>
@@ -260,6 +282,10 @@ export default function QuizPreview() {
 
                 <Button colorScheme="blue" onClick={onOpen}>
                     Add Question
+                </Button>
+
+                <Button onClick={handleTestQuiz} colorScheme="teal" mt={4}>
+                    Test Quiz
                 </Button>
 
                 <VStack spacing={4} align="start">
