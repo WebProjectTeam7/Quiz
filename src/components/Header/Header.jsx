@@ -32,7 +32,6 @@ export default function Header({ registrationModal, loginModal }) {
 
     return (
         <header className="site-header">
-            
             <nav>
                 <div className="nav-buttons">
                     <button className="home-button-home-page" onClick={() => navigate('/')}>
