@@ -37,7 +37,6 @@ export default function QuizPreview() {
     const [quiz, setQuiz] = useState({
         author: 'John Doe',
         type: QuizAccessEnum.PUBLIC,
-        imageUrl: null,
         title: 'Sample Quiz',
         description: 'This is a sample quiz description.',
         timesTried: 0,
