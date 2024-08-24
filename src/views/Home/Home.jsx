@@ -4,9 +4,12 @@ import quizFriendsImg from '../../images/quiz-friends.png';
 import funAndEngagingImg from '../../images/funAndEngaging.png';
 import competitiveAndExciting from '../../images/group.png';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../../state/app.context';
+import { useContext } from 'react';
 
 export default function Home() {
     const navigate = useNavigate();
+    const { userData } = useContext(AppContext);
 
     const handleJoinNow = () => {
         navigate('/tournament');
@@ -14,6 +17,8 @@ export default function Home() {
 
     return (
         <div className="main-page">
+            <h1>Bee Champion</h1>
+            {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
             <section className="hero-banner">
                 <h1>Challenge Your Mind with Fun Quizzes</h1>
                 <p>Play quizzes with up to 4 players. Each question has a 20-second timer!</p>

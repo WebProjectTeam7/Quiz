@@ -32,8 +32,7 @@ export default function Header({ registrationModal, loginModal }) {
 
     return (
         <header className="site-header">
-            <h1>Bee Champion</h1>
-            {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
+            
             <nav>
                 <div className="nav-buttons">
                     <button className="home-button-home-page" onClick={() => navigate('/')}>

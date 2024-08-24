@@ -8,6 +8,25 @@
     background-size: cover;
 }
 
+.main-page h1 {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+}
+
+.main-page h1 {
+    margin: 0;
+    font-size: 8rem;
+    margin-bottom: 60px;
+    margin-top: 0;
+    align-items: center;
+    font-family: cursive;
+    color: rgb(237, 243, 182);
+    text-align: center;
+    padding-top: 70px;
+}
+
 .hero-banner {
     background: rgba(12, 8, 58, 0.486);
     color: rgb(215, 216, 209);

@@ -8,8 +8,7 @@
     position: relative;
     color: rgb(237, 243, 182);
     background-repeat: no-repeat;
-    height: 350px;
-    overflow: hidden;
+    height: 100px;
     padding: 20px;
 }
 
@@ -26,15 +25,6 @@
 .site-header h1, .site-header span {
     position: relative;
     z-index: 2;
-}
-
-.site-header h1 {
-    margin: 0;
-    font-size: 6rem;
-    margin-bottom: 10px;
-    margin-top: 0;
-    font-family: cursive;
-    padding-top: 70px;
 }
 
 .site-header span {
@@ -75,22 +65,25 @@
     transform: scale(1.01) !important;
 }
 
-.site-header .chakra-menu__menu-list {
+.chakra-menu__menu-list {
     top: 100%;
     left: 0;
     background-color: rgba(76, 39, 87, 0.8);
     color: rgb(119, 119, 119);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-    z-index: 3;
+    z-index: 1000;
     font-size: 1.2rem;
     padding: 10px;
     border-radius: 5px;
     transition: opacity 0.3s ease, transform 0.3s ease;
+    position: absolute;
+    display: block;
 }
 
 .chakra-menu__menu-list.chakra-menu__menu-list--open {
     opacity: 1;
     transform: translateY(0);
+    display: flex;
 }
 
 .chakra-menu__menu-item {
@@ -153,7 +146,8 @@
 .css-1kfu8nn {
     outline: 2px solid transparent;
     outline-offset: 2px;
-    color: inherit;
+    color: rgba(137, 43, 226, 0.753);
+    --menu-shadow: var(--chakra-shadows-sm);
     min-width: var(--chakra-sizes-3xs);
     padding: var(--chakra-space-2);
     z-index: 1;
