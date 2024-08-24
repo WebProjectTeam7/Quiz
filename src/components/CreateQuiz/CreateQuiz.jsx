@@ -22,6 +22,7 @@ import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
 import { createQuiz } from '../../services/quiz.service';
 import { useNavigate } from 'react-router-dom';
+import './CreateQuiz.css';
 
 export default function CreateQuiz({ username, isOpen, onClose }) {
     const navigate = useNavigate();
@@ -70,7 +71,7 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent className="create-quiz-container">
                 <ModalHeader>Create Quiz</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
