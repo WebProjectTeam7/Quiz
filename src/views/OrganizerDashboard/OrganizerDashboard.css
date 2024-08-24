@@ -1,0 +1,72 @@
+.organizer-dashboard-container {
+    background:  linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    padding: 40px;
+    color: rgb(237, 243, 182);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.organizer-dashboard-container h2 {
+    color: rgb(237, 243, 182);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.organizer-dashboard-container h3 {
+    color: #dda0dd;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.organizer-dashboard-container .chakra-button {
+    background: linear-gradient(135deg, rgba(12, 8, 58, 0.9), rgba(188, 16, 79, 0.74));
+    color: rgb(237, 243, 182);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+}
+
+.organizer-dashboard-container .chakra-button:hover {
+    background-color: #4c2757;
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.organizer-dashboard-container table {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    width: 100%;
+}
+
+.organizer-dashboard-container table thead {
+    background-color: rgba(12, 8, 58, 0.8);
+    color: rgb(15, 17, 1);
+}
+
+.organizer-dashboard-container table tbody tr:hover {
+    background-color: rgba(188, 16, 79, 0.2);
+}
+
+.organizer-dashboard-container td, .organizer-dashboard-container th {
+    color: rgb(237, 243, 182);
+}
+
+.organizer-dashboard-container a {
+    color: #ffd700;
+    text-decoration: none;
+}
+
+.organizer-dashboard-container a:hover {
+    text-decoration: underline;
+}
+
+.organizer-dashboard-container .chakra-stack {
+    padding-top: 20px;
+}
+
+.css-woqubx tr:nth-of-type(odd) td {
+    background: none;
+}
