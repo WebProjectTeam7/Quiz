@@ -48,6 +48,9 @@ export default function Header({ registrationModal, loginModal }) {
                             <MenuItem as={NavLink} to="/tournament">Quiz Battle</MenuItem>
                             {user && <MenuItem as={NavLink} to="/my-profile">My Profile</MenuItem>}
                             <MenuItem as={NavLink} to="/organizer-dashboard">Organizer Dashboard</MenuItem>
+                            {userData?.role === UserRoleEnum.ADMIN && (
+                                <MenuItem as={NavLink} to="/admin">Admin Dashboard</MenuItem>
+                            )}
                             {user && <MenuItem onClick={logout}>Logout</MenuItem>}
                         </MenuList>
                     </Menu>
