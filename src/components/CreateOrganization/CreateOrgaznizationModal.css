@@ -1,0 +1,106 @@
+.create-quiz-container {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    padding: 40px;
+    color: rgb(237, 243, 182);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.create-quiz-container .chakra-modal__header {
+    color: rgb(237, 243, 182);
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.create-quiz-container .chakra-form-control {
+    margin-bottom: 20px;
+}
+
+.create-quiz-container .chakra-form-label {
+    color: rgb(237, 243, 182);
+    font-size: 1.2rem;
+}
+
+.create-quiz-container .chakra-input,
+.create-quiz-container .chakra-textarea,
+.create-quiz-container .chakra-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgb(237, 243, 182);
+    border: 1px solid rgb(237, 243, 182);
+    border-radius: 8px;
+}
+
+.create-quiz-container .chakra-input:focus,
+.create-quiz-container .chakra-textarea:focus,
+.create-quiz-container .chakra-select:focus {
+    border-color: rgba(237, 243, 182, 0.6);
+}
+
+.create-quiz-container .chakra-button {
+    background: linear-gradient(135deg, rgba(12, 8, 58, 0.9), rgba(188, 16, 79, 0.74));
+    color: rgb(237, 243, 182);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+}
+
+.create-quiz-container .chakra-button:hover {
+    background-color: #4c2757;
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.create-quiz-container .chakra-checkbox {
+    color: rgb(237, 243, 182);
+}
+
+.css-woqubx tr:nth-of-type(odd) td {
+    background: none;
+}
+
+table {
+    background-color: transparent;
+}
+
+tr {
+    background-color: transparent;
+}
+
+td {
+    background-color: transparent;
+}
+
+.css-12y4u6o {
+    background-color: transparent !important;
+}
+
+.css-0 {
+    background-color: transparent !important;
+}
+
+.chakra-link {
+    background-color: transparent;
+}
+
+.chakra-form__label {
+    color: #F7F7D2;
+}
+
+.chakra-form__required-indicator {
+    color: #F7F7D2;
+}
+
+.chakra-textarea,
+.chakra-input {
+    color: #F7F7D2;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid #F7F7D2;
+}
+
+.chakra-textarea:focus,
+.chakra-input:focus {
+    border-color: rgba(247, 247, 210, 0.6);
+}

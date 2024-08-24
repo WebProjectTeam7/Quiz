@@ -125,25 +125,6 @@ export const editQuiz = async (quizId, updatedData) => {
     }
 };
 
-export const addQuestionToQuiz = async (quizId, questionId) => {
-    try {
-        const quizRef = dbRef(db, `quizzes/${quizId}`);
-        const snapshot = await get(quizRef);
-        if (!snapshot.exists()) {
-            throw new Error('Quiz not found');
-        }
-        const quizData = snapshot.val();
-        const questions = quizData.questions || [];
-        if (!questions.includes(questionId)) {
-            questions.push(questionId);
-        }
-        await update(quizRef, { questions });
-    } catch (error) {
-        console.error('Error adding question to quiz:', error);
-        throw new Error('Failed to add question to quiz');
-    }
-};
-
 export const removeQuestionFromQuiz = async (quizId, questionId) => {
     try {
         const quizRef = dbRef(db, `quizzes/${quizId}`);
@@ -161,6 +142,28 @@ export const removeQuestionFromQuiz = async (quizId, questionId) => {
     }
 };
 
+export const updateQuestionsIdsArray = async (quizId, questionsArray) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+        const snapshot = await get(quizRef);
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+        const updatedQuiz = {
+            ...snapshot.val(),
+            questions: questionsArray,
+            updatedAt: new Date().toISOString(),
+        };
+        await update(quizRef, updatedQuiz);
+        return updatedQuiz;
+    } catch (error) {
+        console.error('Error updating questions IDs:', error);
+        throw new Error('Failed to update questions IDs');
+    }
+};
+
+export const submitQuizResults = async () => {
+};
 
 // DELETE
 

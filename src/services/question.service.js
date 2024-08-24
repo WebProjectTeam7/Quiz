@@ -12,6 +12,7 @@ export const createQuestion = async (question) => {
         const newQuestion = {
             ...question,
             imageUrl,
+            id: questionId,
             createdAt: new Date().toISOString(),
         };
         await set(questionRef, newQuestion);

@@ -19,6 +19,7 @@ import { AppContext } from '../../state/app.context';
 import CreateQuizModal from '../../components/CreateQuiz/CreateQuiz';
 import CreateOrganizationModal from '../../components/CreateOrganization/CreateOrganizationModal';
 import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/quiz.service';
+import './OrganizerDashboard.css';
 // import { createOrganization, joinOrganization, leaveOrganization } from '../../services/organization.service';
 
 export default function OrganizerDashboard() {
@@ -102,7 +103,7 @@ export default function OrganizerDashboard() {
     };
 
     return (
-        <Box maxW="1200px" mx="auto" py={8} px={4}>
+        <Box className="organizer-dashboard-container" maxW="1200px" mx="auto" py={8} px={4}>
             <VStack spacing={4} align="start">
                 <Heading as="h2" size="lg">
                     Organizer Dashboard

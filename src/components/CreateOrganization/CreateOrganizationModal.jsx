@@ -17,6 +17,7 @@ import {
     HStack
 } from '@chakra-ui/react';
 import { createOrganization } from '../../services/organization.service'; // Assuming you have a createOrganization service
+import './CreateOrgaznizationModal.css';
 
 const CreateOrganizationModal = ({ isOpen, onClose, userId, onOrganizationCreated }) => {
     const [orgName, setOrgName] = useState('');
@@ -58,7 +59,7 @@ const CreateOrganizationModal = ({ isOpen, onClose, userId, onOrganizationCreate
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent className="create-quiz-container">
                 <ModalHeader>Create Organization</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
