@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import './QuestionPreview.css';
 
 export default function QuestionPreview({ question }) {
     const [selectedOption, setSelectedOption] = useState('');
@@ -26,10 +27,10 @@ export default function QuestionPreview({ question }) {
     };
 
     return (
-        <Box borderWidth="1px" borderRadius="lg" p={4} mb={4}>
+        <Box className="question-preview-container" borderWidth="1px" borderRadius="lg" p={4} mb={4}>
             <VStack align="start" spacing={4}>
-                <Text fontSize="xl" fontWeight="bold">{question.title}</Text>
-                <Text>{question.description}</Text>
+                <Text className="question-preview-title" fontSize="xl" fontWeight="bold">{question.title}</Text>
+                <Text className="question-preview-description">{question.description}</Text>
                 {question.imageUrl && (
                     <Box>
                         <img
@@ -40,8 +41,8 @@ export default function QuestionPreview({ question }) {
                     </Box>
                 )}
                 {question.options && question.options.length > 1 ? (
-                    <FormControl as="fieldset">
-                        <FormLabel as="legend">Choose the correct option:</FormLabel>
+                    <FormControl as="fieldset" className="question-preview-form-control">
+                        <FormLabel as="legend" className="question-preview-form-label">Choose the correct option:</FormLabel>
                         <RadioGroup onChange={setSelectedOption} value={selectedOption}>
                             {question.options.map((option, index) => (
                                 <Radio key={index} value={option}>
@@ -51,8 +52,8 @@ export default function QuestionPreview({ question }) {
                         </RadioGroup>
                     </FormControl>
                 ) : (
-                    <FormControl>
-                        <FormLabel>Provide your answer:</FormLabel>
+                    <FormControl className="question-preview-form-control">
+                        <FormLabel className="question-preview-form-label">Provide your answer:</FormLabel>
                         <Input
                             value={userInput}
                             onChange={(e) => setUserInput(e.target.value)}
