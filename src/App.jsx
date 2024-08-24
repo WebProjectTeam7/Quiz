@@ -20,6 +20,7 @@ import QuizPreview from './views/QuizPreview/QuizPreview';
 import Ranking from './views/Ranking/Ranking';
 import OrganizerDashboard from './views/OrganizerDashboard/OrganizerDashboard';
 import Tournament from './views/Tournament/Tournament';
+import AdminPage from './views/AdminPage/AdminPage';
 
 export default function App() {
 
@@ -107,6 +108,7 @@ export default function App() {
                             <Route path="/quiz-preview/:quizId" element={<QuizPreview />} />
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/tournament" element={<Tournament />} />
+                            <Route path="/admin" element={<AdminPage />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </div>

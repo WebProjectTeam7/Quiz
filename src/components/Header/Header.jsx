@@ -6,6 +6,7 @@ import './Header.css';
 import Swal from 'sweetalert2';
 import { Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
+import UserRoleEnum from '../../common/role-enum';
 
 export default function Header() {
     const { user, userData, setAppState } = useContext(AppContext);
@@ -42,6 +43,9 @@ export default function Header() {
                         <MenuItem as={NavLink} to="/ranking">Ranking</MenuItem>
                         <MenuItem as={NavLink} to="/tournament">Quiz Battle</MenuItem>
                         {user && <MenuItem as={NavLink} to="/my-profile">My Profile</MenuItem>}
+                        {userData?.role === UserRoleEnum.ADMIN && (
+                            <MenuItem as={NavLink} to="/admin">Admin Dashboard</MenuItem>
+                        )}
                         <MenuItem as={NavLink} to="/organizer-dashboard">Organizer Dashboard</MenuItem>
                         {user && <MenuItem onClick={logout}>Logout</MenuItem>}
                     </MenuList>

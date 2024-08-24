@@ -4,20 +4,20 @@ import { AppContext } from '../../state/app.context';
 import { Box, Text, Badge, Button } from '@chakra-ui/react';
 
 export default function NotificationList() {
-    const { user } = useContext(AppContext);
+    const { userData } = useContext(AppContext);
     const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
-        if (!user) return;
+        if (!userData) return;
 
-        const unsubscribe = getNotifications(user.uid, setNotifications);
+        const unsubscribe = getNotifications(userData.uid, setNotifications);
 
         return () => unsubscribe();
-    }, [user]);
+    }, [userData]);
 
     const handleMarkAsRead = async (notificationId) => {
         try {
-            await markNotificationAsRead(user.uid, notificationId);
+            await markNotificationAsRead(userData.uid, notificationId);
             setNotifications((prevNotifications) =>
                 prevNotifications.map((notification) =>
                     notification.id === notificationId
@@ -32,7 +32,7 @@ export default function NotificationList() {
 
     const handleDeleteNotification = async (notificationId) => {
         try {
-            await deleteNotification(user.uid, notificationId);
+            await deleteNotification(userData.uid, notificationId);
             setNotifications((prevNotifications) =>
                 prevNotifications.filter((notification) => notification.id !== notificationId)
             );

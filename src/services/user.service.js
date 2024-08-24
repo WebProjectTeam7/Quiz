@@ -123,6 +123,26 @@ export const getUserStatus = (uid, callback) => {
     return unsubscribe;
 };
 
+export const getAllUsers = async () => {
+    try {
+        const usersRef = ref(db, 'users');
+        const snapshot = await get(usersRef);
+
+        if (!snapshot.exists()) {
+            return [];
+        }
+        const users = Object.keys(snapshot.val()).map((key) => ({
+            username: key,
+            ...snapshot.val()[key],
+        }));
+
+        return users;
+    } catch (error) {
+        console.error('Error retrieving all users:', error.message);
+        throw new Error('Failed to retrieve all users');
+    }
+};
+
 // UPDATE
 
 export const updateUser = async (uid, updatedData) => {

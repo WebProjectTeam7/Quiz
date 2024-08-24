@@ -18,33 +18,43 @@ import './LoginModal.css';
 import { loginUser } from '../../services/auth.service';
 import Swal from 'sweetalert2';
 import { useState } from 'react';
-import { monitorUserStatus } from '../../services/user.service';
+import { getUserByUsername, monitorUserStatus } from '../../services/user.service';
 import { auth } from '../../config/firebase-config';
 
 export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [username, setUsername] = useState('');
 
     const handleLogin = async () => {
         setLoading(true);
         try {
+            const user = await getUserByUsername(username);
+            if (!user) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    confirmButtonText: 'OK',
+                });
+            }
+            const email = user.email;
+
             await loginUser(email, password);
             const uid = auth.currentUser.uid;
-            // Swal.fire({                                   //Strange error when
-            //     icon: 'success',
-            //     title: 'Login Successful',
-            //     confirmButtonText: 'OK',
-            // });
+            Swal.fire({                                   // Strange error when
+                icon: 'success',
+                title: 'Login Successful',
+                confirmButtonText: 'OK',
+            });
             monitorUserStatus(uid);
             onClose();
         } catch (error) {
-            // Swal.fire({
-            //     icon: 'error',                            //Strange error when
-            //     title: 'Login Failed',
-            //     text: error.message,
-            //     confirmButtonText: 'OK',
-            // });
+            Swal.fire({
+                icon: 'error',                            // Strange error when
+                title: 'Login Failed',
+                text: error.message,
+                confirmButtonText: 'OK',
+            });
         } finally {
             setLoading(false);
         }
@@ -57,14 +67,14 @@ export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
                 <ModalHeader>Login</ModalHeader>
                 <ModalCloseButton />
                 <ModalBody>
-                    <FormControl id="email" isRequired>
-                        <FormLabel>Email</FormLabel>
+                    <FormControl id="username" isRequired>
+                        <FormLabel>Username</FormLabel>
                         <Input
-                            type="email"
-                            placeholder="Email"
-                            className="login-email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            type="text"
+                            placeholder="Username"
+                            className="login-username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             borderColor="blue.400"
                         />
                     </FormControl>

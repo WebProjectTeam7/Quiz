@@ -98,7 +98,7 @@ export default function UserProfileModal({ isOpen, onClose, username }) {
                             <Text>{userData.points}</Text>
                         </Flex>
                     </Box>
-                    {currentUserData?.role === 'organizer' && (
+                    {currentUserData?.role === 'organizer'  || currentUserData?.role === 'admin' && (
                         <Box mt={4}>
                             <Text fontWeight="bold" mb={2}>Send Notification</Text>
                             <Input
