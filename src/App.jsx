@@ -19,8 +19,9 @@ import QuizPreview from './views/QuizPreview/QuizPreview';
 import Ranking from './views/Ranking/Ranking';
 import OrganizerDashboard from './views/OrganizerDashboard/OrganizerDashboard';
 import Tournament from './views/Tournament/Tournament';
-import useModal from './custum-hooks/useModal'; // Ensure this is imported
+import useModal from './custom-hooks/useModal';
 import PlayQuiz from './views/PlayQuiz/PlayQuiz';
+import AdminPage from './views/AdminPage/AdminPage';
 
 export default function App() {
     const [appState, setAppState] = useState({
@@ -98,6 +99,7 @@ export default function App() {
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/tournament" element={<Tournament />} />
                             <Route path="/play-quiz/:quizId" element={<PlayQuiz/>}/>
+                            <Route path="/admin" element={<AdminPage />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                     </div>

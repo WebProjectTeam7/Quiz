@@ -5,7 +5,7 @@ import { AppContext } from '../../state/app.context';
 import UserRoleEnum from '../../common/role-enum';
 import { Box, Button, Input, Table, Tbody, Td, Th, Thead, Tr, Text, Badge } from '@chakra-ui/react';
 import Swal from 'sweetalert2';
-import useModal from '../../custum-hooks/useModal';
+import useModal from '../../custom-hooks/useModal';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
 
