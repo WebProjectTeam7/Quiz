@@ -9,15 +9,21 @@ import {
     Divider,
     Spinner,
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import Swal from 'sweetalert2';
+import { useState, useEffect, useContext } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { AppContext } from '../../state/app.context';
 import { getQuizById } from '../../services/quiz.service';
 import { getQuestionById } from '../../services/question.service';
+import Swal from 'sweetalert2';
 import QuestionView from '../../components/QuestionView/QuestionView';
+import UserRoleEnum from '../../common/role-enum';
+import { updateUser } from '../../services/user.service';
 
 export default function PlayQuiz() {
+    const { userData } = useContext(AppContext);
     const { quizId } = useParams();
+    const navigate = useNavigate();
+
     const [quiz, setQuiz] = useState(null);
     const [questions, setQuestions] = useState([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -139,8 +145,18 @@ export default function PlayQuiz() {
         return 0;
     };
 
-    const handleSubmitQuiz = () => {
+    const handleSubmitQuiz = async () => {
         const finalScore = calculateScore();
+        if (userData && userData.role === UserRoleEnum.STUDENT) {
+            try {
+                const updatedUser = { ...userData, points: userData.points + finalScore };
+                await updateUser(userData.uid, updatedUser);
+            } catch (error) {
+                console.error('Failed to update user points');
+            }
+            navigate('/ranking');
+        }
+
         Swal.fire({
             title: 'Quiz Completed',
             text: `You scored ${finalScore} out of ${quiz?.totalPoints ?? 0}.`,
