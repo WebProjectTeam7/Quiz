@@ -29,6 +29,7 @@ import { getQuizById, editQuiz, updateQuestionsIdsArray, deleteQuiz } from '../.
 import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
+import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -47,10 +48,12 @@ export default function QuizPreview() {
         dateBegins: null,
         dateEnds: null,
         timeLimit: 0,
+        isActive: false,
     });
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
 
     useEffect(() => {
         if (quizId) {
@@ -127,6 +130,48 @@ export default function QuizPreview() {
         navigate(`/play-quiz/${quizId}`);
     };
 
+    const handleToggleActive = async () => {
+        const currentDate = new Date();
+        const startDate = new Date(quiz.dateBegins);
+        const endDate = new Date(quiz.dateEnds);
+
+        if (startDate && currentDate < startDate) {
+            Swal.fire({
+                title: 'Quiz Not Yet Active',
+                text: `The quiz will be set to active on ${startDate.toLocaleString()}.`,
+                icon: 'info',
+            });
+            return;
+        }
+
+        if (endDate && currentDate > endDate) {
+            Swal.fire({
+                title: 'Quiz Ended',
+                text: 'The quiz cannot be set to active because the end date has passed.',
+                icon: 'warning',
+            });
+            return;
+        }
+
+        const newActiveState = !quiz.isActive;
+        setQuiz({ ...quiz, isActive: newActiveState });
+
+        try {
+            await editQuiz(quizId, { ...quiz, isActive: newActiveState });
+            Swal.fire({
+                title: `Quiz ${newActiveState ? 'Activated' : 'Deactivated'}`,
+                text: `The quiz has been ${newActiveState ? 'activated' : 'deactivated'}.`,
+                icon: 'success',
+            });
+        } catch (error) {
+            console.error('Failed to update quiz state:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to update the quiz status. Please try again.',
+                icon: 'error',
+            });
+        }
+    };
 
     const handleSaveChanges = async () => {
         setIsSaving(true);
@@ -182,6 +227,11 @@ export default function QuizPreview() {
                 }
             }
         });
+    };
+
+    const handleSendInvitation = (userId) => {
+        // TODO
+        onInviteClose();
     };
 
     return (
@@ -310,23 +360,36 @@ export default function QuizPreview() {
                         </HStack>
                     </Editable>
                 </HStack>
+                <HStack>
+                    <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
+                        Save Changes
+                    </Button>
 
-                <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
-                    Save Changes
-                </Button>
+                    <Button colorScheme="blue" onClick={onOpen}>
+                        Add Question
+                    </Button>
 
-                <Button colorScheme="blue" onClick={onOpen}>
-                    Add Question
-                </Button>
+                    <Button onClick={handleTestQuiz} colorScheme="teal" >
+                        Test Quiz
+                    </Button>
 
-                <Button onClick={handleTestQuiz} colorScheme="teal" mt={4}>
-                    Test Quiz
-                </Button>
+                    {quiz.type === QuizAccessEnum.PRIVATE && (
+                        <Button colorScheme="blue" onClick={onInviteOpen}>
+                            Send Invitation
+                        </Button>
+                    )}
+                </HStack>
 
-                <Button colorScheme="red" onClick={handleDeleteQuiz}>
-                    Delete Quiz
-                </Button>
+                <HStack>
+                    <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
+                        {quiz.isActive ? 'Deactivate Quiz' : 'Activate Quiz'}
+                    </Button>
 
+
+                    <Button colorScheme="red" onClick={handleDeleteQuiz}>
+                        Delete Quiz
+                    </Button>
+                </HStack>
 
                 <VStack spacing={4} align="start">
                     {questions.length > 0 ? questions.map((question, index) => (
@@ -355,6 +418,7 @@ export default function QuizPreview() {
             </VStack>
 
             <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
+            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} onSendInvitation={handleSendInvitation} />
         </Box>
     );
 }
