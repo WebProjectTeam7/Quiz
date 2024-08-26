@@ -1,7 +1,7 @@
 const QuizCategoryEnum = Object.freeze({
     GENERAL: 'general',
-    REACT: 'react',
-    JS_CORE: 'java script core',
+    HISTORY: 'history',
+    GEOGRAPHY: 'geography',
 });
 
 export default QuizCategoryEnum;

@@ -100,8 +100,11 @@ export default function QuizPreview() {
 
     const handleRemoveQuestion = async (questionId) => {
         try {
-            setQuestions((prevQuestions) => prevQuestions.filter((q) => q.id !== questionId));
-            await updateQuestions(questions);
+            setQuestions((prevQuestions) => {
+                const updatedQuestions = prevQuestions.filter(q => q.id !== questionId);
+                updateQuestions(updatedQuestions);
+                return updatedQuestions;
+            });
         } catch (error) {
             console.error('Error removing question:', error);
         }
