@@ -25,7 +25,7 @@ import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
 import CreateQuestion from '../../components/CreateQuestion/CreateQuestion';
 import QuestionPreview from '../../components/QuestionPreview/QuestionPreview';
-import { getQuizById, editQuiz, updateQuestionsIdsArray } from '../../services/quiz.service';
+import { getQuizById, editQuiz, updateQuestionsIdsArray, deleteQuiz } from '../../services/quiz.service';
 import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
@@ -151,6 +151,37 @@ export default function QuizPreview() {
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handleDeleteQuiz = async () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await deleteQuiz(quizId);
+                    Swal.fire(
+                        'Deleted!',
+                        'Your quiz has been deleted.',
+                        'success'
+                    );
+                    navigate('/organizer-dashboard');
+                } catch (error) {
+                    console.error('Failed to delete quiz:', error);
+                    Swal.fire(
+                        'Error!',
+                        'Failed to delete quiz. Please try again.',
+                        'error'
+                    );
+                }
+            }
+        });
     };
 
     return (
@@ -291,6 +322,11 @@ export default function QuizPreview() {
                 <Button onClick={handleTestQuiz} colorScheme="teal" mt={4}>
                     Test Quiz
                 </Button>
+
+                <Button colorScheme="red" onClick={handleDeleteQuiz}>
+                    Delete Quiz
+                </Button>
+
 
                 <VStack spacing={4} align="start">
                     {questions.length > 0 ? questions.map((question, index) => (
