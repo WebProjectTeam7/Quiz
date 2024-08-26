@@ -17,6 +17,7 @@ export default function QuestionPreview({ question }) {
     const [selectedOption, setSelectedOption] = useState('');
     const [userInput, setUserInput] = useState('');
     const [isCorrect, setIsCorrect] = useState(null);
+    const [showAnswer, setShowAnswer] = useState(false);
 
     const handleCheckAnswer = () => {
         if (question.options && question.options.length > 1) {
@@ -26,10 +27,16 @@ export default function QuestionPreview({ question }) {
         }
     };
 
+    const handleToggleAnswer = () => {
+        setShowAnswer(!showAnswer);
+    };
+
     return (
         <Box className="question-preview-container" borderWidth="1px" borderRadius="lg" p={4} mb={4}>
             <VStack align="start" spacing={4}>
-                <Text className="question-preview-title" fontSize="xl" fontWeight="bold">{question.title}</Text>
+                <Text className="question-preview-title" fontSize="xl" fontWeight="bold">
+                    {question.title}
+                </Text>
                 <Text className="question-preview-description">{question.description}</Text>
                 {question.imageUrl && (
                     <Box>
@@ -67,6 +74,14 @@ export default function QuestionPreview({ question }) {
                 {isCorrect !== null && (
                     <Text fontSize="lg" fontWeight="bold" color={isCorrect ? 'green.500' : 'red.500'}>
                         {isCorrect ? 'Correct!' : 'Incorrect!'}
+                    </Text>
+                )}
+                <Button colorScheme="teal" variant="ghost" onClick={handleToggleAnswer} mt={2}>
+                    {showAnswer ? 'Hide Answer' : 'Show Answer'}
+                </Button>
+                {showAnswer && (
+                    <Text fontSize="lg" mt={2} p={2} bg="gray.100" borderRadius="md">
+                        {question.answer}
                     </Text>
                 )}
             </VStack>
