@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
     Modal,
     ModalOverlay,
@@ -17,6 +18,7 @@ import {
     Checkbox,
     Divider,
 } from '@chakra-ui/react';
+import Swal from 'sweetalert2';
 import QuizAccessEnum from '../../common/access-enum';
 import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
@@ -49,8 +51,26 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
         });
     };
 
+    const validateForm = () => {
+        const { title, description, category, difficulty, type, totalPoints } = quiz;
+        if (!title || !description || !category || !difficulty || !type || !totalPoints) {
+            Swal.fire({
+                title: 'Missing Information',
+                text: 'Please fill in all required fields.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+            });
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return;
+        }
 
         try {
             const newQuiz = {
@@ -61,10 +81,24 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                 author: username || 'anonymous',
             };
             const quizId = await createQuiz(newQuiz);
-            navigate(`/quiz-preview/${quizId}`);
-            onClose();
+
+            Swal.fire({
+                title: 'Quiz Created!',
+                text: 'Your quiz has been created successfully.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+            }).then(() => {
+                navigate(`/quiz-preview/${quizId}`);
+                onClose();
+            });
         } catch (error) {
             console.error('Failed to create quiz:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to create quiz. Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK',
+            });
         }
     };
 
@@ -224,3 +258,9 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
         </Modal>
     );
 }
+
+CreateQuiz.propTypes = {
+    username: PropTypes.string,
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+};
