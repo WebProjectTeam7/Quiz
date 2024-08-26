@@ -11,6 +11,8 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import Swal from 'sweetalert2';
+import { deleteQuestion } from '../../services/question.service';
 import './QuestionPreview.css';
 
 export default function QuestionPreview({ question }) {
@@ -29,6 +31,35 @@ export default function QuestionPreview({ question }) {
 
     const handleToggleAnswer = () => {
         setShowAnswer(!showAnswer);
+    };
+
+    const handleDeleteQuestion = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await deleteQuestion(question.id);
+                Swal.fire(
+                    'Deleted!',
+                    'Your quiz has been deleted.',
+                    'success'
+                );
+            } catch (error) {
+                Swal.fire(
+                    'Error!',
+                    'There was an error deleting the quiz.',
+                    'error'
+                );
+            }
+        }
     };
 
     return (
@@ -84,6 +115,9 @@ export default function QuestionPreview({ question }) {
                         {question.answer}
                     </Text>
                 )}
+                <Button colorScheme="red" variant="solid" onClick={handleDeleteQuestion} mt={4}>
+                    Delete Question From Database
+                </Button>
             </VStack>
         </Box>
     );
@@ -91,6 +125,7 @@ export default function QuestionPreview({ question }) {
 
 QuestionPreview.propTypes = {
     question: PropTypes.shape({
+        id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
         description: PropTypes.string.isRequired,
         imageUrl: PropTypes.string,

@@ -63,11 +63,13 @@ export default function QuizPreview() {
             const fetchedQuiz = await getQuizById(quizId);
             setQuiz(fetchedQuiz);
             if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
-                const fetchedQuestions = await Promise.all(fetchedQuiz.questions
-                    .map(async (questionId) => await getQuestionById(questionId))
-                    .filter(q => q !== null));
+                let fetchedQuestions = await Promise.all(fetchedQuiz.questions
+                    .map(async (questionId) => await getQuestionById(questionId)));
+
+                fetchedQuestions = fetchedQuestions.filter(q => q !== null);
                 setQuestions(fetchedQuestions);
             }
+
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
         }
