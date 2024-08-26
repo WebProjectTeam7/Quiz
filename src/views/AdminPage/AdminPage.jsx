@@ -1,7 +1,6 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { getAllUsers } from '../../services/user.service';
-import { deleteReportedBugs, deleteUser } from '../../services/admin.servce';
-import { AppContext } from '../../state/app.context';
+import { banUser, deleteReportedBugs, getAllBannedUsers, unbanUser } from '../../services/admin.servce';
 import UserRoleEnum from '../../common/role-enum';
 import { Box, Button, Input, Table, Tbody, Td, Th, Thead, Tr, Text, Badge } from '@chakra-ui/react';
 import Swal from 'sweetalert2';
@@ -12,54 +11,98 @@ import Pagination from '../../components/Pagination/Pagination';
 export default function AdminPage() {
     const [users, setUsers] = useState([]);
     const [reports, setReports] = useState([]);
-    const [view, setView] = useState('reports');
+    const [view, setView] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const { userData } = useContext(AppContext);
     const [selectedUser, setSelectedUser] = useState(null);
     const { isModalVisible, openModal, closeModal } = useModal();
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10);
+    const [bannedUsers, setBannedUsers] = useState([]);
 
     useEffect(() => {
         fetchAllUsers();
+        fetchBannedUsers();
     }, []);
 
     const fetchAllUsers = async () => {
         try {
             const users = await getAllUsers();
-            setUsers(users);
+            const banned = await getAllBannedUsers();
+
+            const usersWithBanStatus = users.map(user => ({
+                ...user,
+                banned: banned.some(bannedUser => bannedUser.uid === user.uid),
+            }));
+
+            setUsers(usersWithBanStatus);
         } catch (error) {
             console.error(error.message);
         }
     };
 
-    const handleDeleteUser = async (uid, role) => {
-        if (role === UserRoleEnum.ADMIN) {
-            Swal.fire('Error', 'You cannot delete another admin.', 'error');
-            return;
+    const fetchBannedUsers = async () => {
+        try {
+            const banned = await getAllBannedUsers();
+            setBannedUsers(banned);
+        } catch (error) {
+            console.error(error.message);
         }
-        if (uid === userData.uid) {
-            Swal.fire('Error', 'You cannot delete your own account.', 'error');
-            return;
-        }
+    };
 
+    const handleBanUser = async (user) => {
         const result = await Swal.fire({
             title: 'Are you sure?',
-            text: 'Do you really want to delete this user? This action cannot be undone.',
+            text: 'Do you really want to ban this user?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
+            confirmButtonText: 'Yes, ban it!',
             cancelButtonText: 'No, cancel!',
         });
 
         if (result.isConfirmed) {
             try {
-                await deleteUser(uid);
-                Swal.fire('Deleted!', 'User deleted successfully.', 'success');
-                fetchAllUsers();
+                await banUser(user.uid, user.username, user.email);
+                Swal.fire('Banned!', 'User banned successfully.', 'success');
+                setUsers(users.map(u => u.uid === user.uid ? { ...u, banned: true } : u));
+                setBannedUsers([...bannedUsers, user]);
             } catch (error) {
                 Swal.fire('Error', error.message, 'error');
             }
+        }
+    };
+
+    const handleUnbanUser = async (uid) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you really want to unban this user?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, unban it!',
+            cancelButtonText: 'No, cancel!',
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await unbanUser(uid);
+                Swal.fire('Unbanned!', 'User unbanned successfully.', 'success');
+                const unbannedUser = bannedUsers.find(user => user.uid === uid);
+                setBannedUsers(bannedUsers.filter(user => user.uid !== uid));
+                if (unbannedUser) {
+                    setUsers(users.map(u => u.uid === uid ? { ...u, banned: false } : u));
+                }
+            } catch (error) {
+                Swal.fire('Error', error.message, 'error');
+            }
+        }
+    };
+
+    const handleBanUnbanUpdate = (updatedUser) => {
+        setUsers(users.map(user => user.uid === updatedUser.uid ? updatedUser : user));
+
+        if (updatedUser.banned) {
+            setBannedUsers([...bannedUsers, updatedUser]);
+        } else {
+            setBannedUsers(bannedUsers.filter(user => user.uid !== updatedUser.uid));
         }
     };
 
@@ -73,7 +116,7 @@ export default function AdminPage() {
         }
     };
 
-    const filteredUsers = users.filter(user =>
+    const filteredUsers = (view === 'banned' ? bannedUsers : users).filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.firstName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -98,6 +141,7 @@ export default function AdminPage() {
             <Text fontSize="2xl" mb={4}>Admin Panel</Text>
             <Box mb={4}>
                 <Button onClick={() => setView('all')} mr={2}>All Users</Button>
+                <Button onClick={() => setView('banned')} mr={2}>Banned Users</Button>
                 <Button onClick={() => setView('reports')}>Bug Reports</Button>
             </Box>
             <Input
@@ -106,7 +150,7 @@ export default function AdminPage() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 mb={4}
             />
-            {view === 'all' && (
+            {(view === 'all' || view === 'banned') && (
                 <>
                     <Table variant="simple">
                         <Thead>
@@ -125,12 +169,14 @@ export default function AdminPage() {
                                 <Tr key={user.uid}>
                                     <Td>
                                         {user.username}{' '}
-                                        <Badge
-                                            colorScheme={user.role === UserRoleEnum.ADMIN ? 'red' : user.role === UserRoleEnum.ORGANIZER ? 'orange' : 'blue'}
-                                            fontSize="0.6em"
-                                        >
-                                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                                        </Badge>
+                                        {user.role && (
+                                            <Badge
+                                                colorScheme={user.role === UserRoleEnum.ADMIN ? 'red' : user.role === UserRoleEnum.ORGANIZER ? 'orange' : 'blue'}
+                                                fontSize="0.6em"
+                                            >
+                                                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                            </Badge>
+                                        )}
                                     </Td>
                                     <Td>{user.email}</Td>
                                     <Td>{user.firstName}</Td>
@@ -139,7 +185,15 @@ export default function AdminPage() {
                                         <Button onClick={() => handleOpenProfile(user)}>Profile</Button>
                                     </Td>
                                     <Td>
-                                        <Button colorScheme="red" onClick={() => handleDeleteUser(user.uid, user.role)}>Delete</Button>
+                                        {view === 'banned' ? (
+                                            <Button colorScheme="green" onClick={() => handleUnbanUser(user.uid)}>Unban</Button>
+                                        ) : (
+                                            user.banned ? (
+                                                <Button colorScheme="green" onClick={() => handleUnbanUser(user.uid)}>Unban</Button>
+                                            ) : (
+                                                <Button colorScheme="yellow" onClick={() => handleBanUser(user)}>Ban</Button>
+                                            )
+                                        )}
                                     </Td>
                                 </Tr>
                             ))}
@@ -193,6 +247,7 @@ export default function AdminPage() {
                     isOpen={isModalVisible}
                     onClose={closeModal}
                     username={selectedUser.username}
+                    onBanUnban={handleBanUnbanUpdate}
                 />
             )}
         </Box>

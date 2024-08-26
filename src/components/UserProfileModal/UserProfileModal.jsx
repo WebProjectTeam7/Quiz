@@ -17,8 +17,9 @@ import PropTypes from 'prop-types';
 import StatusAvatar from '../StatusAvatar/StatusAvatar';
 import { AppContext } from '../../state/app.context';
 import Swal from 'sweetalert2';
+import { banUser, unbanUser } from '../../services/admin.servce';
 
-export default function UserProfileModal({ isOpen, onClose, username }) {
+export default function UserProfileModal({ isOpen, onClose, username, onBanUnban }) {
     const [userData, setUserData] = useState(null);
     const [notification, setNotification] = useState('');
     const [sending, setSending] = useState(false);
@@ -67,6 +68,46 @@ export default function UserProfileModal({ isOpen, onClose, username }) {
         }
     };
 
+    const handleBanUnbanUser = async () => {
+        const isBanned = userData.banned;
+
+        Swal.fire({
+            title: `Are you sure you want to ${isBanned ? 'unban' : 'ban'} this user?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: `Yes, ${isBanned ? 'unban' : 'ban'} it!`,
+            cancelButtonText: 'No, cancel!',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    if (isBanned) {
+                        await unbanUser(userData.uid);
+                    } else {
+                        await banUser(userData.uid, userData.username, userData.email);
+                    }
+                    const updatedUserData = { ...userData, banned: !isBanned };
+                    setUserData(updatedUserData);
+                    if (onBanUnban) {
+                        onBanUnban(updatedUserData);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: `User ${isBanned ? 'unbanned' : 'banned'} successfully!`,
+                        confirmButtonText: 'OK',
+                    });
+                } catch (error) {
+                    console.error(`Error ${isBanned ? 'unbanning' : 'banning'} user:`, error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: `Failed to ${isBanned ? 'unban' : 'ban'} user.`,
+                        text: error.message,
+                        confirmButtonText: 'OK',
+                    });
+                }
+            }
+        });
+    };
+
     if (!userData) return null;
 
     return (
@@ -98,24 +139,36 @@ export default function UserProfileModal({ isOpen, onClose, username }) {
                             <Text>{userData.points}</Text>
                         </Flex>
                     </Box>
-                    {currentUserData?.role === 'organizer'  || currentUserData?.role === 'admin' && (
-                        <Box mt={4}>
-                            <Text fontWeight="bold" mb={2}>Send Notification</Text>
-                            <Input
-                                placeholder="Enter your notification message"
-                                value={notification}
-                                onChange={(e) => setNotification(e.target.value)}
-                                mb={2}
-                            />
-                            <Button
-                                colorScheme="blue"
-                                onClick={handleSendNotification}
-                                isLoading={sending}
-                            >
-                                Send Notification
-                            </Button>
-                        </Box>
-                    )}
+                    <Flex mt={4} justifyContent="space-between">
+                        {currentUserData?.role === 'organizer' || currentUserData?.role === 'admin' && (
+                            <Box>
+                                <Text fontWeight="bold" mb={2}>Send Notification</Text>
+                                <Input
+                                    placeholder="Enter your notification message"
+                                    value={notification}
+                                    onChange={(e) => setNotification(e.target.value)}
+                                    mb={2}
+                                />
+                                <Button
+                                    colorScheme="blue"
+                                    onClick={handleSendNotification}
+                                    isLoading={sending}
+                                >
+                                    Send Notification
+                                </Button>
+                                {currentUserData?.role === 'admin' && (
+                                    <Button
+                                        colorScheme={userData.banned ? 'green' : 'red'}
+                                        onClick={handleBanUnbanUser}
+                                        alignSelf="flex-start"
+                                        ml={180}
+                                    >
+                                        {userData.banned ? 'Unban' : 'Ban'}
+                                    </Button>
+                                )}
+                            </Box>
+                        )}
+                    </Flex>
                 </ModalBody>
             </ModalContent>
         </Modal>
@@ -126,4 +179,5 @@ UserProfileModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     username: PropTypes.string.isRequired,
+    onBanUnban: PropTypes.func,
 };

@@ -25,7 +25,13 @@ export const getUserByUsername = async (username) => {
         if (!snapshot.exists()) {
             return null;
         }
-        return snapshot.val();
+
+        const user = snapshot.val();
+        const bannedRef = ref(db, `bannedUsers/${user.uid}`);
+        const bannedSnapshot = await get(bannedRef);
+        const isBanned = bannedSnapshot.exists();
+
+        return { ...user, banned: isBanned };
     } catch (error) {
         console.error('Error retrieving user by username:', error);
         throw new Error('Failed to retrieve user: ' + error.message);

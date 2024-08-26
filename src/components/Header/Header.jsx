@@ -27,7 +27,7 @@ export default function Header({ registrationModal, loginModal }) {
         if (result.isConfirmed) {
             await logoutUser(user.uid);
             setAppState({ user: null, userData: null });
-            navigate('/login');
+            navigate('/');
         }
     };
 

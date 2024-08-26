@@ -57,9 +57,9 @@ export default function NotificationList() {
                     onClick={() => handleMarkAsRead(notification.id)}
                 >
                     <Text>{notification.message}</Text>
-                    <Badge colorScheme={notification.status === 'unread' ? 'red' : 'green'}>
-                        {notification.status}
-                    </Badge>
+                    {notification.status === 'unread' && (
+                        <Badge colorScheme="red" ml={2}>New</Badge>
+                    )}
                     <Button
                         size="xs"
                         colorScheme="red"

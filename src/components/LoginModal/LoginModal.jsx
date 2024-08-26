@@ -20,11 +20,13 @@ import Swal from 'sweetalert2';
 import { useState } from 'react';
 import { getUserByUsername, monitorUserStatus } from '../../services/user.service';
 import { auth } from '../../config/firebase-config';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [username, setUsername] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         setLoading(true);
@@ -36,21 +38,36 @@ export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
                     title: 'Login Failed',
                     confirmButtonText: 'OK',
                 });
+                setLoading(false);
+                return;
             }
+
+            if (user.banned) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Login Failed',
+                    text: 'Your account has been banned.',
+                    confirmButtonText: 'OK',
+                });
+                setLoading(false);
+                return;
+            }
+
             const email = user.email;
 
             await loginUser(email, password);
             const uid = auth.currentUser.uid;
-            Swal.fire({                                   // Strange error when
+            Swal.fire({
                 icon: 'success',
                 title: 'Login Successful',
                 confirmButtonText: 'OK',
             });
             monitorUserStatus(uid);
             onClose();
+            navigate('/');
         } catch (error) {
             Swal.fire({
-                icon: 'error',                            // Strange error when
+                icon: 'error',
                 title: 'Login Failed',
                 text: error.message,
                 confirmButtonText: 'OK',
