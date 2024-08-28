@@ -398,28 +398,47 @@ export default function QuizPreview() {
                 </Button>
 
                 <VStack spacing={4} align="start">
-                    {questions.length > 0 ? questions.map((question, index) => (
-                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
-                            <QuestionPreview question={question} />
-                            <HStack mt={2} spacing={4}>
-                                <IconButton
-                                    icon={<ArrowUpIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'up')}
-                                    isDisabled={index === 0}
-                                />
-                                <IconButton
-                                    icon={<ArrowDownIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'down')}
-                                    isDisabled={index === questions.length - 1}
-                                />
-                                <IconButton
-                                    icon={<DeleteIcon />}
-                                    colorScheme="red"
-                                    onClick={() => handleRemoveQuestion(question.id)}
-                                />
-                            </HStack>
-                        </Box>
-                    )) : <Text>No questions added yet.</Text>}
+                    {questions.length > 0 ? questions.map((question, index) => {
+                        const report = reports.find(r => r.questionId === question.id);
+
+                        return (
+                            <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
+                                <QuestionPreview question={question} />
+                                <HStack mt={2} spacing={4}>
+                                    <IconButton
+                                        icon={<ArrowUpIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'up')}
+                                        isDisabled={index === 0}
+                                    />
+                                    <IconButton
+                                        icon={<ArrowDownIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'down')}
+                                        isDisabled={index === questions.length - 1}
+                                    />
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        colorScheme="red"
+                                        onClick={() => handleRemoveQuestion(question.id)}
+                                    />
+                                    {report && (
+                                        <>
+                                            <IconButton
+                                                icon={<FaFlag />}
+                                                aria-label="Reported"
+                                                colorScheme="red"
+                                            />
+                                            <Button
+                                                colorScheme="green"
+                                                onClick={() => handleResolveReport(report.id)}
+                                            >
+                                            Resolve
+                                            </Button>
+                                        </>
+                                    )}
+                                </HStack>
+                            </Box>
+                        );
+                    }) : <Text>No questions added yet.</Text>}
                 </VStack>
             </VStack>
         </Box>
