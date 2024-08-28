@@ -246,21 +246,19 @@ export const sendNotification = async (uid, notificationData) => {
     });
 };
 
-export const getNotifications = (uid, callback) => {
+export const getNotifications = async (uid) => {
     const notificationsRef = ref(db, `notifications/${uid}`);
-    const unsubscribe = onValue(notificationsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-            const notificationsArray = Object.keys(data).map((key) => ({
-                id: key,
-                ...data[key],
-            }));
-            callback(notificationsArray);
-        } else {
-            callback([]);
-        }
-    });
-    return unsubscribe;
+    const snapshot = await get(notificationsRef);
+
+    if (snapshot.exists()) {
+        const notificationsArray = Object.keys(snapshot.val()).map((key) => ({
+            id: key,
+            ...snapshot.val()[key],
+        }));
+        return notificationsArray;
+    }
+    return [];
+
 };
 
 export const markNotificationAsRead = async (uid, notificationId) => {
@@ -285,6 +283,21 @@ export const sendNotificationToUser = async (uid, message) => {
 };
 
 export const deleteNotification = async (uid, notificationId) => {
-    const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
-    await remove(notificationRef);
+    try {
+        if (notificationId) {
+            const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
+            await remove(notificationRef);
+            console.log(`Notification ${notificationId} deleted`);
+        }
+
+        const notificationsRef = ref(db, `notifications/${uid}`);
+        const snapshot = await get(notificationsRef);
+
+        if (!snapshot.exists()) {
+            await remove(notificationsRef);
+            console.log(`All notifications for user ${uid} deleted`);
+        }
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+    }
 };

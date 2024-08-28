@@ -8,12 +8,18 @@ export default function NotificationList() {
     const [notifications, setNotifications] = useState([]);
 
     useEffect(() => {
-        if (!userData) return;
-
-        const unsubscribe = getNotifications(userData.uid, setNotifications);
-
-        return () => unsubscribe();
+        fetchNotifications(userData.uid);
     }, [userData]);
+
+    const fetchNotifications = async (uid) => {
+        try {
+            const notificationsData = await getNotifications(uid);
+            setNotifications(notificationsData);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
+
 
     const handleMarkAsRead = async (notificationId) => {
         try {
@@ -33,9 +39,8 @@ export default function NotificationList() {
     const handleDeleteNotification = async (notificationId) => {
         try {
             await deleteNotification(userData.uid, notificationId);
-            setNotifications((prevNotifications) =>
-                prevNotifications.filter((notification) => notification.id !== notificationId)
-            );
+
+            await fetchNotifications(userData.uid);
         } catch (error) {
             console.error('Error deleting notification:', error);
         }
