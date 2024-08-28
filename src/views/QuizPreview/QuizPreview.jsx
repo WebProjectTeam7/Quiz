@@ -29,8 +29,6 @@ import { getQuizById, editQuiz, updateQuestionsIdsArray, deleteQuiz } from '../.
 import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
-import { FaFlag } from 'react-icons/fa';
-import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.servce';
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 
 export default function QuizPreview() {
@@ -56,12 +54,10 @@ export default function QuizPreview() {
     const [isSaving, setIsSaving] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
-    const [reports, setReports] = useState([]);
 
     useEffect(() => {
         if (quizId) {
             fetchQuiz(quizId);
-            fetchReportedBugs(quizId);
         }
     }, [quizId]);
 
@@ -238,26 +234,6 @@ export default function QuizPreview() {
         onInviteClose();
     };
 
-    const fetchReportedBugs = async (quizId) => {
-        try {
-            const bugs = await getAllReportedBugs();
-            const quizBugs = bugs.filter(bug => bug.quizId === quizId);
-            setReports(quizBugs);
-        } catch (error) {
-            console.error('Failed to fetch reported bugs:', error);
-        }
-    };
-
-    const handleResolveReport = async (reportId) => {
-        try {
-            await deleteReportedBugs(reportId);
-            setReports(reports.filter(report => report.id !== reportId));
-            Swal.fire('Resolved!', 'The reported bug has been resolved.', 'success');
-        } catch (error) {
-            Swal.fire('Error', 'Failed to resolve the bug.', 'error');
-        }
-    };
-
     return (
         <Box maxW="800px" mx="auto" py={8}>
             <VStack spacing={4} align="start">
@@ -384,63 +360,65 @@ export default function QuizPreview() {
                         </HStack>
                     </Editable>
                 </HStack>
+                <HStack>
+                    <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
+                        Save Changes
+                    </Button>
 
-                <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
-                    Save Changes
-                </Button>
+                    <Button colorScheme="blue" onClick={onOpen}>
+                        Add Question
+                    </Button>
 
-                <Button colorScheme="blue" onClick={onOpen}>
-                    Add Question
-                </Button>
+                    <Button onClick={handleTestQuiz} colorScheme="teal" >
+                        Test Quiz
+                    </Button>
 
-                <Button onClick={handleTestQuiz} colorScheme="teal" mt={4}>
-                    Test Quiz
-                </Button>
+                    {quiz.type === QuizAccessEnum.PRIVATE && (
+                        <Button colorScheme="blue" onClick={onInviteOpen}>
+                            Send Invitation
+                        </Button>
+                    )}
+                </HStack>
+
+                <HStack>
+                    <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
+                        {quiz.isActive ? 'Deactivate Quiz' : 'Activate Quiz'}
+                    </Button>
+
+
+                    <Button colorScheme="red" onClick={handleDeleteQuiz}>
+                        Delete Quiz
+                    </Button>
+                </HStack>
 
                 <VStack spacing={4} align="start">
-                    {questions.length > 0 ? questions.map((question, index) => {
-                        const report = reports.find(r => r.questionId === question.id);
-
-                        return (
-                            <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
-                                <QuestionPreview question={question} />
-                                <HStack mt={2} spacing={4}>
-                                    <IconButton
-                                        icon={<ArrowUpIcon />}
-                                        onClick={() => handleMoveQuestion(index, 'up')}
-                                        isDisabled={index === 0}
-                                    />
-                                    <IconButton
-                                        icon={<ArrowDownIcon />}
-                                        onClick={() => handleMoveQuestion(index, 'down')}
-                                        isDisabled={index === questions.length - 1}
-                                    />
-                                    <IconButton
-                                        icon={<DeleteIcon />}
-                                        colorScheme="red"
-                                        onClick={() => handleRemoveQuestion(question.id)}
-                                    />
-                                    {report && (
-                                        <>
-                                            <IconButton
-                                                icon={<FaFlag />}
-                                                aria-label="Reported"
-                                                colorScheme="red"
-                                            />
-                                            <Button
-                                                colorScheme="green"
-                                                onClick={() => handleResolveReport(report.id)}
-                                            >
-                                            Resolve
-                                            </Button>
-                                        </>
-                                    )}
-                                </HStack>
-                            </Box>
-                        );
-                    }) : <Text>No questions added yet.</Text>}
+                    {questions.length > 0 ? questions.map((question, index) => (
+                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
+                            <QuestionPreview question={question} />
+                            <HStack mt={2} spacing={4}>
+                                <IconButton
+                                    icon={<ArrowUpIcon />}
+                                    onClick={() => handleMoveQuestion(index, 'up')}
+                                    isDisabled={index === 0}
+                                />
+                                <IconButton
+                                    icon={<ArrowDownIcon />}
+                                    onClick={() => handleMoveQuestion(index, 'down')}
+                                    isDisabled={index === questions.length - 1}
+                                />
+                                <IconButton
+                                    icon={<DeleteIcon />}
+                                    colorScheme="red"
+                                    onClick={() => handleRemoveQuestion(question.id)}
+                                />
+                            </HStack>
+                        </Box>
+                    )) : <Text>No questions added yet.</Text>}
                 </VStack>
             </VStack>
+
+            <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
+            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} onSendInvitation={handleSendInvitation} />
         </Box>
     );
 }
