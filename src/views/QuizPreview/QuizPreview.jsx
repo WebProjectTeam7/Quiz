@@ -25,12 +25,13 @@ import QuizCategoryEnum from '../../common/category-enum';
 import QuizDifficultyEnum from '../../common/difficulty.enum';
 import CreateQuestion from '../../components/CreateQuestion/CreateQuestion';
 import QuestionPreview from '../../components/QuestionPreview/QuestionPreview';
-import { getQuizById, editQuiz, updateQuestionsIdsArray } from '../../services/quiz.service';
+import { getQuizById, editQuiz, updateQuestionsIdsArray, deleteQuiz } from '../../services/quiz.service';
 import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import { FaFlag } from 'react-icons/fa';
 import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.servce';
+import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -49,10 +50,12 @@ export default function QuizPreview() {
         dateBegins: null,
         dateEnds: null,
         timeLimit: 0,
+        isActive: false,
     });
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
     const [reports, setReports] = useState([]);
 
     useEffect(() => {
@@ -67,11 +70,13 @@ export default function QuizPreview() {
             const fetchedQuiz = await getQuizById(quizId);
             setQuiz(fetchedQuiz);
             if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
-                const fetchedQuestions = await Promise.all(fetchedQuiz.questions
-                    .map(async (questionId) => await getQuestionById(questionId))
-                    .filter(q => q !== null));
+                let fetchedQuestions = await Promise.all(fetchedQuiz.questions
+                    .map(async (questionId) => await getQuestionById(questionId)));
+
+                fetchedQuestions = fetchedQuestions.filter(q => q !== null);
                 setQuestions(fetchedQuestions);
             }
+
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
         }
@@ -129,6 +134,48 @@ export default function QuizPreview() {
         navigate(`/play-quiz/${quizId}`);
     };
 
+    const handleToggleActive = async () => {
+        const currentDate = new Date();
+        const startDate = new Date(quiz.dateBegins);
+        const endDate = new Date(quiz.dateEnds);
+
+        if (startDate && currentDate < startDate) {
+            Swal.fire({
+                title: 'Quiz Not Yet Active',
+                text: `The quiz will be set to active on ${startDate.toLocaleString()}.`,
+                icon: 'info',
+            });
+            return;
+        }
+
+        if (endDate && currentDate > endDate) {
+            Swal.fire({
+                title: 'Quiz Ended',
+                text: 'The quiz cannot be set to active because the end date has passed.',
+                icon: 'warning',
+            });
+            return;
+        }
+
+        const newActiveState = !quiz.isActive;
+        setQuiz({ ...quiz, isActive: newActiveState });
+
+        try {
+            await editQuiz(quizId, { ...quiz, isActive: newActiveState });
+            Swal.fire({
+                title: `Quiz ${newActiveState ? 'Activated' : 'Deactivated'}`,
+                text: `The quiz has been ${newActiveState ? 'activated' : 'deactivated'}.`,
+                icon: 'success',
+            });
+        } catch (error) {
+            console.error('Failed to update quiz state:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to update the quiz status. Please try again.',
+                icon: 'error',
+            });
+        }
+    };
 
     const handleSaveChanges = async () => {
         setIsSaving(true);
@@ -153,6 +200,42 @@ export default function QuizPreview() {
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handleDeleteQuiz = async () => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await deleteQuiz(quizId);
+                    Swal.fire(
+                        'Deleted!',
+                        'Your quiz has been deleted.',
+                        'success'
+                    );
+                    navigate('/organizer-dashboard');
+                } catch (error) {
+                    console.error('Failed to delete quiz:', error);
+                    Swal.fire(
+                        'Error!',
+                        'Failed to delete quiz. Please try again.',
+                        'error'
+                    );
+                }
+            }
+        });
+    };
+
+    const handleSendInvitation = (userId) => {
+        // TODO
+        onInviteClose();
     };
 
     const fetchReportedBugs = async (quizId) => {
@@ -315,50 +398,29 @@ export default function QuizPreview() {
                 </Button>
 
                 <VStack spacing={4} align="start">
-                    {questions.length > 0 ? questions.map((question, index) => {
-                        const report = reports.find(r => r.questionId === question.id);
-
-                        return (
-                            <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
-                                <QuestionPreview question={question} />
-                                <HStack mt={2} spacing={4}>
-                                    <IconButton
-                                        icon={<ArrowUpIcon />}
-                                        onClick={() => handleMoveQuestion(index, 'up')}
-                                        isDisabled={index === 0}
-                                    />
-                                    <IconButton
-                                        icon={<ArrowDownIcon />}
-                                        onClick={() => handleMoveQuestion(index, 'down')}
-                                        isDisabled={index === questions.length - 1}
-                                    />
-                                    <IconButton
-                                        icon={<DeleteIcon />}
-                                        colorScheme="red"
-                                        onClick={() => handleRemoveQuestion(question.id)}
-                                    />
-                                    {report && (
-                                        <>
-                                            <IconButton
-                                                icon={<FaFlag />}
-                                                aria-label="Reported"
-                                                colorScheme="red"
-                                            />
-                                            <Button
-                                                colorScheme="green"
-                                                onClick={() => handleResolveReport(report.id)}
-                                            >
-                                            Resolve
-                                            </Button>
-                                        </>
-                                    )}
-                                </HStack>
-                            </Box>
-                        );
-                    }) : <Text>No questions added yet.</Text>}
+                    {questions.length > 0 ? questions.map((question, index) => (
+                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
+                            <QuestionPreview question={question} />
+                            <HStack mt={2} spacing={4}>
+                                <IconButton
+                                    icon={<ArrowUpIcon />}
+                                    onClick={() => handleMoveQuestion(index, 'up')}
+                                    isDisabled={index === 0}
+                                />
+                                <IconButton
+                                    icon={<ArrowDownIcon />}
+                                    onClick={() => handleMoveQuestion(index, 'down')}
+                                    isDisabled={index === questions.length - 1}
+                                />
+                                <IconButton
+                                    icon={<DeleteIcon />}
+                                    colorScheme="red"
+                                    onClick={() => handleRemoveQuestion(question.id)}
+                                />
+                            </HStack>
+                        </Box>
+                    )) : <Text>No questions added yet.</Text>}
                 </VStack>
-
-                <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
             </VStack>
         </Box>
     );

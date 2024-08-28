@@ -1,12 +1,4 @@
-
-.login-email {
-    border-color: rgb(165, 165, 236) !important;
-    padding: 8px;
-    font-size: 1rem;
-    background-color: #f7f7f7;
-    border-radius: 4px;
-}
-
+.login-email,
 .login-password {
     border-color: rgb(165, 165, 236) !important;
     padding: 8px;
@@ -39,4 +31,126 @@
 
 .login-cancel-button:active {
     background-color: #c53030 !important;
+}
+
+.css-pv22qu {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-radius: 10px;
+    color: #f7f7f7;
+    margin-top: 60px;
+    margin-bottom: 60px;
+    z-index: var(--chakra-zIndices-modal);
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 5px 40px rgb(0, 0, 0) !important;
+    max-width: 600px;
+    padding: 20px;
+}
+
+.css-c6nly4 {
+    transition-property: var(--chakra-transition-property-common);
+    transition-duration: var(--chakra-transition-duration-fast);
+    transition-timing-function: var(--chakra-transition-easing-ease-out);
+    cursor: pointer;
+    -webkit-text-decoration: none;
+    text-decoration: none;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    color: var(--chakra-colors-teal-500);
+}
+
+.css-9fgtzh {
+    flex: 0;
+    padding-inline-start: var(--chakra-space-6);
+    padding-inline-end: var(--chakra-space-6);
+    padding-top: var(--chakra-space-4);
+    padding-bottom: var(--chakra-space-4);
+    font-size: var(--chakra-fontSizes-xl);
+    font-weight: var(--chakra-fontWeights-semibold);
+    color: rgb(237, 243, 182) !important;
+}
+
+.css-c6nly4 {
+    transition-property: var(--chakra-transition-property-common); 
+    transition-duration: var(--chakra-transition-duration-fast);
+    transition-timing-function: var(--chakra-transition-easing-ease-out);
+    cursor: pointer;
+    text-decoration: none;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    color: rgb(237, 243, 182) !important;
+}
+
+.css-14iyyou {
+    color: rgb(237, 243, 182) !important;
+}
+
+.organizer-code {
+    width: 120px !important;
+    padding: 6px !important;
+    border-color: rgb(165, 165, 236) !important;
+    border-radius: 4px;
+    font-size: 1rem !important;
+}
+
+.css-127xmqf {
+    color:  rgb(237, 243, 182) !important;
+}
+
+.css-1g0mrv8 {
+    color:  rgb(237, 243, 182) !important;
+}
+
+.css-2roz5u {
+    background-color: rgb(66, 146, 102) !important;
+}
+
+.css-o9akmp {
+    background-color: rgb(49, 49, 114) !important;
+    color:  rgb(237, 243, 182) !important;
+}
+
+.css-1kfu8nn {
+    background-color: rgb(49, 49, 114) !important;
+    color:  rgb(237, 243, 182) !important;
+    --menu-bg: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+}
+
+/*Players color for quiz battle */
+.player-card:nth-child(1) {
+    background-color: #da1212 !important;
+}
+
+.player-card:nth-child(2) {
+    background-color: #57cc5b !important;
+}
+
+.player-card:nth-child(3) {
+    background-color: #008cff !important;
+}
+
+.player-card:nth-child(4) {
+    background-color: #b2e933f1 !important;
+}
+
+/*start and back button in quiz battle*/
+.chakra-button.css-betff9 {/*ако нещо не е окей - start button in quiz battle*/}
+
+.css-1l847e9 {
+    margin-top: 0px;
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+    margin-left: auto !important;
+    display: flex;
+    justify-content: flex-end !important;
+}
+
+/*quiz-title*/
+.quiz-title {
+    font-weight: lighter;
+    font-size: 1rem;
 }
