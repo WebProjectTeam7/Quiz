@@ -80,6 +80,7 @@
 .how-it-works h2 {
     font-size: 2rem;
     margin-bottom: 20px;
+    color: rgb(237, 243, 182);
 }
 
 .how-it-works .steps {
@@ -118,6 +119,7 @@
 .benefits h2 {
     font-size: 2rem;
     margin-bottom: 20px;
+    color: rgb(237, 243, 182);
 }
 
 .benefits .benefit-item {
@@ -153,6 +155,7 @@
     font-size: 2rem;
     text-align: center;
     margin-bottom: 20px;
+    color: rgb(237, 243, 182);
 }
 
 .current-quizzes .quiz-list {
@@ -196,7 +199,7 @@
 
 .testimonials {
     background: rgba(12, 8, 58, 0.486);
-    color: rgb(215, 216, 209);
+    color: rgb(237, 243, 182);
     padding: 60px 20px;
     text-align: center;
     border-radius: 10px;
@@ -232,4 +235,72 @@
 
 .footer a:hover {
     text-decoration: underline;
+}
+
+.how-it-works .step {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.home-page-quizzes {
+    background: rgb(237, 243, 182);
+    color: rgb(12, 8, 58);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 35px;
+}
+
+.home-page-quizzes:hover {
+    background-color: rgba(188, 16, 79, 0.8);
+    color: #fff;
+}
+
+.home-page-tournament {
+    background: rgb(237, 243, 182);
+    color: rgb(12, 8, 58);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 35px;
+}
+
+.home-page-tournament:hover {
+    background-color: rgba(188, 16, 79, 0.8);
+    color: #fff;
+}
+
+.home-page-question {
+    background: rgb(237, 243, 182);
+    color: rgb(12, 8, 58);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.home-page-question:hover {
+    background-color: rgba(188, 16, 79, 0.8);
+    color: #fff;
+}
+
+.how-it-works .step h3 {
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+    color: rgba(237, 243, 182, 0.733);
+}
+
+.welcome-text {
+    color: rgb(237, 243, 182);
+    font-size: 24px;
 }

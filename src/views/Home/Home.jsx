@@ -1,8 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 import './Home.css';
-import quizFriendsImg from '../../images/quiz-friends.png';
-import funAndEngagingImg from '../../images/funAndEngaging.png';
-import competitiveAndExciting from '../../images/group.png';
+import quizFriendsImg from '../../images/home-home-play-with-friends.png';
+import funAndEngagingImg from '../../images/home-funny.png';
+import competitiveAndExciting from '../../images/home-competitive.png';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
 import { useContext } from 'react';
@@ -11,10 +11,21 @@ export default function Home() {
     const navigate = useNavigate();
     const { userData } = useContext(AppContext);
 
-    const handleJoinNow = () => {
+    // const handleJoinNow = () => {
+    //     navigate('/tournament');
+    // };
+
+    const handleGoToQuizzes = () => {
+        navigate('/quizzes');
+    };
+
+    const handleGoToBattle = () => {
         navigate('/tournament');
     };
 
+    const handleGoToQuestion = () => {
+        navigate('/tournament'); /* must create a questions and after that add nav*/
+    };
     return (
         <div className="main-page">
             <h1>Bee Champion</h1>
@@ -22,7 +33,7 @@ export default function Home() {
             <section className="hero-banner">
                 <h1>Challenge Your Mind with Fun Quizzes</h1>
                 <p>Play quizzes with up to 4 players. Each question has a 20-second timer!</p>
-                <button className="cta-button" onClick={handleJoinNow}>Join Now</button>
+                { /* <button className="cta-button" onClick={handleJoinNow}>Join Now</button> */ }
             </section>
 
             <section className="how-it-works">
@@ -31,14 +42,17 @@ export default function Home() {
                     <div className="step">
                         <h3>Select a Quiz</h3>
                         <p>Choose from a variety of exciting quizzes.</p>
+                        <button className='home-page-quizzes' onClick={handleGoToQuizzes}>Go to quizzes</button>
                     </div>
                     <div className="step">
                         <h3>Join the Game</h3>
                         <p>Play with up to 4 players in real-time.</p>
+                        <button className='home-page-tournament' onClick={handleGoToBattle}>Join now</button>
                     </div>
                     <div className="step">
                         <h3>Answer Questions</h3>
                         <p>Each question has a 20-second timer. Answer quickly!</p>
+                        <button className='home-page-question' onClick={handleGoToQuestion}>Go to question</button>
                     </div>
                 </div>
             </section>
@@ -47,7 +61,7 @@ export default function Home() {
                 <h2>Why Choose Us?</h2>
                 <div className="benefit-item">
                     <img src={funAndEngagingImg} alt='Fun and Engaging' />
-                    <h3>Fun and Engaging</h3>
+                    <h3>Fun Quizzes</h3>
                 </div>
                 <div className="benefit-item">
                     <img src={quizFriendsImg} alt='Play with Friends' />
