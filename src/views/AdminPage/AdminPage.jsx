@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getAllUsers } from '../../services/user.service';
-import { banUser, deleteReportedBugs, getAllBannedUsers, unbanUser } from '../../services/admin.servce';
+import { banUser, deleteReportedBugs, getAllBannedUsers, getAllReportedBugs, unbanUser } from '../../services/admin.servce';
 import UserRoleEnum from '../../common/role-enum';
 import { Box, Button, Input, Table, Tbody, Td, Th, Thead, Tr, Text, Badge } from '@chakra-ui/react';
 import Swal from 'sweetalert2';
 import useModal from '../../custom-hooks/useModal';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
+import { Link } from 'react-router-dom';
 
 export default function AdminPage() {
     const [users, setUsers] = useState([]);
@@ -22,6 +23,7 @@ export default function AdminPage() {
     useEffect(() => {
         fetchAllUsers();
         fetchBannedUsers();
+        fetchReportedBugs();
     }, []);
 
     const fetchAllUsers = async () => {
@@ -115,6 +117,16 @@ export default function AdminPage() {
             Swal.fire('Error', error.message, 'error');
         }
     };
+
+    const fetchReportedBugs = async () => {
+        try {
+            const bugs = await getAllReportedBugs();
+            setReports(bugs);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
 
     const filteredUsers = (view === 'banned' ? bannedUsers : users).filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -210,12 +222,9 @@ export default function AdminPage() {
                 <Table variant="simple">
                     <Thead>
                         <Tr>
-                            <Th>Reported User</Th>
+                            <Th>Reported Question</Th>
                             <Th>Reported By</Th>
-                            <Th>Date</Th>
-                            <Th>Type</Th>
-                            <Th>Content</Th>
-                            <Th>Reason</Th>
+                            <Th>Time</Th>
                             <Th>Actions</Th>
                         </Tr>
                     </Thead>
@@ -223,20 +232,23 @@ export default function AdminPage() {
                         {reports.length > 0 ? (
                             reports.map(report => (
                                 <Tr key={report.id}>
-                                    <Td>{report.reportedUser}</Td>
-                                    <Td>{report.reporter}</Td>
-                                    <Td>{new Date(report.reportedAt).toLocaleString()}</Td>
-                                    <Td>{report.type}</Td>
-                                    <Td>{report.content}</Td>
-                                    <Td>{report.reason}</Td>
                                     <Td>
-                                        <Button colorScheme="red" onClick={() => handleDeleteReport(report.id)}>Dismiss</Button>
+                                        <Link to={`/quiz-preview/${report.quizId}?highlight=${report.questionId}`}>
+                            View Quiz
+                                        </Link>
+                                    </Td>
+                                    <Td>{report.reportedBy}</Td>
+                                    <Td>{new Date(report.reportedAt).toLocaleString()}</Td>
+                                    <Td>
+                                        <Button colorScheme="red" onClick={() => handleDeleteReport(report.id)}>
+                            Resolved
+                                        </Button>
                                     </Td>
                                 </Tr>
                             ))
                         ) : (
                             <Tr>
-                                <Td colSpan="7">No reports available</Td>
+                                <Td colSpan="4">No reports available</Td>
                             </Tr>
                         )}
                     </Tbody>

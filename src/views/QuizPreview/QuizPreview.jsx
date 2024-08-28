@@ -29,6 +29,8 @@ import { getQuizById, editQuiz, updateQuestionsIdsArray } from '../../services/q
 import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
+import { FaFlag } from 'react-icons/fa';
+import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.servce';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -51,10 +53,12 @@ export default function QuizPreview() {
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const [reports, setReports] = useState([]);
 
     useEffect(() => {
         if (quizId) {
             fetchQuiz(quizId);
+            fetchReportedBugs(quizId);
         }
     }, [quizId]);
 
@@ -148,6 +152,26 @@ export default function QuizPreview() {
             });
         } finally {
             setIsSaving(false);
+        }
+    };
+
+    const fetchReportedBugs = async (quizId) => {
+        try {
+            const bugs = await getAllReportedBugs();
+            const quizBugs = bugs.filter(bug => bug.quizId === quizId);
+            setReports(quizBugs);
+        } catch (error) {
+            console.error('Failed to fetch reported bugs:', error);
+        }
+    };
+
+    const handleResolveReport = async (reportId) => {
+        try {
+            await deleteReportedBugs(reportId);
+            setReports(reports.filter(report => report.id !== reportId));
+            Swal.fire('Resolved!', 'The reported bug has been resolved.', 'success');
+        } catch (error) {
+            Swal.fire('Error', 'Failed to resolve the bug.', 'error');
         }
     };
 
@@ -291,32 +315,51 @@ export default function QuizPreview() {
                 </Button>
 
                 <VStack spacing={4} align="start">
-                    {questions.length > 0 ? questions.map((question, index) => (
-                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
-                            <QuestionPreview question={question} />
-                            <HStack mt={2} spacing={4}>
-                                <IconButton
-                                    icon={<ArrowUpIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'up')}
-                                    isDisabled={index === 0}
-                                />
-                                <IconButton
-                                    icon={<ArrowDownIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'down')}
-                                    isDisabled={index === questions.length - 1}
-                                />
-                                <IconButton
-                                    icon={<DeleteIcon />}
-                                    colorScheme="red"
-                                    onClick={() => handleRemoveQuestion(question.id)}
-                                />
-                            </HStack>
-                        </Box>
-                    )) : <Text>No questions added yet.</Text>}
-                </VStack>
-            </VStack>
+                    {questions.length > 0 ? questions.map((question, index) => {
+                        const report = reports.find(r => r.questionId === question.id);
 
-            <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
+                        return (
+                            <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
+                                <QuestionPreview question={question} />
+                                <HStack mt={2} spacing={4}>
+                                    <IconButton
+                                        icon={<ArrowUpIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'up')}
+                                        isDisabled={index === 0}
+                                    />
+                                    <IconButton
+                                        icon={<ArrowDownIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'down')}
+                                        isDisabled={index === questions.length - 1}
+                                    />
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        colorScheme="red"
+                                        onClick={() => handleRemoveQuestion(question.id)}
+                                    />
+                                    {report && (
+                                        <>
+                                            <IconButton
+                                                icon={<FaFlag />}
+                                                aria-label="Reported"
+                                                colorScheme="red"
+                                            />
+                                            <Button
+                                                colorScheme="green"
+                                                onClick={() => handleResolveReport(report.id)}
+                                            >
+                                            Resolve
+                                            </Button>
+                                        </>
+                                    )}
+                                </HStack>
+                            </Box>
+                        );
+                    }) : <Text>No questions added yet.</Text>}
+                </VStack>
+
+                <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
+            </VStack>
         </Box>
     );
 }

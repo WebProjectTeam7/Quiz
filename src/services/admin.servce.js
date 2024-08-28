@@ -1,19 +1,48 @@
-import { get, ref, remove, set } from 'firebase/database';
+import { get, push, ref, remove, set } from 'firebase/database';
 import { db } from '../config/firebase-config';
 
-
 // REPORT BUGS
-export const getReportedBugs = async () => {
-    const reportsRef = ref(db, 'reports');
+export const sendBugReport = async (quizId, questionId, userId, username) => {
     try {
+        const reportRef = push(ref(db, 'reports'));
+        const newReport = {
+            quizId,
+            questionId,
+            reportedBy: username,
+            reportedAt: Date.now(),
+        };
+        await set(reportRef, newReport);
+    } catch (error) {
+        console.error('Error reporting bug:', error.message);
+        throw new Error('Failed to report the bug');
+    }
+};
+
+export const reportBug = async (report) => {
+    try {
+        const reportRef = push(ref(db, 'reports'));
+        await set(reportRef, report);
+    } catch (error) {
+        console.error('Failed to report bug:', error);
+        throw new Error('Failed to report bug');
+    }
+};
+
+export const getAllReportedBugs = async () => {
+    try {
+        const reportsRef = ref(db, 'reports');
         const snapshot = await get(reportsRef);
         if (!snapshot.exists()) {
             return [];
         }
-        return Object.values(snapshot.val());
+        const reportsObject = snapshot.val();
+        return Object.keys(reportsObject).map(key => ({
+            id: key,
+            ...reportsObject[key],
+        }));
     } catch (error) {
-        console.error('Error fetching reports:', error);
-        throw new Error('Failed to fetch reports');
+        console.error('Failed to retrieve reports:', error);
+        throw new Error('Failed to retrieve reports');
     }
 };
 

@@ -8,13 +8,21 @@ import {
     Button,
     FormControl,
     FormLabel,
+    IconButton,
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
+import Swal from 'sweetalert2';
+import { FaFlag } from 'react-icons/fa';
+import { sendBugReport  } from '../../services/admin.servce';
+import { AppContext } from '../../state/app.context';
+import { useParams } from 'react-router-dom';
 
 export default function QuestionView({ question, onAnswerSubmit, savedAnswer }) {
     const [selectedOption, setSelectedOption] = useState('');
     const [userInput, setUserInput] = useState('');
+    const { userData } = useContext(AppContext);
+    const { quizId } = useParams();
 
     useEffect(() => {
         if (question.options && question.options.length > 1) {
@@ -29,6 +37,15 @@ export default function QuestionView({ question, onAnswerSubmit, savedAnswer }) 
             onAnswerSubmit(question.id, selectedOption);
         } else {
             onAnswerSubmit(question.id, userInput);
+        }
+    };
+
+    const handleReportBug = async () => {
+        try {
+            await sendBugReport(quizId, question.id, userData.uid, userData.username); // Adjust parameters as necessary
+            Swal.fire('Reported!', 'The bug has been reported to the admin.', 'success');
+        } catch (error) {
+            Swal.fire('Error', 'Failed to report the bug.', 'error');
         }
     };
 
@@ -70,6 +87,12 @@ export default function QuestionView({ question, onAnswerSubmit, savedAnswer }) 
                 <Button colorScheme="blue" onClick={handleSubmitAnswer}>
                     Submit Answer
                 </Button>
+                <IconButton
+                    aria-label="Report Question"
+                    icon={<FaFlag />}
+                    onClick={handleReportBug}
+                    colorScheme="red"
+                />
             </VStack>
         </Box>
     );
