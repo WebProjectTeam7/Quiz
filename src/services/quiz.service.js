@@ -2,7 +2,6 @@ import { ref as dbRef, push, get, update, set, remove, query, orderByChild, equa
 import { ref as storageRef, deleteObject } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
 
-
 // CREATE
 
 export const createQuiz = async (quiz) => {
@@ -11,6 +10,7 @@ export const createQuiz = async (quiz) => {
         const quizId = quizRef.key;
         const newQuiz = {
             ...quiz,
+            isActive: false,
             createdAt: new Date().toISOString(),
         };
         await set(quizRef, newQuiz);
@@ -21,8 +21,47 @@ export const createQuiz = async (quiz) => {
     }
 };
 
-
 // RETRIEVE
+
+export const getActiveQuizzes = async () => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const activeQuizzesQuery = query(quizRef, orderByChild('isActive'), equalTo(true));
+        const snapshot = await get(activeQuizzesQuery);
+
+        if (snapshot.exists()) {
+            const activeQuizzes = [];
+            snapshot.forEach((childSnapshot) => {
+                activeQuizzes.push({ id: childSnapshot.key, ...childSnapshot.val() });
+            });
+            return activeQuizzes;
+        }
+        return [];
+    } catch (error) {
+        console.error('Error retrieving active quizzes:', error);
+        throw new Error('Failed to retrieve active quizzes');
+    }
+};
+
+export const getQuizzesByCategory = async (categoryName) => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const categoryQuizzesQuery = query(quizRef, orderByChild('category'), equalTo(categoryName));
+        const snapshot = await get(categoryQuizzesQuery);
+
+        if (snapshot.exists()) {
+            const categoryQuizzes = [];
+            snapshot.forEach((childSnapshot) => {
+                categoryQuizzes.push({ id: childSnapshot.key, ...childSnapshot.val() });
+            });
+            return categoryQuizzes;
+        }
+        return [];
+    } catch (error) {
+        console.error('Error retrieving quizzes by category:', error);
+        throw new Error('Failed to retrieve quizzes by category');
+    }
+};
 
 export const getQuizById = async (quizId) => {
     try {
