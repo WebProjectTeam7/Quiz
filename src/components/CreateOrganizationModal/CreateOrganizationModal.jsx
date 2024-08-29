@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 import {
     Modal,
     ModalOverlay,
@@ -16,10 +17,14 @@ import {
     VStack,
     HStack
 } from '@chakra-ui/react';
-import { createOrganization } from '../../services/organization.service'; // Assuming you have a createOrganization service
-import './CreateOrgaznizationModal.css';
+import { createOrganization } from '../../services/organization.service';
+import './CreateOrganizationModal.css';
+import { AppContext } from '../../state/app.context';
+import { updateUserWithOrganization } from '../../services/user.service';
 
-const CreateOrganizationModal = ({ isOpen, onClose, userId, onOrganizationCreated }) => {
+export default function CreateOrganizationModal({ isOpen, onClose, onOrganizationCreated }) {
+    const { userData } = useContext(AppContext);
+
     const [orgName, setOrgName] = useState('');
     const [description, setDescription] = useState('');
     const [logo, setLogo] = useState(null);
@@ -40,11 +45,12 @@ const CreateOrganizationModal = ({ isOpen, onClose, userId, onOrganizationCreate
             const organization = {
                 name: orgName,
                 description,
-                founder: userId,
-                admin: userId,
+                founder: userData.username,
+                admin: userData.username,
                 logo: logo ? logo : null,
             };
             const newOrg = await createOrganization(organization);
+            await updateUserWithOrganization(userData.uid, organization.id, organization.name);
             if (onOrganizationCreated) {
                 onOrganizationCreated(newOrg);
             }
@@ -55,6 +61,7 @@ const CreateOrganizationModal = ({ isOpen, onClose, userId, onOrganizationCreate
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -110,6 +117,11 @@ const CreateOrganizationModal = ({ isOpen, onClose, userId, onOrganizationCreate
             </ModalContent>
         </Modal>
     );
+}
+
+CreateOrganizationModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onOrganizationCreated: PropTypes.func,
 };
 
-export default CreateOrganizationModal;
