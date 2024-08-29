@@ -13,7 +13,8 @@ import {
 } from '@chakra-ui/react';
 import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../state/app.context';
-import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser, getOrganizerCodes, deleteOrganizerCode, getNotifications, markNotificationAsRead } from '../../services/user.service';
+import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser, getOrganizerCodes, deleteOrganizerCode } from '../../services/user.service';
+import { getNotifications, markNotificationAsRead } from '../../services/notification.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
@@ -303,7 +304,7 @@ export default function MyProfile() {
                             mr={2}
                         />
                         <Button colorScheme="blue" onClick={handleUseCode} size="sm">
-                                    Use Code
+                            Use Code
                         </Button>
                     </Box>
                 </Box>
