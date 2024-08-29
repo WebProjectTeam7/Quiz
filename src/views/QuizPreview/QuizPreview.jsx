@@ -75,7 +75,6 @@ export default function QuizPreview() {
                 fetchedQuestions = fetchedQuestions.filter(q => q !== null);
                 setQuestions(fetchedQuestions);
             }
-
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
         }

@@ -74,29 +74,39 @@ export const getQuestionsByQuizId = async (quizId) => {
 
 // UPDATE
 
-export const editQuestion = async (questionId, updatedData, newImageFile) => {
+export const updateQuestion = async (questionId, updatedData, newImageFile) => {
     try {
         const questionRef = dbRef(db, `questions/${questionId}`);
         const snapshot = await get(questionRef);
+
         if (!snapshot.exists()) {
             throw new Error('Question not found');
         }
-        let imageUrl = snapshot.val().imageUrl;
+
+        const oldQuestionData = snapshot.val();
+        let imageUrl = oldQuestionData.imageUrl ?? null;
+
         if (newImageFile) {
             if (imageUrl) {
                 const oldImageRef = storageRef(storage, imageUrl);
                 await deleteObject(oldImageRef);
             }
             imageUrl = await uploadQuestionImage(questionId, newImageFile);
+        } else if (imageUrl && !newImageFile || updatedData.imageUrl === null) {
+            const oldImageRef = storageRef(storage, imageUrl);
+            await deleteObject(oldImageRef);
+            imageUrl = null;
         }
-        const updateQuestion = {
-            ...snapshot.val(),
+
+        const updateQuestionData = {
+            ...oldQuestionData,
             ...updatedData,
             imageUrl,
             updatedAt: new Date().toISOString(),
         };
-        await update(questionRef, updateQuestion);
-        return updateQuestion;
+
+        await update(questionRef, updateQuestionData);
+        return updateQuestionData;
     } catch (error) {
         console.error('Error updating question:', error);
         throw new Error('Failed to update question', { cause: error });
