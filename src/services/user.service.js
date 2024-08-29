@@ -1,4 +1,4 @@
-import { get, set, ref, query, equalTo, orderByChild, update, remove, onValue, onDisconnect, push } from 'firebase/database';
+import { get, set, ref, query, equalTo, orderByChild, update, remove, onValue, onDisconnect } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { auth, db, storage } from '../config/firebase-config';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
@@ -234,70 +234,3 @@ export const deleteOrganizerCode = async (code) => {
     }
 };
 
-// NOTIFICATIONS
-
-export const sendNotification = async (uid, notificationData) => {
-    const notificationRef = ref(db, `notifications/${uid}`);
-    const newNotificationRef = push(notificationRef);
-    await set(newNotificationRef, {
-        ...notificationData,
-        status: 'unread',
-        timestamp: Date.now(),
-    });
-};
-
-export const getNotifications = async (uid) => {
-    const notificationsRef = ref(db, `notifications/${uid}`);
-    const snapshot = await get(notificationsRef);
-
-    if (snapshot.exists()) {
-        const notificationsArray = Object.keys(snapshot.val()).map((key) => ({
-            id: key,
-            ...snapshot.val()[key],
-        }));
-        return notificationsArray;
-    }
-    return [];
-
-};
-
-export const markNotificationAsRead = async (uid, notificationId) => {
-    const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
-    await update(notificationRef, {
-        status: 'read',
-    });
-};
-
-export const sendNotificationToUser = async (uid, message) => {
-    const notificationsRef = ref(db, `notifications/${uid}`);
-    const newNotificationRef = push(notificationsRef);
-
-    const notificationData = {
-        id: newNotificationRef.key,
-        message,
-        status: 'unread',
-        timestamp: Date.now(),
-    };
-
-    await set(newNotificationRef, notificationData);
-};
-
-export const deleteNotification = async (uid, notificationId) => {
-    try {
-        if (notificationId) {
-            const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
-            await remove(notificationRef);
-            console.log(`Notification ${notificationId} deleted`);
-        }
-
-        const notificationsRef = ref(db, `notifications/${uid}`);
-        const snapshot = await get(notificationsRef);
-
-        if (!snapshot.exists()) {
-            await remove(notificationsRef);
-            console.log(`All notifications for user ${uid} deleted`);
-        }
-    } catch (error) {
-        console.error('Error deleting notification:', error);
-    }
-};

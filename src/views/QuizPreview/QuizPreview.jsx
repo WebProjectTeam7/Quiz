@@ -30,7 +30,7 @@ import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
-import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.servce';
+import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.service';
 
 export default function QuizPreview() {
     const { quizId } = useParams();

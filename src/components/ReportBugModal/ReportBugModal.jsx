@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { sendBugReport } from '../../services/admin.servce';
+import { sendBugReport } from '../../services/admin.service';
 import { Button, Select } from '@chakra-ui/react';
 import PropTypes from 'prop-types';
 

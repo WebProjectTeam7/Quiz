@@ -14,7 +14,7 @@ import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaFlag } from 'react-icons/fa';
-import { sendBugReport  } from '../../services/admin.servce';
+import { sendBugReport  } from '../../services/admin.service';
 import { AppContext } from '../../state/app.context';
 import { useParams } from 'react-router-dom';
 
@@ -23,7 +23,6 @@ export default function QuestionView({ question, onAnswerSubmit, savedAnswer }) 
     const [userInput, setUserInput] = useState('');
     const { userData } = useContext(AppContext);
     const { quizId } = useParams();
-    const [reportReason, setReportReason] = useState('Something Else');
 
     useEffect(() => {
         if (question.options && question.options.length > 1) {
@@ -48,7 +47,7 @@ export default function QuestionView({ question, onAnswerSubmit, savedAnswer }) 
             inputOptions: {
                 'Wrong Question': 'Wrong Question',
                 'Wrong Answer': 'Wrong Answer',
-                "Doesn't Work": "Doesn't Work",
+                'Doesn\'t Work': 'Doesn\'t Work',
                 'Something Else': 'Something Else',
             },
             inputPlaceholder: 'Select a reason',

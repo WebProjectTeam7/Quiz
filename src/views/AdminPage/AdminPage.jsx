@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getAllUsers } from '../../services/user.service';
-import { banUser, deleteReportedBugs, getAllBannedUsers, getAllReportedBugs, unbanUser } from '../../services/admin.servce';
+import { banUser, deleteReportedBugs, getAllBannedUsers, getAllReportedBugs, unbanUser } from '../../services/admin.service';
 import UserRoleEnum from '../../common/role-enum';
 import { Box, Button, Input, Table, Tbody, Td, Th, Thead, Tr, Text, Badge } from '@chakra-ui/react';
 import Swal from 'sweetalert2';
