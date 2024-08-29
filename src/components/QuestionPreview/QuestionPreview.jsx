@@ -8,11 +8,22 @@ import {
     Button,
     FormControl,
     FormLabel,
+    Textarea,
+    NumberInput,
+    NumberInputField,
+    Select,
+    HStack,
+    IconButton,
+    Switch,
+    Image,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
-import { deleteQuestion } from '../../services/question.service';
+import { deleteQuestion, updateQuestion } from '../../services/question.service';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
+import QuizAccessEnum from '../../common/access-enum';
+import QuizCategoryEnum from '../../common/category-enum';
 import './QuestionPreview.css';
 
 export default function QuestionPreview({ question }) {
@@ -20,104 +31,318 @@ export default function QuestionPreview({ question }) {
     const [userInput, setUserInput] = useState('');
     const [isCorrect, setIsCorrect] = useState(null);
     const [showAnswer, setShowAnswer] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editableQuestion, setEditableQuestion] = useState({ ...question });
+    const [imagePreview, setImagePreview] = useState(question.imageUrl || '');
+    const [isOpenEnded, setIsOpenEnded] = useState(!question.options || question.options.length === 0);
 
     const handleCheckAnswer = () => {
-        if (question.options && question.options.length > 1) {
-            setIsCorrect(selectedOption === question.answer);
+        if (!editableQuestion.options || editableQuestion.options.length === 0) {
+            setIsCorrect(userInput.trim().toLowerCase() === editableQuestion.answer.trim().toLowerCase());
         } else {
-            setIsCorrect(userInput.trim().toLowerCase() === question.answer.trim().toLowerCase());
+            setIsCorrect(selectedOption.trim().toLowerCase() === editableQuestion.answer.trim().toLowerCase());
         }
+        setShowAnswer(true);
+    };
+
+    const handleEditQuestion = () => {
+        setIsEditing(true);
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setEditableQuestion({ ...question });
+        setImagePreview(question.imageUrl || '');
+    };
+
+    const handleSaveChanges = async () => {
+        await updateQuestion(editableQuestion.id, editableQuestion, editableQuestion.imageFile);
+        setIsEditing(false);
+    };
+
+    const handleDeleteQuestion = async () => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won’t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+        });
+        if (result.isConfirmed) {
+            await deleteQuestion(editableQuestion.id);
+            Swal.fire('Deleted!', 'Your question has been deleted.', 'success');
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value, files } = e.target;
+        const newValue = files ? files[0] : value;
+
+        if (files && files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(files[0]);
+        }
+
+        setEditableQuestion((prev) => ({
+            ...prev,
+            [name]: newValue,
+            imageFile: files ? files[0] : prev.imageFile,
+        }));
+    };
+
+    const handleRemoveImage = () => {
+        setEditableQuestion((prev) => ({
+            ...prev,
+            imageFile: null,
+            imageUrl: '',
+        }));
+        setImagePreview('');
+    };
+
+    const addOption = () => {
+        setEditableQuestion((prev) => ({
+            ...prev,
+            options: [...prev.options, ''],
+        }));
+    };
+
+    const updateOption = (index) => (e) => {
+        const newOptions = [...editableQuestion.options];
+        newOptions[index] = e.target.value;
+        setEditableQuestion((prev) => ({
+            ...prev,
+            options: newOptions,
+        }));
+    };
+
+    const removeOption = (index) => {
+        setEditableQuestion((prev) => ({
+            ...prev,
+            options: prev.options.filter((_, i) => i !== index),
+        }));
     };
 
     const handleToggleAnswer = () => {
         setShowAnswer(!showAnswer);
     };
 
-    const handleDeleteQuestion = async () => {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'You won\'t be able to revert this!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        });
-
-        if (result.isConfirmed) {
-            try {
-                await deleteQuestion(question.id);
-                Swal.fire(
-                    'Deleted!',
-                    'Your quiz has been deleted.',
-                    'success'
-                );
-            } catch (error) {
-                Swal.fire(
-                    'Error!',
-                    'There was an error deleting the quiz.',
-                    'error'
-                );
-            }
-        }
-    };
-
     return (
-        <Box className="question-preview-container" borderWidth="1px" borderRadius="lg" p={4} mb={4}>
-            <VStack align="start" spacing={4}>
-                <Text className="question-preview-title" fontSize="xl" fontWeight="bold">
-                    {question.title}
-                </Text>
-                <Text className="question-preview-description">{question.description}</Text>
-                {question.imageUrl && (
-                    <Box>
-                        <img
-                            src={question.imageUrl}
-                            alt="Quiz Visual"
-                            style={{ maxHeight: '200px', objectFit: 'contain' }}
-                        />
-                    </Box>
-                )}
-                {question.options && question.options.length > 1 ? (
-                    <FormControl as="fieldset" className="question-preview-form-control">
-                        <FormLabel as="legend" className="question-preview-form-label">Choose the correct option:</FormLabel>
-                        <RadioGroup onChange={setSelectedOption} value={selectedOption}>
-                            {question.options.map((option, index) => (
-                                <Radio key={index} value={option}>
-                                    {String.fromCharCode(97 + index)}. {option}
-                                </Radio>
-                            ))}
-                        </RadioGroup>
-                    </FormControl>
+        <Box className="question-preview-container">
+            <VStack spacing={4} align="start">
+                {isEditing ? (
+                    <>
+                        <FormControl>
+                            <FormLabel>Title</FormLabel>
+                            <Input
+                                name="title"
+                                value={editableQuestion.title}
+                                onChange={handleInputChange}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Description</FormLabel>
+                            <Textarea
+                                name="description"
+                                value={editableQuestion.description}
+                                onChange={handleInputChange}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Image (Optional)</FormLabel>
+                            <Input
+                                type="file"
+                                name="imageFile"
+                                onChange={handleInputChange}
+                                accept="image/*"
+                            />
+                            {imagePreview && (
+                                <VStack align="start" spacing={2} mt={2}>
+                                    <Image
+                                        src={imagePreview}
+                                        alt="Image Preview"
+                                        maxHeight="200px"
+                                        objectFit="contain"
+                                    />
+                                    <Button
+                                        colorScheme="red"
+                                        size="sm"
+                                        onClick={handleRemoveImage}
+                                    >
+                                        Remove Image
+                                    </Button>
+                                </VStack>
+                            )}
+                        </FormControl>
+                        <FormControl display="flex" alignItems="center">
+                            <FormLabel mb="0">With Options</FormLabel>
+                            <Switch
+                                isChecked={!isOpenEnded}
+                                onChange={() => setIsOpenEnded(!isOpenEnded)}
+                            />
+                        </FormControl>
+                        {!isOpenEnded && (
+                            <FormControl>
+                                <FormLabel>Options</FormLabel>
+                                {editableQuestion.options.map((option, index) => (
+                                    <HStack key={index} spacing={2}>
+                                        <Input
+                                            value={option}
+                                            onChange={updateOption(index)}
+                                            placeholder={`Option ${index + 1}`}
+                                        />
+                                        <IconButton
+                                            icon={<DeleteIcon />}
+                                            onClick={() => removeOption(index)}
+                                            variant="outline"
+                                            colorScheme="red"
+                                            size="sm"
+                                            isDisabled={editableQuestion.options.length === 1}
+                                        />
+                                    </HStack>
+                                ))}
+                                <Button
+                                    leftIcon={<AddIcon />}
+                                    onClick={addOption}
+                                    variant="link"
+                                    colorScheme="blue"
+                                    size="sm"
+                                    mt={2}
+                                >
+                                    Add Option
+                                </Button>
+                            </FormControl>
+                        )}
+                        <FormControl>
+                            <FormLabel>Answer</FormLabel>
+                            <Input
+                                name="answer"
+                                value={editableQuestion.answer}
+                                onChange={handleInputChange}
+                            />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Category</FormLabel>
+                            <Select
+                                name="category"
+                                value={editableQuestion.category}
+                                onChange={handleInputChange}
+                            >
+                                {Object.values(QuizCategoryEnum).map((category) => (
+                                    <option key={category} value={category}>
+                                        {category}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Points</FormLabel>
+                            <NumberInput
+                                name="points"
+                                value={editableQuestion.points}
+                                onChange={(value) => handleInputChange({ target: { name: 'points', value } })}
+                                min={0}
+                                step={1}
+                            >
+                                <NumberInputField />
+                            </NumberInput>
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Time Amplifier</FormLabel>
+                            <NumberInput
+                                name="timeAmplifier"
+                                value={editableQuestion.timeAmplifier}
+                                onChange={(value) => handleInputChange({ target: { name: 'timeAmplifier', value } })}
+                                min={1}
+                                step={0.1}
+                            >
+                                <NumberInputField />
+                            </NumberInput>
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Access</FormLabel>
+                            <Select
+                                name="access"
+                                value={editableQuestion.access}
+                                onChange={handleInputChange}
+                            >
+                                {Object.values(QuizAccessEnum).map((access) => (
+                                    <option key={access} value={access}>
+                                        {access}
+                                    </option>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <Button colorScheme="blue" onClick={handleSaveChanges}>
+                            Save Changes
+                        </Button>
+                        <Button colorScheme="gray" onClick={handleCancelEdit}>
+                            Cancel
+                        </Button>
+                    </>
                 ) : (
-                    <FormControl className="question-preview-form-control">
-                        <FormLabel className="question-preview-form-label">Provide your answer:</FormLabel>
-                        <Input
-                            value={userInput}
-                            onChange={(e) => setUserInput(e.target.value)}
-                            placeholder="Type your answer"
-                        />
-                    </FormControl>
+                    <>
+                        <Text fontWeight="bold">{editableQuestion.title}</Text>
+                        <Text>{editableQuestion.description}</Text>
+                        {imagePreview && (
+                            <Image
+                                src={imagePreview}
+                                alt="Question Image"
+                                maxHeight="200px"
+                                mt={2}
+                                objectFit="contain"
+                            />
+                        )}
+                        {editableQuestion.options && editableQuestion.options.length > 0 ? (
+                            <FormControl>
+                                <FormLabel>Select an option:</FormLabel>
+                                <RadioGroup
+                                    name="quiz-options"
+                                    onChange={setSelectedOption}
+                                    value={selectedOption}
+                                >
+                                    <VStack align="start">
+                                        {editableQuestion.options.map((option, index) => (
+                                            <Radio key={index} value={option}>
+                                                {option}
+                                            </Radio>
+                                        ))}
+                                    </VStack>
+                                </RadioGroup>
+                            </FormControl>
+                        ) : (
+                            <FormControl>
+                                <FormLabel>Enter your answer:</FormLabel>
+                                <Input
+                                    type="text"
+                                    name="user-answer"
+                                    value={userInput}
+                                    onChange={(e) => setUserInput(e.target.value)}
+                                    placeholder="Type your answer"
+                                />
+                            </FormControl>
+                        )}
+                        <Button onClick={handleCheckAnswer} colorScheme="blue">
+                            Check Answer
+                        </Button>
+                        <Button onClick={handleToggleAnswer} colorScheme="yellow">
+                            {showAnswer ? 'Hide' : 'Show'} Answer
+                        </Button>
+                        <Button onClick={handleEditQuestion} colorScheme="green">
+                            Edit Question
+                        </Button>
+                        <Button onClick={handleDeleteQuestion} colorScheme="red">
+                            Delete Question
+                        </Button>
+                        {showAnswer && (
+                            <Text fontWeight="bold" color={isCorrect ? 'green.500' : 'red.500'}>
+                                {isCorrect ? 'Correct!' : 'Incorrect!'} The correct answer is: {editableQuestion.answer}
+                            </Text>
+                        )}
+                    </>
                 )}
-                <Button colorScheme="blue" onClick={handleCheckAnswer}>
-                    Check Answer
-                </Button>
-                {isCorrect !== null && (
-                    <Text fontSize="lg" fontWeight="bold" color={isCorrect ? 'green.500' : 'red.500'}>
-                        {isCorrect ? 'Correct!' : 'Incorrect!'}
-                    </Text>
-                )}
-                <Button colorScheme="teal" variant="ghost" onClick={handleToggleAnswer} mt={2}>
-                    {showAnswer ? 'Hide Answer' : 'Show Answer'}
-                </Button>
-                {showAnswer && (
-                    <Text fontSize="lg" mt={2} p={2} bg="gray.100" borderRadius="md">
-                        {question.answer}
-                    </Text>
-                )}
-                <Button colorScheme="red" variant="solid" onClick={handleDeleteQuestion} mt={4}>
-                    Delete Question From Database
-                </Button>
             </VStack>
         </Box>
     );
@@ -127,9 +352,13 @@ QuestionPreview.propTypes = {
     question: PropTypes.shape({
         id: PropTypes.string.isRequired,
         title: PropTypes.string.isRequired,
-        description: PropTypes.string.isRequired,
+        description: PropTypes.string,
         imageUrl: PropTypes.string,
         options: PropTypes.arrayOf(PropTypes.string),
         answer: PropTypes.string.isRequired,
+        points: PropTypes.number,
+        category: PropTypes.string,
+        timeAmplifier: PropTypes.number,
+        access: PropTypes.string,
     }).isRequired,
 };

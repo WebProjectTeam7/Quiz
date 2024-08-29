@@ -18,6 +18,7 @@ import {
     HStack,
     IconButton,
     Switch,
+    Image
 } from '@chakra-ui/react';
 import { useContext, useState } from 'react';
 import { AppContext } from '../../state/app.context';
@@ -26,6 +27,7 @@ import propTypes from 'prop-types';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import QuizAccessEnum from '../../common/access-enum';
 import { createQuestion } from '../../services/question.service';
+import QuizCategoryEnum from '../../common/category-enum';
 
 export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quizId }) {
     const { userData } = useContext(AppContext);
@@ -45,13 +47,36 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
 
     const [loading, setLoading] = useState(false);
     const [isOpenEnded, setIsOpenEnded] = useState(false);
+    const [imagePreview, setImagePreview] = useState('');
 
     const updateQuestion = (prop) => (e) => {
         const value = prop === 'imageFile' ? e.target.files[0] : e.target.value;
+
+        if (prop === 'imageFile') {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImagePreview(reader.result);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                setImagePreview('');
+            }
+        }
+
         setQuestion((prev) => ({
             ...prev,
             [prop]: value,
         }));
+    };
+
+    const handleRemoveImage = () => {
+        setQuestion((prev) => ({
+            ...prev,
+            imageFile: null,
+        }));
+        setImagePreview('');
     };
 
     const addOption = () => {
@@ -106,6 +131,7 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
                 timeAmplifier: 1,
             });
             setIsOpenEnded(false);
+            setImagePreview('');
             onClose();
         } catch (error) {
             Swal.fire({
@@ -146,12 +172,31 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
                                 />
                             </FormControl>
 
-                            <FormControl id="imageFile">
+                            <FormControl>
                                 <FormLabel>Image (Optional)</FormLabel>
                                 <Input
                                     type="file"
+                                    name="imageFile"
                                     onChange={updateQuestion('imageFile')}
+                                    accept="image/*"
                                 />
+                                {imagePreview && (
+                                    <VStack align="start" spacing={2} mt={2}>
+                                        <Image
+                                            src={imagePreview}
+                                            alt="Image Preview"
+                                            maxHeight="200px"
+                                            objectFit="contain"
+                                        />
+                                        <Button
+                                            colorScheme="red"
+                                            size="sm"
+                                            onClick={handleRemoveImage}
+                                        >
+                                            Remove Image
+                                        </Button>
+                                    </VStack>
+                                )}
                             </FormControl>
 
                             <FormControl display="flex" alignItems="center">
@@ -202,7 +247,6 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
                                 </FormControl>
                             )}
 
-
                             <FormControl id="answer" isRequired>
                                 <FormLabel>Answer</FormLabel>
                                 <Input
@@ -212,13 +256,18 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
                                 />
                             </FormControl>
 
-                            <FormControl id="category">
-                                <FormLabel>Category (Optional)</FormLabel>
-                                <Input
+                            <FormControl id="category" isRequired>
+                                <FormLabel>Category</FormLabel>
+                                <Select
                                     value={question.category}
                                     onChange={updateQuestion('category')}
-                                    type="text"
-                                />
+                                >
+                                    {Object.values(QuizCategoryEnum).map((category) => (
+                                        <option key={category} value={category}>
+                                            {category}
+                                        </option>
+                                    ))}
+                                </Select>
                             </FormControl>
 
                             <FormControl id="points">
