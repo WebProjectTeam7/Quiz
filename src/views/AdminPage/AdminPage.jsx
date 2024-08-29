@@ -224,6 +224,7 @@ export default function AdminPage() {
                         <Tr>
                             <Th>Reported Question</Th>
                             <Th>Reported By</Th>
+                            <Th>Reason</Th>
                             <Th>Time</Th>
                             <Th>Actions</Th>
                         </Tr>
@@ -234,21 +235,22 @@ export default function AdminPage() {
                                 <Tr key={report.id}>
                                     <Td>
                                         <Link to={`/quiz-preview/${report.quizId}?highlight=${report.questionId}`}>
-                            View Quiz
+                                            View Quiz
                                         </Link>
                                     </Td>
                                     <Td>{report.reportedBy}</Td>
+                                    <Td>{report.reason}</Td>
                                     <Td>{new Date(report.reportedAt).toLocaleString()}</Td>
                                     <Td>
                                         <Button colorScheme="red" onClick={() => handleDeleteReport(report.id)}>
-                            Resolved
+                                            Resolved
                                         </Button>
                                     </Td>
                                 </Tr>
                             ))
                         ) : (
                             <Tr>
-                                <Td colSpan="4">No reports available</Td>
+                                <Td colSpan="5">No reports available</Td>
                             </Tr>
                         )}
                     </Tbody>

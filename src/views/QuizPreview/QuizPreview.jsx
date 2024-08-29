@@ -30,6 +30,7 @@ import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
+import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.servce';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -54,10 +55,12 @@ export default function QuizPreview() {
     const [isSaving, setIsSaving] = useState(false);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
+    const [reports, setReports] = useState([]);
 
     useEffect(() => {
         if (quizId) {
             fetchQuiz(quizId);
+            fetchReportedBugs(quizId);
         }
     }, [quizId]);
 
@@ -229,6 +232,26 @@ export default function QuizPreview() {
         });
     };
 
+    const fetchReportedBugs = async (quizId) => {
+        try {
+            const bugs = await getAllReportedBugs();
+            const quizBugs = bugs.filter(bug => bug.quizId === quizId);
+            setReports(quizBugs);
+        } catch (error) {
+            console.error('Failed to fetch reported bugs:', error);
+        }
+    };
+
+    const handleResolveReport = async (reportId) => {
+        try {
+            await deleteReportedBugs(reportId);
+            setReports(reports.filter(report => report.id !== reportId));
+            Swal.fire('Resolved!', 'The reported bug has been resolved.', 'success');
+        } catch (error) {
+            Swal.fire('Error', 'Failed to resolve the bug.', 'error');
+        }
+    };
+
     const handleSendInvitation = (userId) => {
         // TODO
         onInviteClose();
@@ -392,28 +415,57 @@ export default function QuizPreview() {
                 </HStack>
 
                 <VStack spacing={4} align="start">
-                    {questions.length > 0 ? questions.map((question, index) => (
-                        <Box key={question.id} borderWidth={1} p={4} borderRadius="md" shadow="md">
-                            <QuestionPreview question={question} />
-                            <HStack mt={2} spacing={4}>
-                                <IconButton
-                                    icon={<ArrowUpIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'up')}
-                                    isDisabled={index === 0}
-                                />
-                                <IconButton
-                                    icon={<ArrowDownIcon />}
-                                    onClick={() => handleMoveQuestion(index, 'down')}
-                                    isDisabled={index === questions.length - 1}
-                                />
-                                <IconButton
-                                    icon={<DeleteIcon />}
-                                    colorScheme="red"
-                                    onClick={() => handleRemoveQuestion(question.id)}
-                                />
-                            </HStack>
-                        </Box>
-                    )) : <Text>No questions added yet.</Text>}
+                    {questions.length > 0 ? questions.map((question, index) => {
+                        const report = reports.find(r => r.questionId === question.id);
+
+                        return (
+                            <Box
+                                key={question.id}
+                                borderWidth={1}
+                                p={4}
+                                borderRadius="md"
+                                shadow="md"
+                                borderColor={report ? 'red.500' : 'gray.200'}
+                            >
+                                <QuestionPreview question={question} />
+                                <HStack mt={2} spacing={4}>
+                                    <IconButton
+                                        icon={<ArrowUpIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'up')}
+                                        isDisabled={index === 0}
+                                    />
+                                    <IconButton
+                                        icon={<ArrowDownIcon />}
+                                        onClick={() => handleMoveQuestion(index, 'down')}
+                                        isDisabled={index === questions.length - 1}
+                                    />
+                                    <IconButton
+                                        icon={<DeleteIcon />}
+                                        colorScheme="red"
+                                        onClick={() => handleRemoveQuestion(question.id)}
+                                    />
+                                    {report && (
+                                        <>
+                                            <Box textAlign="left">
+                                                <Text color="red.500" fontWeight="bold" mb={0}>
+                                                    Reported for:
+                                                </Text>
+                                                <Text color="red.500" fontWeight="bold" mt={0}>
+                                                    {report.reason}
+                                                </Text>
+                                            </Box>
+                                            <Button
+                                                colorScheme="green"
+                                                onClick={() => handleResolveReport(report.id)}
+                                            >
+                                                Resolved
+                                            </Button>
+                                        </>
+                                    )}
+                                </HStack>
+                            </Box>
+                        );
+                    }) : <Text>No questions added yet.</Text>}
                 </VStack>
             </VStack>
 
