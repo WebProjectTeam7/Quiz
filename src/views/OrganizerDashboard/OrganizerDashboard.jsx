@@ -17,10 +17,14 @@ import {
 } from '@chakra-ui/react';
 import { AppContext } from '../../state/app.context';
 import CreateQuizModal from '../../components/CreateQuiz/CreateQuiz';
-import CreateOrganizationModal from '../../components/CreateOrganization/CreateOrganizationModal';
+import CreateOrganizationModal from '../../components/CreateOrganizationModal/CreateOrganizationModal';
 import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/quiz.service';
+import {
+    joinOrganization,
+    leaveOrganization,
+    getOrganizationById
+} from '../../services/organization.service';
 import './OrganizerDashboard.css';
-// import { createOrganization, joinOrganization, leaveOrganization } from '../../services/organization.service';
 
 export default function OrganizerDashboard() {
     const { userData } = useContext(AppContext);
@@ -44,6 +48,9 @@ export default function OrganizerDashboard() {
     useEffect(() => {
         if (userData) {
             fetchQuizzes();
+            if (userData.organizationId) {
+                fetchOrganizationDetails(userData.organizationId);
+            }
         }
     }, [userData]);
 
@@ -67,23 +74,24 @@ export default function OrganizerDashboard() {
         }
     };
 
+    const fetchOrganizationDetails = async (orgId) => {
+        try {
+            const organization = await getOrganizationById(orgId);
+            setOrganization(organization);
+        } catch (error) {
+            console.error('Failed to fetch organization details:', error);
+        }
+    };
+
     const handleQuizClick = (quizId) => {
         navigate(`/quiz-preview/${quizId}`);
     };
 
-    const handleCreateOrganization = async () => {
+    const handleJoinOrganization = async (orgId) => {
         try {
-            // const newOrg = await createOrganization({ name: "New Organization" });
-            // setUserData({ ...userData, organizationId: newOrg.id });
-        } catch (error) {
-            console.error('Error creating organization:', error);
-        }
-    };
-
-    const handleJoinOrganization = async () => {
-        try {
-            // await joinOrganization(orgId, userData.id);
-            // setUserData({ ...userData, organizationId: orgId });
+            await joinOrganization(orgId, userData.id);
+            userData.organizationId = orgId;
+            fetchOrganizationDetails(orgId);
         } catch (error) {
             console.error('Error joining organization:', error);
         }
@@ -91,8 +99,9 @@ export default function OrganizerDashboard() {
 
     const handleLeaveOrganization = async () => {
         try {
-            // await leaveOrganization(userData.organizationId, userData.id);
-            // setUserData({ ...userData, organizationId: null });
+            await leaveOrganization(userData.organizationId, userData.id);
+            userData.organizationId = null;
+            setOrganization(null);
         } catch (error) {
             console.error('Error leaving organization:', error);
         }
@@ -100,6 +109,7 @@ export default function OrganizerDashboard() {
 
     const handleOrganizationCreated = (newOrg) => {
         setOrganization(newOrg);
+        userData.organizationId = newOrg.id;
     };
 
     return (
@@ -127,14 +137,13 @@ export default function OrganizerDashboard() {
                             <Button colorScheme="blue" onClick={handleJoinOrganization}>
                                 Join Organization
                             </Button>
-
                         </>
                     )}
                 </HStack>
 
                 <Box w="full" mt={8}>
                     <Heading as="h3" size="md" mb={4}>
-                        My Organization's Quizzes
+                        {organization ? `${organization.name}'s Quizzes` : "My Quizzes"}
                     </Heading>
                     <Table variant="striped" colorScheme="teal">
                         <Thead>
@@ -178,7 +187,6 @@ export default function OrganizerDashboard() {
             <CreateOrganizationModal
                 isOpen={isOrganizationModalOpen}
                 onClose={onOrganizationModalClose}
-                username={userData?.username}
                 onOrganizationCreated={handleOrganizationCreated}
             />
         </Box>

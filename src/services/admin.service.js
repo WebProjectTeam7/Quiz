@@ -2,7 +2,7 @@ import { get, push, ref, remove, set } from 'firebase/database';
 import { db } from '../config/firebase-config';
 
 // REPORT BUGS
-export const sendBugReport = async (quizId, questionId, userId, username) => {
+export const sendBugReport = async (quizId, questionId, userId, username, reason) => {
     try {
         const reportRef = push(ref(db, 'reports'));
         const newReport = {
@@ -10,6 +10,7 @@ export const sendBugReport = async (quizId, questionId, userId, username) => {
             questionId,
             reportedBy: username,
             reportedAt: Date.now(),
+            reason,
         };
         await set(reportRef, newReport);
     } catch (error) {

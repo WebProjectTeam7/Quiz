@@ -102,7 +102,7 @@ export default function App() {
                             <Route path="/quiz-categories" element={<QuizCategories />} />
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/tournament" element={<Tournament />} />
-                            <Route path="/play-quiz/:quizId" element={<PlayQuiz/>}/>
+                            <Route path="/play-quiz/:quizId" element={<PlayQuiz />} />
                             <Route path="/admin" element={<AdminPage />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>

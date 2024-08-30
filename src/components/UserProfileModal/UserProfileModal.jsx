@@ -12,12 +12,13 @@ import {
     Button,
     Input,
 } from '@chakra-ui/react';
-import { getUserByUsername, sendNotificationToUser } from '../../services/user.service';
+import { getUserByUsername } from '../../services/user.service';
+import { sendNotificationToUser } from '../../services/notification.service';
 import PropTypes from 'prop-types';
 import StatusAvatar from '../StatusAvatar/StatusAvatar';
 import { AppContext } from '../../state/app.context';
 import Swal from 'sweetalert2';
-import { banUser, unbanUser } from '../../services/admin.servce';
+import { banUser, unbanUser } from '../../services/admin.service';
 
 export default function UserProfileModal({ isOpen, onClose, username, onBanUnban }) {
     const [userData, setUserData] = useState(null);

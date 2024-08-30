@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from 'react';
-import { deleteNotification, getNotifications, markNotificationAsRead } from '../../services/user.service';
+import { deleteNotification, getNotifications, markNotificationAsRead } from '../../services/notification.service';
 import { AppContext } from '../../state/app.context';
 import { Box, Text, Badge, Button } from '@chakra-ui/react';
 

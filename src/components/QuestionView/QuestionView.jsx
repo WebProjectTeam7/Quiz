@@ -14,7 +14,7 @@ import { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import Swal from 'sweetalert2';
 import { FaFlag } from 'react-icons/fa';
-import { sendBugReport  } from '../../services/admin.servce';
+import { sendBugReport  } from '../../services/admin.service';
 import { AppContext } from '../../state/app.context';
 import { useParams } from 'react-router-dom';
 
@@ -41,11 +41,35 @@ export default function QuestionView({ question, onAnswerSubmit, savedAnswer }) 
     };
 
     const handleReportBug = async () => {
-        try {
-            await sendBugReport(quizId, question.id, userData.uid, userData.username); // Adjust parameters as necessary
-            Swal.fire('Reported!', 'The bug has been reported to the admin.', 'success');
-        } catch (error) {
-            Swal.fire('Error', 'Failed to report the bug.', 'error');
+        const { value: reason } = await Swal.fire({
+            title: 'Report a Bug',
+            input: 'select',
+            inputOptions: {
+                'Wrong Question': 'Wrong Question',
+                'Wrong Answer': 'Wrong Answer',
+                'Doesn\'t Work': 'Doesn\'t Work',
+                'Something Else': 'Something Else',
+            },
+            inputPlaceholder: 'Select a reason',
+            showCancelButton: true,
+            inputValidator: (value) => {
+                return new Promise((resolve) => {
+                    if (value) {
+                        resolve();
+                    } else {
+                        resolve('You need to select a reason for reporting!');
+                    }
+                });
+            },
+        });
+
+        if (reason) {
+            try {
+                await sendBugReport(quizId, question.id, userData.uid, userData.username, reason);
+                Swal.fire('Reported!', 'The bug has been reported to the admin.', 'success');
+            } catch (error) {
+                Swal.fire('Error', 'Failed to report the bug.', 'error');
+            }
         }
     };
 
