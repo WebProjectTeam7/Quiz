@@ -29,11 +29,13 @@ import './QuestionPreview.css';
 export default function QuestionPreview({ question }) {
     const [selectedOption, setSelectedOption] = useState('');
     const [userInput, setUserInput] = useState('');
+    const [showIsCorrect, setShowIsCorrect] = useState(false);
     const [isCorrect, setIsCorrect] = useState(null);
     const [showAnswer, setShowAnswer] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editableQuestion, setEditableQuestion] = useState({ ...question });
     const [imagePreview, setImagePreview] = useState(question.imageUrl || '');
+    const [imageFile, setImageFile] = useState(null);
     const [isOpenEnded, setIsOpenEnded] = useState(!question.options || question.options.length === 0);
 
     const handleCheckAnswer = () => {
@@ -42,6 +44,7 @@ export default function QuestionPreview({ question }) {
         } else {
             setIsCorrect(selectedOption.trim().toLowerCase() === editableQuestion.answer.trim().toLowerCase());
         }
+        setShowIsCorrect(true);
     };
 
     const handleEditQuestion = () => {
@@ -52,53 +55,74 @@ export default function QuestionPreview({ question }) {
         setIsEditing(false);
         setEditableQuestion({ ...question });
         setImagePreview(question.imageUrl || '');
+        setImageFile(null);
     };
 
     const handleSaveChanges = async () => {
-        await updateQuestion(editableQuestion.id, editableQuestion, editableQuestion.imageFile);
-        setIsEditing(false);
+        try {
+            const updatedQuestion = { ...editableQuestion };
+
+            if (imageFile) {
+                updatedQuestion.imageFile = imageFile;
+            } else if (imagePreview === '') {
+                updatedQuestion.imageUrl = '';
+            }
+
+            await updateQuestion(editableQuestion.id, updatedQuestion);
+
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Error saving changes:', error);
+        }
     };
 
     const handleDeleteQuestion = async () => {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'You won’t be able to revert this!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-        });
-        if (result.isConfirmed) {
-            await deleteQuestion(editableQuestion.id);
-            Swal.fire('Deleted!', 'Your question has been deleted.', 'success');
+        try {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'You won’t be able to revert this!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+            });
+
+            if (result.isConfirmed) {
+                await deleteQuestion(editableQuestion.id);
+                Swal.fire('Deleted!', 'Your question has been deleted.', 'success');
+
+                window.location.reload();
+            }
+        } catch (error) {
+            console.error('Error deleting question:', error);
         }
     };
 
     const handleInputChange = (e) => {
         const { name, value, files } = e.target;
-        const newValue = files ? files[0] : value;
 
         if (files && files[0]) {
+            const file = files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
                 setImagePreview(e.target.result);
             };
-            reader.readAsDataURL(files[0]);
+            reader.readAsDataURL(file);
+            setImageFile(file);
+        } else {
+            setEditableQuestion((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
         }
-
-        setEditableQuestion((prev) => ({
-            ...prev,
-            [name]: newValue,
-            imageFile: files ? files[0] : prev.imageFile,
-        }));
     };
 
     const handleRemoveImage = () => {
+        setImagePreview('');
+        setImageFile(null);
         setEditableQuestion((prev) => ({
             ...prev,
-            imageFile: null,
             imageUrl: '',
         }));
-        setImagePreview('');
     };
 
     const addOption = () => {
@@ -326,15 +350,15 @@ export default function QuestionPreview({ question }) {
                         <Button onClick={handleCheckAnswer} colorScheme="blue">
                             Check Answer
                         </Button>
-                        {isCorrect ? (
+                        {showIsCorrect && (isCorrect ? (
                             <Text fontWeight="bold" color='green.500' >
                                 Correct!
                             </Text>
                         ) : (
                             <Text fontWeight="bold" color='red.500'>
-                                Incorrect!{editableQuestion.answer}
+                                Incorrect!
                             </Text>
-                        )}
+                        ))}
                         <Button onClick={handleToggleAnswer} colorScheme="yellow">
                             {showAnswer ? 'Hide' : 'Show'} Answer
                         </Button>
@@ -347,9 +371,8 @@ export default function QuestionPreview({ question }) {
                             Edit Question
                         </Button>
                         <Button onClick={handleDeleteQuestion} colorScheme="red">
-                            Delete Question
+                            Delete Question From DB
                         </Button>
-
                     </>
                 )}
             </VStack>
@@ -365,7 +388,7 @@ QuestionPreview.propTypes = {
         imageUrl: PropTypes.string,
         options: PropTypes.arrayOf(PropTypes.string),
         answer: PropTypes.string.isRequired,
-        points: PropTypes.number,
+        points: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         category: PropTypes.string,
         timeAmplifier: PropTypes.number,
         access: PropTypes.string,

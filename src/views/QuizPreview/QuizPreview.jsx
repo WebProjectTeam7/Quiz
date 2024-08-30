@@ -253,10 +253,6 @@ export default function QuizPreview() {
         }
     };
 
-    const handleSendInvitation = (userId) => {
-        // TODO
-        onInviteClose();
-    };
 
     return (
         <Box maxW="800px" mx="auto" py={8}>
