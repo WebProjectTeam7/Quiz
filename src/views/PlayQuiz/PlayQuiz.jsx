@@ -72,11 +72,11 @@ export default function PlayQuiz() {
             setQuiz(fetchedQuiz);
 
             if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
-                const fetchedQuestions = await Promise.all(
+                let fetchedQuestions = await Promise.all(
                     fetchedQuiz.questions
                         .map(async (questionId) => await getQuestionById(questionId))
-                        .filter((q) => q !== null)
                 );
+                fetchedQuestions = fetchedQuestions.filter((q) => q !== null);
                 setQuestions(fetchedQuestions);
             }
 
