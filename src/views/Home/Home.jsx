@@ -11,9 +11,9 @@ export default function Home() {
     const navigate = useNavigate();
     const { userData } = useContext(AppContext);
 
-    // const handleJoinNow = () => {
-    //     navigate('/tournament');
-    // };
+    const handleSampleQuiz = () => {
+        navigate('/sample-quiz');
+    };
 
     const handleGoToQuizzes = () => {
         navigate('/quizzes');
@@ -32,8 +32,8 @@ export default function Home() {
             {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
             <section className="hero-banner">
                 <h1>Challenge Your Mind with Fun Quizzes</h1>
-                <p>Play quizzes with up to 4 players. Each question has a 20-second timer!</p>
-                { /* <button className="cta-button" onClick={handleJoinNow}>Join Now</button> */ }
+                <p>Try this sample quiz now!</p>
+                <button className="cta-button" onClick={handleSampleQuiz}>Sample Quiz</button>
             </section>
 
             <section className="how-it-works">

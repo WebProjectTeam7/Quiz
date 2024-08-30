@@ -43,7 +43,8 @@ export default function Header({ registrationModal, loginModal }) {
                             MENU
                         </MenuButton>
                         <MenuList className="chakra-menu__menu-list">
-                            <MenuItem as={NavLink} to="/quizzes">Quizzes</MenuItem>
+                            <MenuItem as={NavLink} to="/quiz-categories">Quizzes</MenuItem>
+                            {/* <MenuItem as={NavLink} to="/quizzes">Quizzes</MenuItem> */}
                             <MenuItem as={NavLink} to="/ranking">Ranking</MenuItem>
                             <MenuItem as={NavLink} to="/tournament">Quiz Battle</MenuItem>
                             {user && <MenuItem as={NavLink} to="/my-profile">My Profile</MenuItem>}
