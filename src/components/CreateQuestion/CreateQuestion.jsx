@@ -40,7 +40,7 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
         options: [],
         answer: '',
         points: 0,
-        category: '',
+        category: QuizCategoryEnum.GENERAL,
         access: QuizAccessEnum.PUBLIC,
         timeAmplifier: 1,
     });
@@ -126,7 +126,7 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
                 options: [],
                 answer: '',
                 points: 0,
-                category: '',
+                category: QuizCategoryEnum.GENERAL,
                 access: QuizAccessEnum.PUBLIC,
                 timeAmplifier: 1,
             });

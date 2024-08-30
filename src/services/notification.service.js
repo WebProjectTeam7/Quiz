@@ -1,4 +1,4 @@
-import { get, set, ref, update, remove, push } from 'firebase/database';
+import { get, set, ref, remove, push } from 'firebase/database';
 import { db } from '../config/firebase-config';
 
 export const sendNotification = async (uid, notificationData) => {
@@ -26,12 +26,12 @@ export const getNotifications = async (uid) => {
 
 };
 
-export const markNotificationAsRead = async (uid, notificationId) => {
-    const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
-    await update(notificationRef, {
-        status: 'read',
-    });
-};
+// export const markNotificationAsRead = async (uid, notificationId) => {
+//     const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
+//     await update(notificationRef, {
+//         status: 'read',
+//     });
+// };
 
 export const sendNotificationToUser = async (uid, message) => {
     const notificationsRef = ref(db, `notifications/${uid}`);

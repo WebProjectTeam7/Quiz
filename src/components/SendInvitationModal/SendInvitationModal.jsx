@@ -27,8 +27,9 @@ import Pagination from '../../components/Pagination/Pagination';
 import { getAllUsers } from '../../services/user.service';
 import UserRoleEnum from '../../common/role-enum';
 import { SearchIcon } from '@chakra-ui/icons';
+import InvitationEnum from '../../common/invitation-enum';
 
-const SendInvitationModal = ({ isOpen, onClose, onSendInvitation }) => {
+const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
     const [users, setUsers] = useState([]);
     const [view, setView] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +72,11 @@ const SendInvitationModal = ({ isOpen, onClose, onSendInvitation }) => {
     };
 
     const handleInviteUser = (user) => {
-        // TODO
+        if (objType === InvitationEnum.ORGANIZATION) {
+            // TODO
+        } else if (objType === InvitationEnum.QUIZ) {
+            // TODO
+        }
     };
 
 

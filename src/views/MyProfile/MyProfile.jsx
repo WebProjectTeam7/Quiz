@@ -14,11 +14,11 @@ import {
 import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../state/app.context';
 import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser, getOrganizerCodes, deleteOrganizerCode } from '../../services/user.service';
-import { getNotifications, markNotificationAsRead } from '../../services/notification.service';
 import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import NotificationList from '../../components/NotificationList/NotificationList';
+import useModal from '../../custom-hooks/useModal';
 
 export default function MyProfile() {
     const { user, userData, setAppState } = useContext(AppContext);
@@ -29,7 +29,12 @@ export default function MyProfile() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [organizerCode, setOrganizerCode] = useState('');
-    const [notifications, setNotifications] = useState([]);
+
+    const {
+        isModalVisible: isNotificationModalOpen,
+        openModal: openNotificationModal,
+        closeModal: closeNotificationModal,
+    } = useModal();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -44,16 +49,16 @@ export default function MyProfile() {
             }
         };
 
-        const fetchNotifications = async () => {
-            if (user && user.uid) {
-                const notificationsData = await getNotifications(user.uid);
-                setNotifications(notificationsData);
-            }
-        };
+        // const fetchNotifications = async () => {
+        //     if (user && user.uid) {
+        //         const notificationsData = await getNotifications(user.uid);
+        //         setNotifications(notificationsData);
+        //     }
+        // };
 
         if (user && user.uid) {
             fetchUserData();
-            fetchNotifications();
+            // fetchNotifications();
         }
     }, [user]);
 
@@ -228,20 +233,20 @@ export default function MyProfile() {
         }
     };
 
-    const handleMarkNotificationAsRead = async (notificationId) => {
-        try {
-            await markNotificationAsRead(user.uid, notificationId);
-            setNotifications((prevNotifications) =>
-                prevNotifications.map((notification) =>
-                    notification.id === notificationId
-                        ? { ...notification, status: 'read' }
-                        : notification
-                )
-            );
-        } catch (error) {
-            console.error('Error marking notification as read:', error);
-        }
-    };
+    // const handleMarkNotificationAsRead = async (notificationId) => {
+    //     try {
+    //         await markNotificationAsRead(user.uid, notificationId);
+    //         setNotifications((prevNotifications) =>
+    //             prevNotifications.map((notification) =>
+    //                 notification.id === notificationId
+    //                     ? { ...notification, status: 'read' }
+    //                     : notification
+    //             )
+    //         );
+    //     } catch (error) {
+    //         console.error('Error marking notification as read:', error);
+    //     }
+    // };
 
     if (!formData) return <div>Loading...</div>;
 
@@ -289,10 +294,9 @@ export default function MyProfile() {
                         </Box>
                     )}
                     <Box mt={4} width="100%">
-                        <NotificationList
-                            notifications={notifications}
-                            onMarkAsRead={handleMarkNotificationAsRead}
-                        />
+                        <Button colorScheme="blue" onClick={openNotificationModal} mt={4}>
+                            Notifications
+                        </Button>
                     </Box>
                     <Box display="flex" alignItems="center" mt="auto">
                         <Input
@@ -396,6 +400,10 @@ export default function MyProfile() {
                     </form>
                 </Box>
             </Box>
+            <NotificationList
+                isOpen={isNotificationModalOpen}
+                onClose={closeNotificationModal}
+            />
         </Box>
     );
 }
