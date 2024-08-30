@@ -31,6 +31,7 @@ import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.service';
+import InvitationEnum from '../../common/invitation-enum';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -50,6 +51,7 @@ export default function QuizPreview() {
         dateEnds: null,
         timeLimit: 0,
         isActive: false,
+        imageFile: null,
     });
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
@@ -469,7 +471,7 @@ export default function QuizPreview() {
             </VStack>
 
             <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
-            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} onSendInvitation={handleSendInvitation} />
+            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} objId={quizId} objType={InvitationEnum.QUIZ} />
         </Box>
     );
 }
