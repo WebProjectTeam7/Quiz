@@ -8,6 +8,7 @@ import useModal from '../../custom-hooks/useModal';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
 import { Link } from 'react-router-dom';
+import './AdminPage.css';
 
 export default function AdminPage() {
     const [users, setUsers] = useState([]);

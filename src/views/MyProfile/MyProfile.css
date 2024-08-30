@@ -70,3 +70,12 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Adds a subtle shadow */
     border: 3px solid #f2a900; /* Optional: Add a border to the avatar */
 }
+
+.css-1scogwl {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+}
+
+.css-1wtemij {
+    background: #bb2701 !important;
+    color: white !important;
+}
