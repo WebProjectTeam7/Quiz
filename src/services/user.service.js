@@ -149,6 +149,20 @@ export const getAllUsers = async () => {
     }
 };
 
+// export const getUserCount = async () => {
+//     try {
+//         const usersRef = query(ref(db, 'users'));
+//         const snapshot = await get(usersRef);
+//         if (!snapshot.exists()) {
+//             return 0;
+//         }
+//         return Object.keys(snapshot.val()).length;
+//     } catch (error) {
+//         console.error('Error retrieving users count:', error);
+//         throw new Error('Failed to retrieve users count: ' + error.message);
+//     }
+// };
+
 // UPDATE
 
 export const updateUser = async (uid, updatedData) => {
@@ -208,19 +222,24 @@ export const reauthenticateUser = async (password) => {
     }
 };
 
-// export const getUserCount = async () => {
-//     try {
-//         const usersRef = query(ref(db, 'users'));
-//         const snapshot = await get(usersRef);
-//         if (!snapshot.exists()) {
-//             return 0;
-//         }
-//         return Object.keys(snapshot.val()).length;
-//     } catch (error) {
-//         console.error('Error retrieving users count:', error);
-//         throw new Error('Failed to retrieve users count: ' + error.message);
-//     }
-// };
+export const updateUserWithOrganization = async (uid, organizationId, organizationName) => {
+    const userRef = query(ref(db, 'users'), orderByChild('uid'), equalTo(uid));
+    try {
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+            throw new Error('User not found');
+        }
+        const userId = Object.keys(snapshot.val())[0];
+        const updatedData = {
+            organizationId: organizationId,
+            organizationName: organizationName,
+        };
+        await update(ref(db, `users/${userId}`), updatedData);
+    } catch (error) {
+        console.error('Error updating user:', error);
+        throw new Error('Failed to update user: ' + error.message);
+    }
+};
 
 // DELETE
 

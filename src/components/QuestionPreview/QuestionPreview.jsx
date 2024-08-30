@@ -42,7 +42,6 @@ export default function QuestionPreview({ question }) {
         } else {
             setIsCorrect(selectedOption.trim().toLowerCase() === editableQuestion.answer.trim().toLowerCase());
         }
-        setShowAnswer(true);
     };
 
     const handleEditQuestion = () => {
@@ -327,20 +326,30 @@ export default function QuestionPreview({ question }) {
                         <Button onClick={handleCheckAnswer} colorScheme="blue">
                             Check Answer
                         </Button>
+                        {isCorrect ? (
+                            <Text fontWeight="bold" color='green.500' >
+                                Correct!
+                            </Text>
+                        ) : (
+                            <Text fontWeight="bold" color='red.500'>
+                                Incorrect!{editableQuestion.answer}
+                            </Text>
+                        )}
                         <Button onClick={handleToggleAnswer} colorScheme="yellow">
                             {showAnswer ? 'Hide' : 'Show'} Answer
                         </Button>
+                        {showAnswer && (
+                            <Text fontWeight="bold" color='yellow.500'>
+                                The correct answer is: {editableQuestion.answer}
+                            </Text>
+                        )}
                         <Button onClick={handleEditQuestion} colorScheme="green">
                             Edit Question
                         </Button>
                         <Button onClick={handleDeleteQuestion} colorScheme="red">
                             Delete Question
                         </Button>
-                        {showAnswer && (
-                            <Text fontWeight="bold" color={isCorrect ? 'green.500' : 'red.500'}>
-                                {isCorrect ? 'Correct!' : 'Incorrect!'} The correct answer is: {editableQuestion.answer}
-                            </Text>
-                        )}
+
                     </>
                 )}
             </VStack>

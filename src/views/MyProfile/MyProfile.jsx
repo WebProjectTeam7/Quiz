@@ -18,7 +18,6 @@ import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import NotificationList from '../../components/NotificationList/NotificationList';
-import { getNotifications } from '../../services/notification.service';
 import useModal from '../../custom-hooks/useModal';
 
 export default function MyProfile() {
@@ -30,7 +29,6 @@ export default function MyProfile() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [organizerCode, setOrganizerCode] = useState('');
-    const [notifications, setNotifications] = useState([]);
 
     const {
         isModalVisible: isNotificationModalOpen,
@@ -310,7 +308,7 @@ export default function MyProfile() {
                             mr={2}
                         />
                         <Button colorScheme="blue" onClick={handleUseCode} size="sm">
-                                    Use Code
+                            Use Code
                         </Button>
                     </Box>
                 </Box>

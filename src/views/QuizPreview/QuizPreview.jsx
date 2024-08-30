@@ -159,7 +159,7 @@ export default function QuizPreview() {
         setQuiz({ ...quiz, isActive: newActiveState });
 
         try {
-            await editQuiz(quizId, { ...quiz, isActive: newActiveState });
+            await editQuiz(quizId, quiz);
             Swal.fire({
                 title: `Quiz ${newActiveState ? 'Activated' : 'Deactivated'}`,
                 text: `The quiz has been ${newActiveState ? 'activated' : 'deactivated'}.`,
@@ -403,8 +403,8 @@ export default function QuizPreview() {
                 </HStack>
 
                 <HStack>
-                    <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
-                        {quiz.isActive ? 'Deactivate Quiz' : 'Activate Quiz'}
+                    <Button colorScheme={quiz.isActive ? 'green' : 'red'} onClick={handleToggleActive}>
+                        {quiz.isActive ? 'Activate Quiz' : 'Deactivate Quiz'}
                     </Button>
 
 

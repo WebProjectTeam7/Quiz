@@ -100,6 +100,9 @@ export default function Quizzes() {
                 ))}
             </Flex>
         </Flex>
+        <button className="back-button" onClick={() => navigate('/quiz-categories')}>
+                Back
+            </button>
     </Box>
     );
 }
