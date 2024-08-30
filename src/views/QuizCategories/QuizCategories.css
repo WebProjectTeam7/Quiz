@@ -1,0 +1,83 @@
+.quizzes-container-category {
+    gap: 20px;
+    justify-items: center;
+    padding: 60px 20px;
+    background: rgba(12, 8, 58, 0.486);
+    border-radius: 10px;
+    margin: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.chakra-button-quiz-categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: 20% !important;
+    padding: 23px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: rgb(237, 243, 182);
+    color: rgb(12, 8, 58);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.chakra-button-quiz-categories:hover {
+    background-color: rgba(188, 16, 79, 0.8);
+    color: #fff;
+}
+
+.hexagon-group-category {
+    margin: 20px 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.445) 130.5%) !important;
+    border-radius: 10px;
+    box-shadow: 0px 5px 40px rgb(0, 0, 0);
+    font-family: Arial, sans-serif;
+    color: #f2f2f2;
+}
+
+.css-x9dxnn {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    border-radius: var(--chakra-radii-md);
+    color: inherit;
+    margin-top: var(--chakra-space-16);
+    margin-bottom: var(--chakra-space-16);
+    z-index: var(--chakra-zIndices-modal);
+    --modal-bg: var(--chakra-colors-white);
+    --modal-shadow: var(--chakra-shadows-lg);
+    background: rgba(76, 39, 87, 0.877) !important;
+    box-shadow: var(--modal-shadow);
+    max-width: var(--chakra-sizes-xl);
+}
+
+.all-quizzes-button {
+    background: rgb(237, 243, 182) !important;
+    color: rgb(12, 8, 58);
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold !important;
+}
+
+.all-quizzes-button:hover {
+    background-color: rgba(188, 16, 79, 0.8) !important;
+    color: #fff;
+}
