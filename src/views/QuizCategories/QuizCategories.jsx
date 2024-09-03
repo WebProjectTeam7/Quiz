@@ -17,12 +17,17 @@ const categories = [
     'Space and Astronomy', 'Cultural Traditions'
 ];
 
-export default function Quizzes() {
+export default function QuizzesCategories() {
     const navigate = useNavigate();
     const [clickedHexagon, setClickedHexagon] = useState(null);
     const [playedHexagons, setPlayedHexagons] = useState({});
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const {
+        isOpen: isCategoriesOpen,
+        onOpen: onCategoriesOpen,
+        onClose: onCategoriesClose
+    } = useDisclosure();
 
     const handleHexagonClick = (level) => {
         const hexagonKey = `${selectedCategory}-${level}`;
@@ -57,16 +62,13 @@ export default function Quizzes() {
 
     return (
         <div>
-            <Button className='all-quizzes-button' onClick={() => navigate('/quizzes')}>ALL QUIZZES</Button>
-        <Box className="quizzes-container-category" padding="20px">
-            <Flex justifyContent="center" marginBottom="20px" wrap="wrap" gap={4}>
-                {categories.map((category) => (
-                    <Button key={category} colorScheme="blue" onClick={() => openCategoryModal(category)} className="chakra-button-quiz-categories">
-                        {category}
-                    </Button>
-                ))}
+            <Flex justifyContent="center" marginBottom="20px" gap={4}>
+                <Button className='all-quizzes-button' onClick={() => navigate('/quizzes')}>MIXED QUIZZES</Button>
+                <Button className='categories-button' onClick={onCategoriesOpen}>CATEGORIES</Button>
             </Flex>
 
+            <Box className="quizzes-container-category" padding="20px">
+            </Box>
             <Modal isOpen={isOpen} onClose={onClose} size="xl">
                 <ModalOverlay />
                 <ModalContent>
@@ -77,7 +79,31 @@ export default function Quizzes() {
                     </ModalBody>
                 </ModalContent>
             </Modal>
-        </Box>
+
+            <Modal isOpen={isCategoriesOpen} onClose={onCategoriesClose} size="xl">
+    <ModalOverlay />
+    <ModalContent>
+        <ModalHeader textAlign="center">Categories</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody>
+            <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={4}>
+                {categories.map((category) => (
+                    <Button
+                        key={category}
+                        colorScheme="blue"
+                        onClick={() => {
+                            openCategoryModal(category);
+                            onCategoriesClose();
+                        }}
+                        className="chakra-button-quiz-categories"
+                    >
+                        {category}
+                    </Button>
+                ))}
+            </Box>
+        </ModalBody>
+    </ModalContent>
+</Modal>
         </div>
     );
 }

@@ -74,8 +74,11 @@ export default function QuizPreview() {
                 let fetchedQuestions = await Promise.all(fetchedQuiz.questions
                     .map(async (questionId) => await getQuestionById(questionId)));
 
-                fetchedQuestions = fetchedQuestions.filter(q => q !== null);
-                setQuestions(fetchedQuestions);
+                const filteredQuestions = fetchedQuestions.filter(q => q !== null);
+                if (filteredQuestions.length < fetchedQuestions.length) {
+                    await updateQuestions(filteredQuestions);
+                }
+                setQuestions(filteredQuestions);
             }
         } catch (error) {
             console.error('Failed to fetch quiz:', error);
@@ -253,10 +256,6 @@ export default function QuizPreview() {
         }
     };
 
-    const handleSendInvitation = (userId) => {
-        // TODO
-        onInviteClose();
-    };
 
     return (
         <Box maxW="800px" mx="auto" py={8}>

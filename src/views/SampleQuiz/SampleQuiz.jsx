@@ -130,7 +130,7 @@ export default function SampleQuiz() {
                                 {currentQuestionIndex < quizQuestions.length - 1 ? 'Next Question' : 'Show Results'}
                             </Button>
                         </HStack>
-                        <button className="back-button" onClick={() => navigate('/')}>Back</button>
+                        <button className="back-button" onClick={() => navigate('/')}>Exit</button>
 
                     </>
                 ) : (

@@ -74,7 +74,7 @@ export const getQuestionsByQuizId = async (quizId) => {
 
 // UPDATE
 
-export const updateQuestion = async (questionId, updatedData, newImageFile) => {
+export const updateQuestion = async (questionId, updatedData) => {
     try {
         const questionRef = dbRef(db, `questions/${questionId}`);
         const snapshot = await get(questionRef);
@@ -86,13 +86,13 @@ export const updateQuestion = async (questionId, updatedData, newImageFile) => {
         const oldQuestionData = snapshot.val();
         let imageUrl = oldQuestionData.imageUrl ?? null;
 
-        if (newImageFile) {
+        if (updatedData.imageFile) {
             if (imageUrl) {
                 const oldImageRef = storageRef(storage, imageUrl);
                 await deleteObject(oldImageRef);
             }
-            imageUrl = await uploadQuestionImage(questionId, newImageFile);
-        } else if (imageUrl && !newImageFile || updatedData.imageUrl === null) {
+            imageUrl = await uploadQuestionImage(questionId, updatedData.imageFile);
+        } else if (imageUrl && !updatedData.imageFile || updatedData.imageUrl === null) {
             const oldImageRef = storageRef(storage, imageUrl);
             await deleteObject(oldImageRef);
             imageUrl = null;
