@@ -20,10 +20,12 @@ import Swal from 'sweetalert2';
 import { banUser, unbanUser } from '../../services/admin.service';
 import NotificationModal from '../NotificationModal/NotificationModal';
 import useModal from '../../custom-hooks/useModal';
+import { getOrganizationById } from '../../services/organization.service';
 
 export default function UserProfileModal({ isOpen, onClose, username, onBanUnban }) {
     const [userData, setUserData] = useState(null);
     const { userData: currentUserData } = useContext(AppContext);
+    const [organizationData, setOrganizationData] = useState(null);
     const {
         isModalVisible: isNotificationModalOpen,
         openModal: openNotificationModal,
@@ -36,6 +38,11 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
                 const data = await getUserByUsername(username);
                 if (data) {
                     setUserData(data);
+
+                    if (data.organizationId) {
+                        const orgData = await getOrganizationById(data.organizationId);
+                        setOrganizationData(orgData);
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
@@ -97,10 +104,27 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
                     <ModalHeader>{userData.username}'s Profile</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <Box display="flex" flexDirection="column" alignItems="center" mb={4}>
-                            <StatusAvatar uid={userData.uid} src={userData.avatar} size="xl" />
-                            <Text fontSize="lg" fontWeight="bold" mt={2}>{userData.role}</Text>
-                        </Box>
+                        <Flex justifyContent={organizationData ? 'space-between' : 'center'} alignItems="center" mb={4}>
+
+                            <Box display="flex" flexDirection="column" alignItems="center">
+                                <StatusAvatar uid={userData.uid} src={userData.avatar} size="xl" />
+                                <Text fontSize="lg" fontWeight="bold" mt={2}>Role: {userData.role}</Text>
+                            </Box>
+
+                            {organizationData && (
+                                <Box display="flex" flexDirection="column" alignItems="center">
+                                    <Box
+                                        as="img"
+                                        src={organizationData.logoUrl}
+                                        alt={organizationData.name}
+                                        boxSize="100px"
+                                        borderRadius="full"
+                                        mb={2}
+                                    />
+                                    <Text fontSize="lg" fontWeight="bold">Organization: {organizationData.name}</Text>
+                                </Box>
+                            )}
+                        </Flex>
                         <Box>
                             <Flex>
                                 <Text fontWeight="bold" mr={2}>Username:</Text>
@@ -121,7 +145,7 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
                         </Box>
                         <Flex mt={4} justifyContent="space-between">
                             {(currentUserData?.role === 'organizer' || currentUserData?.role === 'admin') && (
-                                <Box>
+                                <>
                                     <Button
                                         colorScheme="blue"
                                         onClick={openNotificationModal}
@@ -132,13 +156,11 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
                                         <Button
                                             colorScheme={userData.banned ? 'green' : 'red'}
                                             onClick={handleBanUnbanUser}
-                                            alignSelf="flex-start"
-                                            ml={180}
                                         >
                                             {userData.banned ? 'Unban' : 'Ban'}
                                         </Button>
                                     )}
-                                </Box>
+                                </>
                             )}
                         </Flex>
                     </ModalBody>

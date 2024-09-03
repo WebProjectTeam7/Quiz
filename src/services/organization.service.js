@@ -136,4 +136,18 @@ export const leaveOrganization = async (userId) => {
     }
 };
 
+export const updateUserWithOrganization = async (username, organizationId, organizationName) => {
+    try {
+        const userRef = dbRef(db, `users/${username}`);
+        const updates = {
+            organizationId,
+            organizationName
+        };
+
+        await update(userRef, updates);
+    } catch (error) {
+        console.error('Error updating user with organization:', error);
+        throw new Error('Failed to update user with organization: ' + error.message);
+    }
+};
 // DELETE

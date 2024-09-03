@@ -6,7 +6,6 @@ export const sendNotification = async (uid, notificationData) => {
     const newNotificationRef = push(notificationRef);
     await set(newNotificationRef, {
         ...notificationData,
-        status: 'unread',
         timestamp: Date.now(),
     });
 };
@@ -26,25 +25,16 @@ export const getNotifications = async (uid) => {
 
 };
 
-// export const markNotificationAsRead = async (uid, notificationId) => {
-//     const notificationRef = ref(db, `notifications/${uid}/${notificationId}`);
-//     await update(notificationRef, {
-//         status: 'read',
-//     });
-// };
-
-export const sendNotificationToUser = async (uid, message) => {
+export const sendNotificationToUser = async (uid, notificationData) => {
     const notificationsRef = ref(db, `notifications/${uid}`);
     const newNotificationRef = push(notificationsRef);
 
-    const notificationData = {
-        id: newNotificationRef.key,
-        message,
-        status: 'unread',
+    const notification = {
+        ...notificationData,
         timestamp: Date.now(),
     };
 
-    await set(newNotificationRef, notificationData);
+    await set(newNotificationRef, notification);
 };
 
 export const deleteNotification = async (uid, notificationId) => {

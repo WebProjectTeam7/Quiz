@@ -28,6 +28,8 @@ import { getAllUsers } from '../../services/user.service';
 import UserRoleEnum from '../../common/role-enum';
 import { SearchIcon } from '@chakra-ui/icons';
 import InvitationEnum from '../../common/invitation-enum';
+import PropTypes from 'prop-types';
+import NotificationModal from '../NotificationModal/NotificationModal';
 
 const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
     const [users, setUsers] = useState([]);
@@ -37,6 +39,8 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
     const { isModalVisible, openModal, closeModal } = useModal();
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10);
+    const { isModalVisible: isNotificationModalOpen, openModal: openNotificationModal, closeModal: closeNotificationModal } = useModal();
+    const [recipientUid, setRecipientUid] = useState(null);
 
     useEffect(() => {
         fetchAllUsers();
@@ -54,7 +58,8 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
     const filteredUsers = users.filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase())
+        user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (user.organizationName && user.organizationName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const indexOfLastUser = currentPage * usersPerPage;
@@ -72,11 +77,8 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
     };
 
     const handleInviteUser = (user) => {
-        if (objType === InvitationEnum.ORGANIZATION) {
-            // TODO
-        } else if (objType === InvitationEnum.QUIZ) {
-            // TODO
-        }
+        setRecipientUid(user.uid);
+        openNotificationModal();
     };
 
 
@@ -93,7 +95,7 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
                                 <Icon as={SearchIcon} color="gray.300" />
                             </InputLeftElement>
                             <Input
-                                placeholder="Search by username, email, or name"
+                                placeholder="username, email, name or organization"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 maxW='350px'
@@ -107,7 +109,7 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
                                             <Th>Username</Th>
                                             <Th>Email</Th>
                                             <Th>First Name</Th>
-                                            <Th>Last Name</Th>
+                                            <Th>Organization</Th>
                                             <Th>Details</Th>
                                             <Th></Th>
                                             <Th></Th>
@@ -129,7 +131,7 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
                                                 </Td>
                                                 <Td>{user.email}</Td>
                                                 <Td>{user.firstName}</Td>
-                                                <Td>{user.lastName}</Td>
+                                                <Td>{user.organizationName || ''}</Td>
                                                 <Td>
                                                     <Button onClick={() => handleOpenProfile(user)}>Profile</Button>
                                                 </Td>
@@ -154,6 +156,13 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
                                 username={selectedUser.username}
                             />
                         )}
+                        {recipientUid && (
+                            <NotificationModal
+                                isOpen={isNotificationModalOpen}
+                                onClose={closeNotificationModal}
+                                recipientUid={recipientUid}
+                            />
+                        )}
                     </Box>
                 </ModalBody>
                 <ModalFooter>
@@ -162,6 +171,13 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
             </ModalContent>
         </Modal>
     );
+};
+
+SendInvitationModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    objId: PropTypes.string.isRequired,
+    objType: PropTypes.oneOf([InvitationEnum.ORGANIZATION, InvitationEnum.QUIZ]).isRequired,
 };
 
 export default SendInvitationModal;
