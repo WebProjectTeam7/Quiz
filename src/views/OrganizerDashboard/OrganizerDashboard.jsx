@@ -29,7 +29,6 @@ import './OrganizerDashboard.css';
 export default function OrganizerDashboard() {
     const { userData } = useContext(AppContext);
     const navigate = useNavigate();
-
     const {
         isOpen: isQuizModalOpen,
         onOpen: onQuizModalOpen,

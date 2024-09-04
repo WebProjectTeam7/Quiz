@@ -24,7 +24,18 @@
     font-size: 18px;
     cursor: pointer;
     background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
-    color: rgb(237, 243, 182);
+    color: rgb(237, 243, 182) !important;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.css-1xlie69 {
+    font-size: 18px;
+    cursor: pointer;
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
     border: none;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);

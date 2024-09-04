@@ -12,7 +12,7 @@ import {
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
-import { getQuizById } from '../../services/quiz.service';
+import { getQuizById, saveQuizSummary } from '../../services/quiz.service';
 import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import QuestionView from '../../components/QuestionView/QuestionView';
@@ -146,26 +146,58 @@ export default function PlayQuiz() {
     };
 
     const handleSubmitQuiz = async () => {
-        const finalScore = calculateScore();
-        if (userData && userData.role === UserRoleEnum.STUDENT) {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'Do you want to submit your answers? You won’t be able to enter the quiz again.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, submit it!',
+            cancelButtonText: 'No, keep playing'
+        });
+
+        if (result.isConfirmed) {
             try {
+                const finalScore = calculateScore();
+
+                const summary = {
+                    username: userData.username,
+                    points: finalScore,
+                    date: new Date().toISOString(),
+                    questions: questions.map((q) => {
+                        const userAnswer = answers[q.id]?.answer || 'No Answer';
+                        const isCorrect = answers[q.id]?.isCorrect || false;
+                        const imageUrl = q.imageFile ? URL.createObjectURL(q.imageFile) : q.imageUrl || '';
+                        return {
+                            questionText: q.title,
+                            description: q.description || '',
+                            imageUrl: imageUrl,
+                            userAnswer,
+                            correctAnswer: q.answer,
+                            isCorrect,
+                            options: q.options ? q.options : null,
+                            isOpenEnded: q.options && q.options.length > 0 ? true : false,
+                        };
+                    }),
+                };
+                // TODO uncomment IF statement after tests !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                // if (userData && userData.role === UserRoleEnum.STUDENT) {
+                await saveQuizSummary(quizId, userData.username, summary);
+
                 const updatedUser = { ...userData, points: userData.points + finalScore };
                 await updateUser(userData.uid, updatedUser);
-            } catch (error) {
-                console.error('Failed to update user points');
-            }
-            navigate('/ranking');
-        }
+                // }
 
-        Swal.fire({
-            title: 'Quiz Completed',
-            text: `You scored ${finalScore} out of ${quiz?.totalPoints ?? 0}.`,
-            icon: 'success',
-            timer: 5000,
-            showConfirmButton: true,
-        });
-        localStorage.removeItem(`quiz-${quizId}-timeLeft`);
-        localStorage.removeItem(`quiz-${quizId}-answers`);
+                localStorage.removeItem(`quiz-${quizId}-timeLeft`);
+                localStorage.removeItem(`quiz-${quizId}-answers`);
+
+                navigate('/quiz-summary', { state: { summary } });
+
+            } catch (error) {
+                console.error('Error saving quiz summary:', error);
+            }
+        }
     };
 
     const handleQuestionClick = (index) => {

@@ -9,6 +9,7 @@ import UserProfileModal from '../../components/UserProfileModal/UserProfileModal
 import Pagination from '../../components/Pagination/Pagination';
 import { Link } from 'react-router-dom';
 import './AdminPage.css';
+import OrganizerCodeModal from '../../components/OrganizerCodeModal/OrganizerCodeModal';
 
 export default function AdminPage() {
     const [users, setUsers] = useState([]);
@@ -20,12 +21,17 @@ export default function AdminPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10);
     const [bannedUsers, setBannedUsers] = useState([]);
+    const { isModalVisible: isCodeModalVisible, openModal: openCodeModal, closeModal: closeCodeModal } = useModal();
 
     useEffect(() => {
         fetchAllUsers();
         fetchBannedUsers();
         fetchReportedBugs();
     }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [view]);
 
     const fetchAllUsers = async () => {
         try {
@@ -156,6 +162,7 @@ export default function AdminPage() {
                 <Button onClick={() => setView('all')} mr={2}>All Users</Button>
                 <Button onClick={() => setView('banned')} mr={2}>Banned Users</Button>
                 <Button onClick={() => setView('reports')}>Bug Reports</Button>
+                <Button onClick={openCodeModal} ml={4}>Organizer Codes</Button>
             </Box>
             <Input
                 placeholder="Search by username, email, or name"
@@ -265,6 +272,8 @@ export default function AdminPage() {
                     onBanUnban={handleBanUnbanUpdate}
                 />
             )}
+
+            <OrganizerCodeModal isOpen={isCodeModalVisible} onClose={closeCodeModal} />
         </Box>
     );
 }
