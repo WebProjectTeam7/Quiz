@@ -10,6 +10,7 @@ import Pagination from '../../components/Pagination/Pagination';
 import { Link } from 'react-router-dom';
 import './AdminPage.css';
 import OrganizerCodeModal from '../../components/OrganizerCodeModal/OrganizerCodeModal';
+import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 
 export default function AdminPage() {
     const [users, setUsers] = useState([]);
@@ -138,7 +139,7 @@ export default function AdminPage() {
     const filteredUsers = (view === 'banned' ? bannedUsers : users).filter(user =>
         user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.firstName.toLowerCase().includes(searchTerm.toLowerCase())
+        (user.organizationName && user.organizationName.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     const indexOfLastUser = currentPage * usersPerPage;
@@ -156,7 +157,7 @@ export default function AdminPage() {
     };
 
     return (
-        <Box p={4}>
+        <Box className="admin-panel-container">
             <Text fontSize="2xl" mb={4}>Admin Panel</Text>
             <Box mb={4}>
                 <Button onClick={() => setView('all')} mr={2}>All Users</Button>
@@ -165,10 +166,12 @@ export default function AdminPage() {
                 <Button onClick={openCodeModal} ml={4}>Organizer Codes</Button>
             </Box>
             <Input
-                placeholder="Search by username, email, or name"
+                placeholder="Search by username, email, or organization"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                mb={4}
+                mb={1}
+                width="337px"
+                maxWidth="100%"
             />
             {(view === 'all' || view === 'banned') && (
                 <>
@@ -178,40 +181,46 @@ export default function AdminPage() {
                                 <Th>Username</Th>
                                 <Th>Email</Th>
                                 <Th>First Name</Th>
-                                <Th>Last Name</Th>
+                                <Th>Organization</Th>
                                 <Th>Details</Th>
-                                <Th></Th>
-                                <Th></Th>
+                                <Th>Actions</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
                             {currentUsers.map(user => (
                                 <Tr key={user.uid}>
                                     <Td>
-                                        {user.username}{' '}
-                                        {user.role && (
-                                            <Badge
-                                                colorScheme={user.role === UserRoleEnum.ADMIN ? 'red' : user.role === UserRoleEnum.ORGANIZER ? 'orange' : 'blue'}
-                                                fontSize="0.6em"
-                                            >
-                                                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                                            </Badge>
-                                        )}
+                                        <Box display="flex" alignItems="center">
+                                            <StatusAvatar uid={user.uid} src={user.avatar} size="sm" />
+                                            <Box ml={2}>
+                                                <Text>{user.username}</Text>
+                                                {user.role && (
+                                                    <Badge
+                                                        backgroundColor={user.role === 'admin' ? '#e60000' : user.role === 'organizer' ? 'orange' : 'blue'}
+                                                        color="black"
+                                                        fontSize="0.55em"
+                                                        mt={1}
+                                                    >
+                                                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                                    </Badge>
+                                                )}
+                                            </Box>
+                                        </Box>
                                     </Td>
                                     <Td>{user.email}</Td>
                                     <Td>{user.firstName}</Td>
-                                    <Td>{user.lastName}</Td>
+                                    <Td>{user.organizationName || ' '}</Td>
                                     <Td>
                                         <Button onClick={() => handleOpenProfile(user)}>Profile</Button>
                                     </Td>
                                     <Td>
                                         {view === 'banned' ? (
-                                            <Button colorScheme="green" onClick={() => handleUnbanUser(user.uid)}>Unban</Button>
+                                            <Button colorScheme="green"  width="80px" onClick={() => handleUnbanUser(user.uid)}>Unban</Button>
                                         ) : (
                                             user.banned ? (
-                                                <Button colorScheme="green" onClick={() => handleUnbanUser(user.uid)}>Unban</Button>
+                                                <Button colorScheme="green" width="80px" onClick={() => handleUnbanUser(user.uid)}>Unban</Button>
                                             ) : (
-                                                <Button colorScheme="yellow" onClick={() => handleBanUser(user)}>Ban</Button>
+                                                <Button colorScheme="yellow"  width="80px" onClick={() => handleBanUser(user)}>Ban</Button>
                                             )
                                         )}
                                     </Td>
