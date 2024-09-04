@@ -84,3 +84,14 @@ td {
 .chakra-link {
     background-color: transparent;
 }
+
+.custom-select {
+    background-color: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    border-radius: 5px;
+    padding: 0.5em;
+}
+.custom-select:focus {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    border-color: rgba(188, 16, 79, 0.9) !important;
+    box-shadow: 0 0 0 1px rgba(188, 16, 79, 0.9) !important;
+}
