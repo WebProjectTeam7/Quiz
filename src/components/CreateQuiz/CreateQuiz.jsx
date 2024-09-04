@@ -135,6 +135,7 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                                 <Select
                                     value={quiz.category}
                                     onChange={handleInputChange('category')}
+                                    className="custom-select"
                                 >
                                     {Object.values(QuizCategoryEnum).map((category) => (
                                         <option key={category} value={category}>
