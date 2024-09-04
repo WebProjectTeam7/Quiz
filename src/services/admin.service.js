@@ -112,3 +112,41 @@ export const getAllBannedUsers = async () => {
         throw new Error('Failed to retrieve banned users');
     }
 };
+
+// ADD CODES
+
+const generateRandomCode = () => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    const getRandomChar = () => {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        return characters[randomIndex];
+    };
+
+    const buildCode = (code = '') => {
+        if (code.length === 5) {
+            return code;
+        }
+        return buildCode(code + getRandomChar());
+    };
+
+    return buildCode();
+};
+
+export const addOrganizerCode = async () => {
+    const newCode = generateRandomCode();
+    const codeRef = ref(db, `organizerCodes/${newCode}`);
+
+    try {
+        const snapshot = await get(codeRef);
+        if (!snapshot.exists()) {
+            await set(codeRef, true);
+            return newCode;
+        }
+        return addOrganizerCode();
+
+    } catch (error) {
+        console.error('Error generating organizer code:', error);
+        throw new Error('Failed to generate organizer code: ' + error.message);
+    }
+};
