@@ -201,7 +201,27 @@ export const updateQuestionsIdsArray = async (quizId, questionsArray) => {
     }
 };
 
-export const submitQuizResults = async () => {
+export const saveQuizSummary = async (quizId, username, summary) => {
+    try {
+        const quizSummaryRef = dbRef(db, `quizzes/${quizId}/summaries/${username}`);
+
+        const snapshot = await get(quizSummaryRef);
+
+        let userSummaries = [];
+        if (snapshot.exists()) {
+            userSummaries = snapshot.val();
+        }
+
+        userSummaries.push({
+            ...summary,
+            createdAt: new Date().toISOString(),
+        });
+
+        await set(quizSummaryRef, userSummaries);
+    } catch (error) {
+        console.error('Error saving quiz summary:', error);
+        throw new Error('Failed to save quiz summary');
+    }
 };
 
 // DELETE
