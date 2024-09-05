@@ -45,17 +45,28 @@ export const getActiveQuizzes = async () => {
 
 export const getQuizzesByCategory = async (categoryName) => {
     try {
-        const quizRef = dbRef(db, 'quizzes');
-        const categoryQuizzesQuery = query(quizRef, orderByChild('category'), equalTo(categoryName));
+        let categoryQuizzesQuery;
+
+        if (categoryName === 'all') {
+            categoryQuizzesQuery = query(dbRef(db, 'quizzes'));
+        } else {
+            const quizRef = dbRef(db, 'quizzes');
+            categoryQuizzesQuery = query(quizRef, orderByChild('category'), equalTo(categoryName));
+        }
+
         const snapshot = await get(categoryQuizzesQuery);
 
         if (snapshot.exists()) {
             const categoryQuizzes = [];
             snapshot.forEach((childSnapshot) => {
-                categoryQuizzes.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                const quizData = childSnapshot.val();
+                if (quizData.isActive) {
+                    categoryQuizzes.push({ id: childSnapshot.key, ...quizData });
+                }
             });
             return categoryQuizzes;
         }
+
         return [];
     } catch (error) {
         console.error('Error retrieving quizzes by category:', error);

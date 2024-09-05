@@ -94,7 +94,7 @@ export default function App() {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/sample-quiz" element={<SampleQuiz />} />
-                            <Route path="/quizzes" element={<Quizzes />} />
+                            <Route path="/quizzes/:categoryName" element={<Quizzes />} />
                             <Route path="/my-profile" element={<MyProfile />} />
                             <Route path="/quiz-of-the-week" element={<QuizOfTheWeek />} />
                             <Route path="/quiz-of-the-week-detail" element={<QuizOfTheWeekDetail />} />

@@ -85,6 +85,10 @@
     background: linear-gradient(145deg, #e64343, #da2727);
 }
 
+.hexagon.done {
+    background: linear-gradient(145deg, #f5d4d4, #9f8b8b);
+}
+
 .hexagon-in {
     position: absolute;
     top: 50%;

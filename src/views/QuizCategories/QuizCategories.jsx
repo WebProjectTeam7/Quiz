@@ -1,109 +1,36 @@
-/* eslint-disable indent */
-// src/pages/Quizzes.js
 import './QuizCategories.css';
 import { useNavigate } from 'react-router-dom';
-import Hexagon from '../../components/Hexagon/Hexagon';
-import {
-    Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton,
-    ModalBody, useDisclosure, Button, Box, Flex
-} from '@chakra-ui/react';
-import { useState } from 'react';
-
-const categories = [
-    'History', 'Geography', 'Science', 'Literature', 'Art and Culture',
-    'Sports', 'Music', 'Movies and TV', 'Technology', 'Famous People',
-    'Food and Drinks', 'Nature and Animals', 'Logic Puzzles', 'Mythology',
-    'Politics', 'Medicine', 'Fashion and Design', 'JavaScript DSA',
-    'Space and Astronomy', 'Cultural Traditions'
-];
+import { Button, Box, Heading, Flex } from '@chakra-ui/react';
+import QuizCategoryEnum from '../../common/category-enum';
 
 export default function QuizzesCategories() {
+    const categories = Object.values(QuizCategoryEnum);
     const navigate = useNavigate();
-    const [clickedHexagon, setClickedHexagon] = useState(null);
-    const [playedHexagons, setPlayedHexagons] = useState({});
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const [selectedCategory, setSelectedCategory] = useState(null);
-    const {
-        isOpen: isCategoriesOpen,
-        onOpen: onCategoriesOpen,
-        onClose: onCategoriesClose
-    } = useDisclosure();
 
-    const handleHexagonClick = (level) => {
-        const hexagonKey = `${selectedCategory}-${level}`;
-        navigate(`/quizzes/${level}/${selectedCategory}`);
-        setClickedHexagon(hexagonKey);
-        setPlayedHexagons((prev) => ({ ...prev, [hexagonKey]: true }));
-        onClose();
+    const handleCategoryClick = (category) => {
+        navigate(`/quizzes/${category}`);
     };
-
-    const hexagonClass = (level) => {
-        const hexagonKey = `${selectedCategory}-${level}`;
-        return `hexagon ${level} ${clickedHexagon === hexagonKey ? 'clicked' : ''} ${playedHexagons[hexagonKey] ? 'played' : ''}`;
-    };
-
-    const openCategoryModal = (category) => {
-        setSelectedCategory(category);
-        onOpen();
-    };
-
-    const renderHexagons = () => (
-        <Flex className="hexagon-group-category" wrap="wrap" justify="center" gap={4}>
-            {['easy', 'medium', 'hard'].map((level) => (
-                <Hexagon
-                    key={level}
-                    className={hexagonClass(level)}
-                    level={level}
-                    onClick={() => handleHexagonClick(level)}
-                />
-            ))}
-        </Flex>
-    );
 
     return (
         <div>
             <Flex justifyContent="center" marginBottom="20px" gap={4}>
-                <Button className='all-quizzes-button' onClick={() => navigate('/quizzes')}>MIXED QUIZZES</Button>
-                <Button className='categories-button' onClick={onCategoriesOpen}>CATEGORIES</Button>
+                <Button colorScheme="blue" onClick={() => navigate('/quiz-of-the-week')}>Quiz of the Week</Button>
             </Flex>
-
-            <Box className="quizzes-container-category" padding="20px">
-            </Box>
-            <Modal isOpen={isOpen} onClose={onClose} size="xl">
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>{selectedCategory}</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        {renderHexagons()}
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
-
-            <Modal isOpen={isCategoriesOpen} onClose={onCategoriesClose} size="xl">
-    <ModalOverlay />
-    <ModalContent>
-        <ModalHeader textAlign="center">Categories</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
+            <Heading as="h2" size="lg" textAlign="center" marginBottom="20px" color='white'>
+                Select a Category
+            </Heading>
             <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={4}>
                 {categories.map((category) => (
                     <Button
                         key={category}
                         colorScheme="blue"
-                        onClick={() => {
-                            openCategoryModal(category);
-                            onCategoriesClose();
-                        }}
+                        onClick={() => handleCategoryClick(category)}
                         className="chakra-button-quiz-categories"
                     >
                         {category}
                     </Button>
                 ))}
             </Box>
-        </ModalBody>
-    </ModalContent>
-</Modal>
         </div>
     );
 }
