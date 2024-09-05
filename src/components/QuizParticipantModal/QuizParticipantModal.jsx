@@ -20,14 +20,14 @@ import { Link as RouterLink } from 'react-router-dom';
 
 const QuizParticipantModal = ({ isOpen, onClose, quiz }) => {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="lg">
+        <Modal isOpen={isOpen} onClose={onClose} size="lg" color={'white'}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>Quiz Participants</ModalHeader>
                 <ModalBody>
                     <Table variant="simple">
                         <Thead>
-                            <Tr>
+                            <Tr >
                                 <Th>Username</Th>
                                 <Th>Points</Th>
                                 <Th>Date</Th>
@@ -47,21 +47,6 @@ const QuizParticipantModal = ({ isOpen, onClose, quiz }) => {
                     </Table>
                 </ModalBody>
                 <ModalFooter>
-                    <Box>
-                        {Object.entries(quiz.summaries).flatMap(([username, summaries]) =>
-                            summaries.length > 0 && (
-                                <Link
-                                    as={RouterLink}
-                                    to={`/summary/${username}`}
-                                    key={username}
-                                >
-                                    <Button colorScheme="blue" onClick={onClose}>
-                                        View Full Summary for {username}
-                                    </Button>
-                                </Link>
-                            )
-                        )}
-                    </Box>
                     <Button colorScheme="red" ml={3} onClick={onClose}>
                         Close
                     </Button>
