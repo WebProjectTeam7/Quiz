@@ -28,6 +28,7 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import QuizAccessEnum from '../../common/access-enum';
 import { createQuestion } from '../../services/question.service';
 import QuizCategoryEnum from '../../common/category-enum';
+import './CreateQuestion.css';
 
 export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quizId }) {
     const { userData } = useContext(AppContext);
@@ -156,7 +157,7 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
                         <VStack spacing={4}>
 
                             <FormControl id="title" isRequired>
-                                <FormLabel>Title</FormLabel>
+                                <FormLabel>Question</FormLabel>
                                 <Input
                                     value={question.title}
                                     onChange={updateQuestion('title')}
