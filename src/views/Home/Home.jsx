@@ -28,8 +28,8 @@ export default function Home() {
     };
     return (
         <div className="main-page">
-            <h1>Bee Champion</h1>
-            {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
+            <h1>Quiz Champion</h1>
+            {/* userData && <span className="welcome-text">Welcome, {userData.username}</span> */}
             <section className="hero-banner">
                 <h1>Challenge Your Mind with Fun Quizzes</h1>
                 <p>Try this sample quiz now!</p>
