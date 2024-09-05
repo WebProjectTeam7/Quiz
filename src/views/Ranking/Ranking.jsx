@@ -67,7 +67,7 @@ const Ranking = () => {
   return (
     <VStack spacing={4} align="center" className="ranking-container">
       <Heading as="h2" size="lg" className="ranking-title">
-        Who is the best BI*CHES?
+        Who is the best?
       </Heading>
       {currentUsers.map((user, index) => (
         <Box
