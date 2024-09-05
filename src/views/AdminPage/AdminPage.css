@@ -28,6 +28,31 @@
     border-radius: 8px;
 }
 
+.css-1v4gb9d:hover {
+    background-color: rgb(243, 0, 0) !important;
+    transition-duration: .2s;
+}
+
+.css-lj9scj:hover {
+    background-color: rgb(73, 185, 39) !important;
+    transition-duration: .2s;
+}
+
+.css-1xlie69:hover {
+    background-color: rgb(41, 39, 185) !important;
+    transition-duration: .2s;
+}
+
+.css-18oqwto:hover {
+    background-color: rgb(41, 39, 185) !important;
+    transition-duration: .2s;
+}
+
+.css-ez23ye:hover {
+    background-color: rgb(41, 39, 185) !important;
+    transition-duration: .2s;
+}
+
 .css-1xlie69 {
     background: linear-gradient(135deg, rgba(12, 8, 58, 0.9), rgba(188, 16, 79, 0.74)) !important;
     color: rgb(237, 243, 182) !important;

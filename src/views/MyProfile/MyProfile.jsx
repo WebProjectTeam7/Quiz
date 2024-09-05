@@ -10,6 +10,7 @@ import {
     Text,
     Flex,
     Divider,
+    HStack,
 } from '@chakra-ui/react';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { AppContext } from '../../state/app.context';
@@ -279,7 +280,7 @@ export default function MyProfile() {
                         Choose File
                     </Button>
                     <Button variant="solid" colorScheme="yellow" mt={2} onClick={() => setShowPasswordChange(!showPasswordChange)}>
-                        {showPasswordChange ? 'Cancel Password Change' : 'Change Password'}
+                        {showPasswordChange ? 'Cancel' : 'Change Password'}
                     </Button>
                     {showPasswordChange && (
                         <Box mt={4} className="password-change-container">
@@ -297,7 +298,7 @@ export default function MyProfile() {
                                 onChange={(e) => setConfirmNewPassword(e.target.value)}
                                 mb={2}
                             />
-                            <Button colorScheme="blue" onClick={handleChangePassword}>
+                            <Button ml={7} colorScheme="blue" onClick={handleChangePassword}>
                                 Update Password
                             </Button>
                         </Box>
@@ -339,94 +340,95 @@ export default function MyProfile() {
                         </Button>
                     </Box>
                 </Box>
+
                 <Box className="right-section">
                     <form onSubmit={saveChanges}>
                         <Stack spacing={3}>
-                            <Box>
-                                <Flex alignItems="center">
-                                    <Text className="right-section-label">Username:</Text>
-                                    <Editable defaultValue={formData.username} isDisabled>
-                                        <EditablePreview className="right-section-data" />
-                                        <EditableInput />
-                                    </Editable>
-                                </Flex>
-                            </Box>
-                            <Divider my={2} />
-                            <Box>
-                                <Flex alignItems="center">
-                                    <Text className="right-section-label">First Name:</Text>
-                                    <Editable
-                                        defaultValue={formData.firstName}
-                                        onSubmit={(value) => updateUserData('firstName')(value)}
-                                    >
-                                        <EditablePreview className="right-section-data" />
-                                        <EditableInput />
-                                        <EditableControls />
-                                    </Editable>
-                                </Flex>
-                            </Box>
-                            <Divider my={2} />
-                            <Box>
-                                <Flex alignItems="center">
-                                    <Text className="right-section-label">Last Name:</Text>
-                                    <Editable
-                                        defaultValue={formData.lastName}
-                                        onSubmit={(value) => updateUserData('lastName')(value)}
-                                    >
-                                        <EditablePreview className="right-section-data" />
+
+                            <HStack>
+                                <Text className="right-section-label">Username:</Text>
+                                <Editable mt={3} defaultValue={formData.username} isDisabled>
+                                    <EditablePreview className="right-section-data" />
+                                    <EditableInput />
+                                </Editable>
+                            </HStack>
+                            <Divider my={1} />
+
+                            <HStack>
+                                <Text className="right-section-label">First Name:</Text>
+                                <Editable
+                                    value={formData.firstName}
+                                    onChange={(value) => updateUserData('firstName')(value)}
+                                >
+                                    <HStack>
+                                        <EditablePreview mt={3} className="right-section-data" />
                                         <EditableInput />
                                         <EditableControls />
-                                    </Editable>
-                                </Flex>
-                            </Box>
-                            <Divider my={2} />
-                            <Box>
-                                <Flex alignItems="center">
-                                    <Text className="right-section-label">Email:</Text>
-                                    <Editable defaultValue={formData.email} isDisabled>
-                                        <EditablePreview className="right-section-data" />
-                                        <EditableInput />
-                                    </Editable>
-                                </Flex>
-                            </Box>
-                            <Divider my={2} />
-                            <Box>
-                                <Flex alignItems="center">
-                                    <Text className="right-section-label">Phone Number:</Text>
-                                    <Editable
-                                        defaultValue={formData.phoneNumber}
-                                        onSubmit={(value) => updateUserData('phoneNumber')(value)}
-                                    >
-                                        <EditablePreview className="right-section-data" />
+                                    </HStack>
+                                </Editable>
+                            </HStack>
+                            <Divider my={1} />
+
+                            <HStack>
+                                <Text className="right-section-label">Last Name:</Text>
+                                <Editable
+                                    value={formData.lastName}
+                                    onChange={(value) => updateUserData('lastName')(value)}
+                                >
+                                    <HStack>
+                                        <EditablePreview mt={3} className="right-section-data" />
                                         <EditableInput />
                                         <EditableControls />
-                                    </Editable>
-                                </Flex>
-                            </Box>
+                                    </HStack>
+                                </Editable>
+                            </HStack>
+                            <Divider my={1} />
+
+                            <HStack>
+                                <Text className="right-section-label">Email:</Text>
+                                <Editable mt={3} defaultValue={formData.email} isDisabled>
+                                    <EditablePreview className="right-section-data" />
+                                    <EditableInput />
+                                </Editable>
+                            </HStack>
                             <Divider my={2} />
-                            <Box>
-                                <Flex alignItems="center">
-                                    <Text className="right-section-label">Role:</Text>
-                                    <Text className="right-section-data">
-                                        {formData.role}
-                                    </Text>
-                                </Flex>
-                            </Box>
+
+                            <HStack>
+                                <Text className="right-section-label">Phone Number:</Text>
+                                <Editable
+                                    value={formData.phoneNumber || ''}
+                                    onChange={(value) => updateUserData('phoneNumber')(value)}
+                                >
+                                    <HStack>
+                                        <EditablePreview mt={3} className="right-section-data" />
+                                        <EditableInput />
+                                        <EditableControls />
+                                    </HStack>
+                                </Editable>
+                            </HStack>
+                            <Divider my={1} />
+
+                            <HStack>
+                                <Text className="right-section-label" >Role:</Text>
+                                <Text className="right-section-data">{formData.role}</Text>
+                            </HStack>
                         </Stack>
+
                         <Divider my={2} />
-                        <Box className="button-container" mt={4} display="flex" justifyContent="space-between">
+                        <Box className="button-container" mt={100} display="flex" justifyContent="space-between">
                             <Box>
                                 <Button colorScheme="green" type="submit" className="right-section-save-button" size="sm">
                                     Save
                                 </Button>
                                 <Button variant="solid" colorScheme="red" ml={2} onClick={discardChanges} size="sm">
-                                    Discard Changes
+                                    Discard
                                 </Button>
                             </Box>
                         </Box>
                     </form>
                 </Box>
             </Box>
+
             <NotificationList
                 isOpen={isNotificationModalOpen}
                 onClose={closeNotificationModal}

@@ -80,21 +80,23 @@
     justify-content: flex-start;
     gap: 10px;
     padding: 0px 15px;
-    background-color: rgb(66, 66, 66);
+    background-color: linear-gradient(135deg, rgba(12, 8, 58, 0.9), rgba(188, 16, 79, 0.74));
     border-radius: 10px;
-    color: white;
+    color: rgb(237, 243, 182);
     border: none;
     position: relative;
     cursor: pointer;
     transition-duration: .2s;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    font-weight: bold;
   }
   
   .bell {
-    width: 13px;
+    width: 18px;
   }
   
   .bell path {
-    fill: rgb(0, 206, 62);
+    fill: yellow
   }
 
   
@@ -119,4 +121,66 @@
 .css-1wtemij {
     background: #bb2701 !important;
     color: white !important;
+}
+
+.css-hipoo1 {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    color: rgb(237, 243, 182) !important;
+    border-radius: 8px;
+}
+
+.css-hipoo1:hover {
+    background-color: rgb(237, 243, 182) !important;
+    transition-duration: .2s;
+}
+
+.css-lgnrpw {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    color: rgb(237, 243, 182) !important;
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+.css-lgnrpw:hover {
+    background-color: rgb(237, 243, 182) !important;
+    transition-duration: .2s;
+}
+
+.css-1ngb7fh {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    color: rgb(237, 243, 182) !important;
+    border-radius: 8px;
+    margin-bottom: 4px;
+}
+
+.css-1ngb7fh:hover {
+    background-color: rgb(237, 243, 182) !important;
+    transition-duration: .2s;
+}
+
+.css-1lp2lqs {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    color: rgb(237, 243, 182) !important;
+    border-radius: 8px;
+}
+
+.css-1lp2lqs:hover {
+    background-color: rgb(237, 243, 182) !important;
+    transition-duration: .2s;
+}
+
+.css-1y4cryk {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    color: rgb(237, 243, 182) !important;
+    border-radius: 8px;
+}
+
+.css-1y4cryk:hover {
+    background-color: rgb(237, 243, 182) !important;
+    transition-duration: .2s;
 }
