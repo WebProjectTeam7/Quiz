@@ -32,18 +32,17 @@ import SendInvitationModal from '../../components/SendInvitationModal/SendInvita
 import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.service';
 import InvitationEnum from '../../common/invitation-enum';
 import './QuizPreview.css';
+import QuizParticipantModal from '../../components/QuizParticipantModal/QuizParticipantModal';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
     const navigate = useNavigate();
-
     const [quiz, setQuiz] = useState({
         author: 'John Doe',
         type: QuizAccessEnum.PUBLIC,
         title: 'Sample Quiz',
         description: 'This is a sample quiz description.',
         timesTried: 0,
-        scoreboard: [],
         category: QuizCategoryEnum.GENERAL,
         totalPoints: 0,
         difficulty: QuizDifficultyEnum.MEDIUM,
@@ -52,12 +51,14 @@ export default function QuizPreview() {
         timeLimit: 0,
         isActive: false,
         imageFile: null,
+        summaries: [],
     });
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [reports, setReports] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
-    const [reports, setReports] = useState([]);
+    const { isOpen: isParticipantsOpen, onOpen: onParticipantsOpen, onClose: onParticipantsClose } = useDisclosure();
 
     useEffect(() => {
         if (quizId) {
@@ -384,6 +385,9 @@ export default function QuizPreview() {
                         </Button>
                     )}
                 </HStack>
+                <Button colorScheme="blue" onClick={onParticipantsOpen}>
+                    Quiz Participants
+                </Button>
 
                 <HStack spacing={4}>
                     <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
@@ -452,6 +456,7 @@ export default function QuizPreview() {
 
             <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
             <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} objId={quizId} objType={InvitationEnum.QUIZ} />
+            <QuizParticipantModal isOpen={isParticipantsOpen} onClose={onParticipantsClose} quiz={quiz} />
         </Box>
     );
 }
