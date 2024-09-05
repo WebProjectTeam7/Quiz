@@ -60,9 +60,7 @@ export default function PlayQuiz() {
 
         setTimer(interval);
 
-        return () => {
-            clearInterval(interval);
-        };
+        return () => { clearInterval(interval); };
     }, [timeLeft, isLoading, quizId]);
 
     const fetchQuizData = async () => {
