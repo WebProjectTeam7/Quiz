@@ -31,6 +31,7 @@ import EditableControls from '../../components/EditableControls/EditableControls
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.service';
 import InvitationEnum from '../../common/invitation-enum';
+import './QuizPreview.css';
 
 export default function QuizPreview() {
     const { quizId } = useParams();

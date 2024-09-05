@@ -6,12 +6,16 @@ import {
     List,
     ListItem,
     VStack,
+    Button,
 } from '@chakra-ui/react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import './QuizSummary.css';
 
 const QuizSummary = () => {
     const location = useLocation();
     const { summary } = location.state;
+    const navigate = useNavigate();
+
     return (
         <Box maxW="800px" mx="auto" py={8} color="rgb(237, 243, 182)">
             <Heading as="h2" size="lg" mb={4} >
@@ -78,6 +82,11 @@ const QuizSummary = () => {
                     </Box>
                 ))}
             </VStack>
+            <Box display="flex" justifyContent="center" mt={6}>
+                <Button onClick={() => navigate('/')}>
+                    Go to home page
+                </Button>
+            </Box>
         </Box>
     );
 };

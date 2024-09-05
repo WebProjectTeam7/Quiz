@@ -1,0 +1,12 @@
+.chakra-radio-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .chakra-radio {
+    margin-bottom: 11px;
+  }
+  
+  .chakra-heading .css-1jb3vzl {
+    text-align: center !important;
+  }
