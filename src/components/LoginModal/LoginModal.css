@@ -72,6 +72,8 @@
     font-size: var(--chakra-fontSizes-xl);
     font-weight: var(--chakra-fontWeights-semibold);
     color: rgb(237, 243, 182) !important;
+    font-size: 40px !important;
+    text-align: center;
 }
 
 .css-c6nly4 {
@@ -153,4 +155,16 @@
 .quiz-title {
     font-weight: lighter;
     font-size: 1rem;
+}
+
+.css-wubf5g {
+    background: linear-gradient(135deg, rgba(12, 8, 58, 0.9), rgba(188, 16, 79, 0.74)) !important;
+    color: rgb(237, 243, 182) !important;
+    margin-left: 10px !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    border-radius: 8px;
+}
+
+.css-wsjeba {
+    text-align: center !important;
 }

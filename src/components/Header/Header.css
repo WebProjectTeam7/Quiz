@@ -29,7 +29,7 @@
 
 .site-header span {
     font-size: 1.5rem;
-    margin-top: -10px;
+    text-align: left !important;
 }
 
 .site-header .nav-buttons {
@@ -160,4 +160,10 @@
 
 .css-1kfu8nn:hover {
     background: rgba(76, 39, 87, 0.9);
+}
+
+.welcome-text {
+    color: rgb(237, 243, 182);
+    font-size: 24px;
+    padding-left: 30px;
 }

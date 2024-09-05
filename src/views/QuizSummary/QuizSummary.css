@@ -1,0 +1,22 @@
+.css-pqhn2b {
+    max-width: 800px;
+    -webkit-margin-start: auto;
+    margin-inline-start: auto;
+    -webkit-margin-end: auto;
+    margin-inline-end: auto;
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    padding-top: var(--chakra-space-8);
+    padding-bottom: var(--chakra-space-8);
+    color: rgb(237, 243, 182);
+    margin-top: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0px 5px 40px rgba(188, 16, 79, 0.74);
+}
+
+.css-q2ryjt {
+    text-align: center;
+    font-size: 40px !important;
+}
