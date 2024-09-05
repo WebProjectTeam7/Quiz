@@ -69,11 +69,11 @@ export default function QuizPreview() {
         try {
             const fetchedQuiz = await getQuizById(quizId);
             setQuiz(fetchedQuiz);
-            if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
-                let fetchedQuestions = await Promise.all(fetchedQuiz.questions
-                    .map(async (questionId) => await getQuestionById(questionId)));
 
+            if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
+                const fetchedQuestions = await Promise.all(fetchedQuiz.questions.map(id => getQuestionById(id)));
                 const filteredQuestions = fetchedQuestions.filter(q => q !== null);
+
                 if (filteredQuestions.length < fetchedQuestions.length) {
                     await updateQuestions(filteredQuestions);
                 }
@@ -235,14 +235,13 @@ export default function QuizPreview() {
         }
     };
 
-
     return (
         <Box maxW="800px" mx="auto" py={8}>
             <VStack spacing={4} align="start">
                 <Heading as="h2" size="lg">Quiz Preview</Heading>
                 <Divider />
 
-                {quiz.imageUrl && <Image src={quiz.imageUrl} alt="Quiz Image" />}
+                {quiz.imageFile && <Image src={quiz.imageFile} alt="Quiz Image" />}
 
                 <Editable
                     value={quiz.title}
@@ -314,8 +313,8 @@ export default function QuizPreview() {
                 </HStack>
 
                 <HStack>
-                    <Text fontSize="xl" fontWeight="bold">Times Tried:</Text>
-                    <Text>{quiz.timesTried}</Text>
+                    <Text fontSize="xl" fontWeight="bold">Times Played:</Text>
+                    <Text>{quiz.summaries ? Object.values(quiz.summaries).flat().length : 0}</Text>
                 </HStack>
 
                 <HStack>
@@ -333,26 +332,28 @@ export default function QuizPreview() {
                     </Editable>
                 </HStack>
 
-                <HStack>
-                    <Text fontSize="xl" fontWeight="bold">Date Start:</Text>
-                    <Input
-                        type="datetime-local"
-                        value={quiz.dateBegins ? new Date(quiz.dateBegins).toISOString().slice(0, -8) : ''}
-                        onChange={(e) => setQuiz({ ...quiz, dateBegins: new Date(e.target.value).toISOString() })}
-                    />
-                    <Text fontSize="xl" fontWeight="bold">Date End:</Text>
-                    <Input
-                        type="datetime-local"
-                        value={quiz.dateEnds ? new Date(quiz.dateEnds).toISOString().slice(0, -8) : ''}
-                        onChange={(e) => setQuiz({ ...quiz, dateEnds: new Date(e.target.value).toISOString() })}
-                    />
-                </HStack>
+                {quiz.type === QuizAccessEnum.PRIVATE && (
+                    <HStack>
+                        <Text fontSize="xl" fontWeight="bold">Date Start:</Text>
+                        <Input
+                            type="datetime-local"
+                            value={quiz.dateBegins ? new Date(quiz.dateBegins).toISOString().slice(0, -8) : ''}
+                            onChange={(e) => setQuiz({ ...quiz, dateBegins: new Date(e.target.value).toISOString() })}
+                        />
+                        <Text fontSize="xl" fontWeight="bold">Date End:</Text>
+                        <Input
+                            type="datetime-local"
+                            value={quiz.dateEnds ? new Date(quiz.dateEnds).toISOString().slice(0, -8) : ''}
+                            onChange={(e) => setQuiz({ ...quiz, dateEnds: new Date(e.target.value).toISOString() })}
+                        />
+                    </HStack>
+                )}
 
                 <HStack>
                     <Text fontSize="xl" fontWeight="bold">Time Limit (minutes):</Text>
                     <Editable
                         value={quiz.timeLimit ? quiz.timeLimit.toString() : ''}
-                        onChange={(value) => setQuiz({ ...quiz, timeLimit: value })}
+                        onChange={(value) => setQuiz({ ...quiz, timeLimit: parseInt(value, 10) })}
                         isPreviewFocusable={false}
                     >
                         <HStack>
@@ -362,16 +363,17 @@ export default function QuizPreview() {
                         </HStack>
                     </Editable>
                 </HStack>
-                <HStack>
-                    <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
-                        Save Changes
-                    </Button>
 
+                <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
+                    Save Changes
+                </Button>
+
+                <HStack spacing={4}>
                     <Button colorScheme="blue" onClick={onOpen}>
                         Add Question
                     </Button>
 
-                    <Button onClick={handleTestQuiz} colorScheme="teal" >
+                    <Button colorScheme="teal" onClick={handleTestQuiz}>
                         Test Quiz
                     </Button>
 
@@ -382,11 +384,10 @@ export default function QuizPreview() {
                     )}
                 </HStack>
 
-                <HStack>
+                <HStack spacing={4}>
                     <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
                         {quiz.isActive ? 'Deactivate Quiz' : 'Activate Quiz'}
                     </Button>
-
 
                     <Button colorScheme="red" onClick={handleDeleteQuiz}>
                         Delete Quiz

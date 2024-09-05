@@ -31,6 +31,9 @@ export default function QuizzesCategories() {
                     </Button>
                 ))}
             </Box>
+            <Flex justifyContent="center" marginTop="40px" gap={4}>
+                <Button colorScheme="blue" onClick={() => navigate('/invitational-quizzes')}>Invitational Quizzes</Button>
+            </Flex>
         </div>
     );
 }

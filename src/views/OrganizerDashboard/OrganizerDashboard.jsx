@@ -25,6 +25,7 @@ import {
     getOrganizationById
 } from '../../services/organization.service';
 import './OrganizerDashboard.css';
+import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 
 export default function OrganizerDashboard() {
     const { userData } = useContext(AppContext);
@@ -34,6 +35,8 @@ export default function OrganizerDashboard() {
         onOpen: onQuizModalOpen,
         onClose: onQuizModalClose,
     } = useDisclosure();
+
+    const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
 
     const {
         isOpen: isOrganizationModalOpen,
@@ -138,6 +141,9 @@ export default function OrganizerDashboard() {
                             </Button>
                         </>
                     )}
+                    <Button colorScheme="blue" onClick={onInviteOpen}>
+                        Send Invitation
+                    </Button>
                 </HStack>
 
                 <Box w="full" mt={8}>
@@ -192,6 +198,7 @@ export default function OrganizerDashboard() {
                 onClose={onOrganizationModalClose}
                 onOrganizationCreated={handleOrganizationCreated}
             />
+            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose}   />
         </Box>
     );
 }

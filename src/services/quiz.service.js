@@ -137,6 +137,7 @@ export const getQuizzesByAuthor = async (username) => {
         throw new Error('Failed to retrieve quizzes by username');
     }
 };
+
 export const getQuizzesByOrganizationId = async (organizationId) => {
     try {
         const quizRef = dbRef(db, 'quizzes');
@@ -152,6 +153,25 @@ export const getQuizzesByOrganizationId = async (organizationId) => {
     }
 };
 
+export const getPrivateQuizzes = async () => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const organizationQuery = query(quizRef, orderByChild('type'), equalTo('private'));
+        const snapshot = await get(organizationQuery);
+
+        if (!snapshot.exists()) {
+            return [];
+        }
+        const quizzes = snapshot.val();
+        return Object.keys(quizzes).map(key => ({
+            id: key,
+            ...quizzes[key]
+        }));
+    } catch (error) {
+        console.error('Error fetching private quizzes:', error);
+        throw new Error('Failed to fetch private quizzes');
+    }
+};
 
 // UPDATE
 
@@ -232,6 +252,29 @@ export const saveQuizSummary = async (quizId, username, summary) => {
     } catch (error) {
         console.error('Error saving quiz summary:', error);
         throw new Error('Failed to save quiz summary');
+    }
+};
+
+export const inviteUserToPrivateQuiz = async (quizId, username) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+
+        const snapshot = await get(quizRef);
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+        const quizData = snapshot.val();
+        let invitedUsers = quizData.invitedUsers || [];
+
+        if (invitedUsers.includes(username)) {
+            throw new Error(`User ${username} is already invited to the quiz.`);
+        }
+
+        invitedUsers.push(username);
+        await update(quizRef, { invitedUsers });
+    } catch (error) {
+        console.error('Error inviting user to quiz:', error);
+        throw new Error('Failed to invite user to quiz');
     }
 };
 

@@ -25,6 +25,7 @@ import AdminPage from './views/AdminPage/AdminPage';
 import SampleQuiz from './views/SampleQuiz/SampleQuiz';
 import QuizCategories from './views/QuizCategories/QuizCategories';
 import QuizSummary from './views/QuizSummary/QuizSummary';
+import InvitationalQuizzes from './views/InvitationalQuizzes/InvitationalQuizzes';
 
 export default function App() {
     const [appState, setAppState] = useState({
@@ -105,6 +106,7 @@ export default function App() {
                             <Route path="/tournament" element={<Tournament />} />
                             <Route path="/play-quiz/:quizId" element={<PlayQuiz />} />
                             <Route path="/quiz-summary" element={<QuizSummary />} />
+                            <Route path="/invitational-quizzes" element={<InvitationalQuizzes />} />
                             <Route path="/admin" element={<AdminPage />} />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
