@@ -1,4 +1,3 @@
-/* eslint-disable consistent-return */
 import {
     Box,
     Heading,
@@ -47,7 +46,7 @@ export default function PlayQuiz() {
 
     useEffect(() => {
         if (timeLeft <= 0 && !isLoading) {
-            handleSubmitQuiz();
+            handleSubmitQuiz(true);
             return;
         }
 
@@ -73,8 +72,7 @@ export default function PlayQuiz() {
 
             if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
                 let fetchedQuestions = await Promise.all(
-                    fetchedQuiz.questions
-                        .map(async (questionId) => await getQuestionById(questionId))
+                    fetchedQuiz.questions.map(async (questionId) => await getQuestionById(questionId))
                 );
                 fetchedQuestions = fetchedQuestions.filter((q) => q !== null);
                 setQuestions(fetchedQuestions);
@@ -116,10 +114,10 @@ export default function PlayQuiz() {
         setAnswers((prevAnswers) => {
             const updatedAnswers = {
                 ...prevAnswers,
-                [questionId]: { answer, isCorrect }
+                [questionId]: { answer, isCorrect },
             };
 
-            const count = Object.values(updatedAnswers).filter(a => a.isCorrect).length;
+            const count = Object.values(updatedAnswers).filter((a) => a.isCorrect).length;
             setCorrectAnswersCount(count);
 
             localStorage.setItem(`quiz-${quizId}-answers`, JSON.stringify(updatedAnswers));
@@ -145,58 +143,59 @@ export default function PlayQuiz() {
         return 0;
     };
 
-    const handleSubmitQuiz = async () => {
-        const result = await Swal.fire({
-            title: 'Are you sure?',
-            text: 'Do you want to submit your answers? You won’t be able to enter the quiz again.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, submit it!',
-            cancelButtonText: 'No, keep playing'
-        });
+    const handleSubmitQuiz = async (forceSubmit = false) => {
+        if (!forceSubmit) {
+            const result = await Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to submit your answers? You won’t be able to enter the quiz again.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, submit it!',
+                cancelButtonText: 'No, keep playing',
+            });
 
-        if (result.isConfirmed) {
-            try {
-                const finalScore = calculateScore();
-
-                const summary = {
-                    username: userData.username,
-                    points: finalScore,
-                    date: new Date().toISOString(),
-                    questions: questions.map((q) => {
-                        const userAnswer = answers[q.id]?.answer || 'No Answer';
-                        const isCorrect = answers[q.id]?.isCorrect || false;
-                        const imageUrl = q.imageFile ? URL.createObjectURL(q.imageFile) : q.imageUrl || '';
-                        return {
-                            questionText: q.title,
-                            description: q.description || '',
-                            imageUrl: imageUrl,
-                            userAnswer,
-                            correctAnswer: q.answer,
-                            isCorrect,
-                            options: q.options ? q.options : null,
-                            isOpenEnded: q.options && q.options.length > 0 ? true : false,
-                        };
-                    }),
-                };
-                // TODO uncomment IF statement after tests !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                // if (userData && userData.role === UserRoleEnum.STUDENT) {
-                await saveQuizSummary(quizId, userData.username, summary);
-
-                const updatedUser = { ...userData, points: userData.points + finalScore };
-                await updateUser(userData.uid, updatedUser);
-                // }
-
-                localStorage.removeItem(`quiz-${quizId}-timeLeft`);
-                localStorage.removeItem(`quiz-${quizId}-answers`);
-
-                navigate('/quiz-summary', { state: { summary } });
-
-            } catch (error) {
-                console.error('Error saving quiz summary:', error);
+            if (!result.isConfirmed) {
+                return;
             }
+        }
+
+        try {
+            const finalScore = calculateScore();
+
+            const summary = {
+                username: userData.username,
+                points: finalScore,
+                date: new Date().toISOString(),
+                questions: questions.map((q) => {
+                    const userAnswer = answers[q.id]?.answer || 'No Answer';
+                    const isCorrect = answers[q.id]?.isCorrect || false;
+                    const imageUrl = q.imageFile ? URL.createObjectURL(q.imageFile) : q.imageUrl || '';
+                    return {
+                        questionText: q.title,
+                        description: q.description || '',
+                        imageUrl: imageUrl,
+                        userAnswer,
+                        correctAnswer: q.answer,
+                        isCorrect,
+                        options: q.options ? q.options : null,
+                        isOpenEnded: q.options && q.options.length > 0 ? true : false,
+                    };
+                }),
+            };
+
+            await saveQuizSummary(quizId, userData.username, summary);
+
+            const updatedUser = { ...userData, points: userData.points + finalScore };
+            await updateUser(userData.uid, updatedUser);
+
+            localStorage.removeItem(`quiz-${quizId}-timeLeft`);
+            localStorage.removeItem(`quiz-${quizId}-answers`);
+
+            navigate('/quiz-summary', { state: { summary } });
+        } catch (error) {
+            console.error('Error saving quiz summary:', error);
         }
     };
 
@@ -207,6 +206,7 @@ export default function PlayQuiz() {
     if (isLoading) {
         return <Spinner />;
     }
+
 
     return (
         <HStack>
@@ -247,7 +247,7 @@ export default function PlayQuiz() {
                                 <Button onClick={handleNextQuestion} isDisabled={currentQuestionIndex === questions.length - 1}>
                                     Next
                                 </Button>
-                                <Button onClick={handleSubmitQuiz} colorScheme="blue">
+                                <Button onClick={() => handleSubmitQuiz(false)} colorScheme="blue">
                                     Submit
                                 </Button>
                             </HStack>

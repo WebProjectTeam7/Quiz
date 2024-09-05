@@ -3,7 +3,9 @@ import { forwardRef } from 'react';
 import './Hexagon.css';
 import PropTypes from 'prop-types';
 
-const Hexagon = forwardRef(({ level, onClick, userId }, ref) => {
+const Hexagon = forwardRef(({ quiz, onClick, userId }, ref) => {
+    const level = quiz.difficulty;
+
     return (
         <div
             ref={ref}
@@ -11,7 +13,7 @@ const Hexagon = forwardRef(({ level, onClick, userId }, ref) => {
             onClick={() => onClick(userId, level)}
         >
             <div className="hexagon-in">
-                <div className="hexagon-content">{level.toUpperCase()} QUIZZES</div>
+                <div className="hexagon-content">{quiz.title}</div>
             </div>
         </div>
     );
