@@ -142,16 +142,18 @@ export default function OrganizerDashboard() {
 
                 <Box w="full" mt={8}>
                     <Heading as="h3" size="md" mb={4}>
-                        {organization ? `${organization.name}'s Quizzes` : "My Quizzes"}
+                        {organization ? `${organization.name}'s Quizzes` : 'My Quizzes'}
                     </Heading>
                     <Table variant="striped" colorScheme="teal">
                         <Thead>
                             <Tr>
                                 <Th>Title</Th>
                                 <Th>Description</Th>
+                                <Th>Type</Th>
                                 <Th>Author</Th>
                                 <Th>Category</Th>
                                 <Th>Created At</Th>
+                                <Th>Status</Th>
                                 <Th>Actions</Th>
                             </Tr>
                         </Thead>
@@ -160,9 +162,11 @@ export default function OrganizerDashboard() {
                                 <Tr key={quiz.id}>
                                     <Td>{quiz.title}</Td>
                                     <Td>{quiz.description}</Td>
+                                    <Td>{quiz.type}</Td>
                                     <Td>{quiz.author}</Td>
                                     <Td>{quiz.category}</Td>
                                     <Td>{new Date(quiz.createdAt).toLocaleDateString()}</Td>
+                                    <Td>{quiz.isActive ? 'active' : 'inactive'}</Td>
                                     <Td>
                                         <Link
                                             color="teal.500"

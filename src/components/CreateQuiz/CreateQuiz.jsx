@@ -15,7 +15,6 @@ import {
     Select,
     Textarea,
     Stack,
-    Checkbox,
     Divider,
 } from '@chakra-ui/react';
 import Swal from 'sweetalert2';
@@ -25,12 +24,12 @@ import QuizDifficultyEnum from '../../common/difficulty.enum';
 import { createQuiz } from '../../services/quiz.service';
 import { useNavigate } from 'react-router-dom';
 import './CreateQuiz.css';
+import { MIN_QUIZ_TIME_LIMIT } from '../../common/components.constants';
 
 export default function CreateQuiz({ username, isOpen, onClose }) {
     const navigate = useNavigate();
 
     const [useDateRange, setUseDateRange] = useState(false);
-    const [useTimeLimit, setUseTimeLimit] = useState(false);
     const [quiz, setQuiz] = useState({
         author: username,
         type: QuizAccessEnum.PUBLIC,
@@ -38,10 +37,11 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
         description: '',
         category: QuizCategoryEnum.GENERAL,
         totalPoints: 100,
+        isActive: false,
         difficulty: QuizDifficultyEnum.MEDIUM,
         dateBegins: null,
         dateEnds: null,
-        timeLimit: null,
+        timeLimit: MIN_QUIZ_TIME_LIMIT,
     });
 
     const handleInputChange = (prop) => (e) => {
@@ -52,7 +52,8 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
     };
 
     const validateForm = () => {
-        const { title, description, category, difficulty, type, totalPoints } = quiz;
+        const { title, description, category, difficulty, type, totalPoints, timeLimit } = quiz;
+
         if (!title || !description || !category || !difficulty || !type || !totalPoints) {
             Swal.fire({
                 title: 'Missing Information',
@@ -62,6 +63,17 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
             });
             return false;
         }
+
+        if (!timeLimit || timeLimit < MIN_QUIZ_TIME_LIMIT) {
+            Swal.fire({
+                title: 'Invalid Time Limit',
+                text: `Please set a time limit of at least ${MIN_QUIZ_TIME_LIMIT} minutes.`,
+                icon: 'warning',
+                confirmButtonText: 'OK',
+            });
+            return false;
+        }
+
         return true;
     };
 
@@ -75,9 +87,8 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
         try {
             const newQuiz = {
                 ...quiz,
-                dateBegins: useDateRange ? quiz.dateBegins : null,
-                dateEnds: useDateRange ? quiz.dateEnds : null,
-                timeLimit: useTimeLimit ? quiz.timeLimit : null,
+                dateBegins: quiz.type === QuizAccessEnum.PRIVATE && useDateRange ? quiz.dateBegins : null,
+                dateEnds: quiz.type === QuizAccessEnum.PRIVATE && useDateRange ? quiz.dateEnds : null,
                 author: username || 'anonymous',
             };
             const quizId = await createQuiz(newQuiz);
@@ -111,7 +122,6 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                 <ModalBody>
                     <form onSubmit={handleSubmit}>
                         <Stack spacing={4}>
-
                             <FormControl id="title" isRequired>
                                 <FormLabel>Title</FormLabel>
                                 <Input
@@ -163,7 +173,10 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                                 <FormLabel>Access Type</FormLabel>
                                 <Select
                                     value={quiz.type}
-                                    onChange={handleInputChange('type')}
+                                    onChange={(e) => {
+                                        handleInputChange('type')(e);
+                                        setUseDateRange(e.target.value === QuizAccessEnum.PRIVATE);
+                                    }}
                                 >
                                     {Object.values(QuizAccessEnum).map((type) => (
                                         <option key={type} value={type}>
@@ -183,18 +196,19 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                                 />
                             </FormControl>
 
-                            <FormControl display="flex" alignItems="center">
-                                <Checkbox
-                                    isChecked={useDateRange}
-                                    onChange={(e) => setUseDateRange(e.target.checked)}
-                                >
-                                    Set Date Range?
-                                </Checkbox>
+                            <FormControl id="timeLimit" isRequired>
+                                <FormLabel>Time Limit (minutes)</FormLabel>
+                                <Input
+                                    value={quiz.timeLimit || ''}
+                                    onChange={(e) => { handleInputChange('timeLimit')(e); }}
+                                    type="number"
+                                    min={MIN_QUIZ_TIME_LIMIT}
+                                    placeholder={`Enter time limit (minimum ${MIN_QUIZ_TIME_LIMIT} minutes)`}
+                                />
                             </FormControl>
-
                             {useDateRange && (
                                 <>
-                                    <FormControl id="dateBegins">
+                                    <FormControl id="dateBegins" >
                                         <FormLabel>Date Begins</FormLabel>
                                         <Input
                                             value={quiz.dateBegins || ''}
@@ -204,7 +218,7 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                                         />
                                     </FormControl>
 
-                                    <FormControl id="dateEnds">
+                                    <FormControl id="dateEnds" >
                                         <FormLabel>Date Ends</FormLabel>
                                         <Input
                                             value={quiz.dateEnds || ''}
@@ -215,33 +229,6 @@ export default function CreateQuiz({ username, isOpen, onClose }) {
                                     </FormControl>
                                 </>
                             )}
-
-                            <FormControl display="flex" alignItems="center">
-                                <Checkbox
-                                    isChecked={useTimeLimit}
-                                    onChange={(e) => {
-                                        setUseTimeLimit(e.target.checked);
-                                        if (!e.target.checked) {
-                                            setQuiz({ ...quiz, timeLimit: null });
-                                        }
-                                    }}
-                                >
-                                    Set Time Limit?
-                                </Checkbox>
-                            </FormControl>
-
-                            {useTimeLimit && (
-                                <FormControl id="timeLimit">
-                                    <FormLabel>Time Limit (minutes)</FormLabel>
-                                    <Input
-                                        value={quiz.timeLimit || ''}
-                                        onChange={handleInputChange('timeLimit')}
-                                        type="number"
-                                        placeholder="Enter time limit in minutes"
-                                    />
-                                </FormControl>
-                            )}
-
                             <Divider />
                         </Stack>
                     </form>

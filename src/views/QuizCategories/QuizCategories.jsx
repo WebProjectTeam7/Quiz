@@ -4,7 +4,7 @@ import { Button, Box, Heading, Flex } from '@chakra-ui/react';
 import QuizCategoryEnum from '../../common/category-enum';
 
 export default function QuizzesCategories() {
-    const categories = Object.values(QuizCategoryEnum);
+    const categories = ['all', ...Object.values(QuizCategoryEnum)];
     const navigate = useNavigate();
 
     const handleCategoryClick = (category) => {

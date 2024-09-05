@@ -15,7 +15,6 @@ import {
     Input,
     Image,
     EditableTextarea,
-    Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -139,33 +138,13 @@ export default function QuizPreview() {
     };
 
     const handleToggleActive = async () => {
-        const currentDate = new Date();
-        const startDate = new Date(quiz.dateBegins);
-        const endDate = new Date(quiz.dateEnds);
-
-        if (startDate && currentDate < startDate) {
-            Swal.fire({
-                title: 'Quiz Not Yet Active',
-                text: `The quiz will be set to active on ${startDate.toLocaleString()}.`,
-                icon: 'info',
-            });
-            return;
-        }
-
-        if (endDate && currentDate > endDate) {
-            Swal.fire({
-                title: 'Quiz Ended',
-                text: 'The quiz cannot be set to active because the end date has passed.',
-                icon: 'warning',
-            });
-            return;
-        }
-
-        const newActiveState = !quiz.isActive;
-        setQuiz({ ...quiz, isActive: newActiveState });
-
         try {
-            await editQuiz(quizId, quiz);
+            const newActiveState = !quiz.isActive;
+
+            setQuiz(prevState => ({ ...prevState, isActive: newActiveState }));
+
+            await editQuiz(quizId, { ...quiz, isActive: newActiveState });
+
             Swal.fire({
                 title: `Quiz ${newActiveState ? 'Activated' : 'Deactivated'}`,
                 text: `The quiz has been ${newActiveState ? 'activated' : 'deactivated'}.`,
@@ -405,8 +384,8 @@ export default function QuizPreview() {
                 </HStack>
 
                 <HStack>
-                    <Button colorScheme={quiz.isActive ? 'green' : 'red'} onClick={handleToggleActive}>
-                        {quiz.isActive ? 'Activate Quiz' : 'Deactivate Quiz'}
+                    <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
+                        {quiz.isActive ? 'Deactivate Quiz' : 'Activate Quiz'}
                     </Button>
 
 

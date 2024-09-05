@@ -1,5 +1,4 @@
 const QuizCategoryEnum = Object.freeze({
-    ALL: 'all',
     GENERAL: 'general',
     HISTORY: 'history',
     GEOGRAPHY: 'geography',
