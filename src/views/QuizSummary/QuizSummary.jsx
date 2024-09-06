@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import {
     Box,
     Heading,
@@ -10,6 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './QuizSummary.css';
+
 
 const QuizSummary = () => {
     const location = useLocation();

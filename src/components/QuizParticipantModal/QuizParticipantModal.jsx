@@ -14,34 +14,54 @@ import {
     Th,
     Td,
     Box,
-    Link,
 } from '@chakra-ui/react';
-import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const QuizParticipantModal = ({ isOpen, onClose, quiz }) => {
+    const navigate = useNavigate();
+
+    const handleViewSummary = (summary) => {
+        navigate('/quiz-summary', { state: { summary } });
+    };
+
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="lg" color={'white'}>
+        <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
-            <ModalContent>
+            <ModalContent maxWidth="700px" mx="auto">
                 <ModalHeader>Quiz Participants</ModalHeader>
                 <ModalBody>
                     <Table variant="simple">
                         <Thead>
-                            <Tr >
+                            <Tr>
                                 <Th>Username</Th>
                                 <Th>Points</Th>
                                 <Th>Date</Th>
+                                <Th>Quiz Summary</Th>
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {Object.entries(quiz.summaries).flatMap(([username, summaries]) =>
-                                summaries.map((summary, index) => (
-                                    <Tr key={`${username}-${index}`}>
-                                        <Td>{username}</Td>
-                                        <Td>{summary.points}</Td>
-                                        <Td>{new Date(summary.date).toLocaleString()}</Td>
-                                    </Tr>
-                                ))
+                            {quiz.summaries ? (
+                                Object.entries(quiz.summaries).flatMap(([username, summaries]) =>
+                                    summaries.map((summary, index) => (
+                                        <Tr key={`${username}-${index}`}>
+                                            <Td>{username}</Td>
+                                            <Td>{summary.points}</Td>
+                                            <Td>{new Date(summary.date).toLocaleString()}</Td>
+                                            <Td>
+                                                <Button
+                                                    colorScheme="blue"
+                                                    onClick={() => handleViewSummary(summary)}
+                                                >
+                                                    Overview
+                                                </Button>
+                                            </Td>
+                                        </Tr>
+                                    ))
+                                )
+                            ) : (
+                                <Tr>
+                                    <Td colSpan="4">No Entries</Td>
+                                </Tr>
                             )}
                         </Tbody>
                     </Table>
@@ -65,6 +85,7 @@ QuizParticipantModal.propTypes = {
                 PropTypes.shape({
                     points: PropTypes.number.isRequired,
                     date: PropTypes.string.isRequired,
+                    questions: PropTypes.array.isRequired,
                 })
             )
         ).isRequired,
