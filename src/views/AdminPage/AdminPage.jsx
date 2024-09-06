@@ -196,7 +196,7 @@ export default function AdminPage() {
                                                 <Text>{user.username}</Text>
                                                 {user.role && (
                                                     <Badge
-                                                        backgroundColor={user.role === 'admin' ? 'red' : user.role === 'organizer' ? 'orange' : 'blue'}
+                                                        backgroundColor={user.role === 'admin' ? 'red.200' : user.role === 'organizer' ? 'orange.200' : 'blue.200'}
                                                         color="black"
                                                         fontSize="0.55em"
                                                         mt={1}

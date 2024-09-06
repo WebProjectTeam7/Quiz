@@ -98,8 +98,10 @@ export default function OrganizerDashboard() {
 
     const handleLeaveOrganization = async () => {
         try {
-            await leaveOrganization(userData.organizationId, userData.id);
+            await leaveOrganization(userData.username);
             userData.organizationId = null;
+            userData.organizationName = null;
+
             setOrganization(null);
         } catch (error) {
             console.error('Error leaving organization:', error);
@@ -142,7 +144,7 @@ export default function OrganizerDashboard() {
 
                 <Box w="full" mt={8}>
                     <Heading as="h3" size="md" mb={4}>
-                        {organization ? `${organization.name}'s Quizzes` : "My Quizzes"}
+                        {organization ? `${organization.name}'s Quizzes` : 'My Quizzes'}
                     </Heading>
                     <Table variant="striped" colorScheme="teal">
                         <Thead>

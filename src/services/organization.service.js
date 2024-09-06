@@ -129,7 +129,7 @@ export const joinOrganization = async (orgId, userId) => {
 export const leaveOrganization = async (userId) => {
     try {
         const userRef = dbRef(db, `users/${userId}`);
-        await update(userRef, { organizationId: null });
+        await update(userRef, { organizationId: null, organizationName: null });
     } catch (error) {
         console.error('Error leaving organization:', error);
         throw new Error('Failed to leave organization');
