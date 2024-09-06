@@ -1,0 +1,35 @@
+.css-1ruxp1v {
+    border-radius: 10px;
+    box-shadow: rgb(188, 16, 79) !important;
+    font-family: Arial, sans-serif;
+    color: rgb(237, 243, 182);
+}
+
+.css-1bb37uo {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
+    border-radius: 10px;
+    box-shadow: rgb(188, 16, 79) !important;
+    font-family: Arial, sans-serif;
+    color: rgba(237, 243, 182, 0.87);
+}
+
+.css-6ciz0c {
+    font-size: var(--chakra-fontSizes-xl);
+    font-weight: var(--chakra-fontWeights-bold);
+    color: rgb(237, 243, 182);
+}
+
+.css-1krnl1 {
+    margin-top: var(--chakra-space-2);
+    font-size: var(--chakra-fontSizes-sm);
+    color: rgba(237, 243, 182, 0.87);
+}
+
+.css-yid6n0 {
+    font-size: var(--chakra-fontSizes-2xl);
+    font-weight: var(--chakra-fontWeights-bold);
+    /* margin-bottom: var(--chakra-space-6); */
+    text-decoration: underline;
+    margin-bottom: 30px;
+    text-align: center;
+}

@@ -4,6 +4,7 @@ import { getPrivateQuizzes } from '../../services/quiz.service';
 import { Box, Flex, Text, Icon, Button, Spinner, Badge } from '@chakra-ui/react';
 import { FaLock } from 'react-icons/fa';
 import Swal from 'sweetalert2';
+import './InvitationalQuizzes.css';
 
 export default function InvitationalQuizzes() {
     const { userData } = useContext(AppContext);

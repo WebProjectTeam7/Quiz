@@ -1,0 +1,49 @@
+.css-pv22qu {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    border-radius: 10px;
+    box-shadow: rgb(188, 16, 79) !important;
+    font-family: Arial, sans-serif;
+}
+
+.modal-content {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    border-radius: 10px;
+    box-shadow: rgb(188, 16, 79) !important;
+    color: rgb(237, 243, 182);
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.chakra-modal__overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chakra-modal__header {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.chakra-modal__body {
+    margin-top: 10px;
+}
+
+.chakra-modal__footer {
+    margin-top: 20px;
+}
+
+.chakra-button {
+    margin-left: 10px;
+}
+
+.chakra-badge {
+    margin-right: 10px;
+}
+
+.css-rqgtb9 {
+    background: linear-gradient(135deg, rgba(12, 8, 58, 0.9), rgba(188, 16, 79, 0.74));
+    color: rgb(237, 243, 182) !important;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+}
