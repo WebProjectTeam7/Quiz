@@ -101,8 +101,10 @@ export default function OrganizerDashboard() {
 
     const handleLeaveOrganization = async () => {
         try {
-            await leaveOrganization(userData.organizationId, userData.id);
+            await leaveOrganization(userData.username);
             userData.organizationId = null;
+            userData.organizationName = null;
+
             setOrganization(null);
         } catch (error) {
             console.error('Error leaving organization:', error);
