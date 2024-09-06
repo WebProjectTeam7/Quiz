@@ -74,6 +74,50 @@ export const getQuizzesByCategory = async (categoryName) => {
     }
 };
 
+export const getQuizSummariesByCategory = async (category) => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const snapshot = await get(quizRef);
+
+        const quizzes = snapshot.val();
+        if (!quizzes) return [];
+
+        const userPointsMap = {};
+        const targetCategory = category.toLowerCase();
+
+        Object.keys(quizzes).forEach((quizId) => {
+            const quiz = quizzes[quizId];
+
+            if (quiz.category && quiz.category.toLowerCase() === targetCategory) {
+                if (quiz.summaries) {
+                    Object.keys(quiz.summaries).forEach((username) => {
+                        const userSummaries = quiz.summaries[username];
+
+                        Object.keys(userSummaries).forEach((attempt) => {
+                            const summary = userSummaries[attempt];
+                            const userPoints = summary.points;
+
+                            if (typeof userPoints === 'number') {
+                                userPointsMap[username] = (userPointsMap[username] || 0) + userPoints;
+                            }
+                        });
+                    });
+                }
+            }
+        });
+
+        const rankingData = Object.keys(userPointsMap).map((username) => ({
+            username,
+            points: userPointsMap[username],
+        }));
+
+        return rankingData;
+    } catch (error) {
+        console.error('Error retrieving quiz summaries by category:', error);
+        throw new Error('Failed to retrieve quiz summaries by category');
+    }
+};
+
 export const getQuizById = async (quizId) => {
     try {
         const quizRef = dbRef(db, `quizzes/${quizId}`);
@@ -237,15 +281,15 @@ export const saveQuizSummary = async (quizId, username, summary) => {
         const quizSummaryRef = dbRef(db, `quizzes/${quizId}/summaries/${username}`);
 
         const snapshot = await get(quizSummaryRef);
-
         let userSummaries = [];
         if (snapshot.exists()) {
             userSummaries = snapshot.val();
         }
 
         userSummaries.push({
-            ...summary,
+            points: summary.points,
             createdAt: new Date().toISOString(),
+            questions: summary.questions,
         });
 
         await set(quizSummaryRef, userSummaries);
