@@ -18,7 +18,7 @@ import { MAX_NOTIFICATION_LENGTH } from '../../common/components.constants';
 import Swal from 'sweetalert2';
 import { AppContext } from '../../state/app.context';
 import { getUserData } from '../../services/user.service';
-import { getQuizzesByAuthor } from '../../services/quiz.service';
+import { getQuizzesByAuthor, inviteUserToPrivateQuiz } from '../../services/quiz.service';
 import QuizAccessEnum from '../../common/access-enum';
 
 export default function NotificationModal({ isOpen, onClose, recipientUid }) {
@@ -41,6 +41,7 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
             });
         }
     }, [user]);
+
     const fetchUserQuizzes = async (username) => {
         try {
             const userQuizzes = await getQuizzesByAuthor(username);
@@ -129,6 +130,8 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
                     quizPoints: selectedQuiz.totalPoints,
                     senderName: customUserData.username,
                 };
+                await inviteUserToPrivateQuiz(user.username);
+
             } else if (notificationType === notificationEnum.TEXT && message.trim()) {
                 notificationContent = message.trim();
                 notificationData = {
@@ -146,6 +149,7 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
             }
 
             await sendNotificationToUser(recipientUid, notificationData);
+
             Swal.fire({
                 icon: 'success',
                 title: 'Success',

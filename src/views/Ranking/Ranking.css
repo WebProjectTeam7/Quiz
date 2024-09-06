@@ -33,14 +33,14 @@
   padding: 15px;
   border-radius: 10px;
   margin-bottom: 10px;
-  background-color: #f7fafc;
+  background-color: #ffffffea;
   transition: background-color 0.3s ease;
   width: 100%;
   max-width: 100%;
 }
 
 .ranking-box:hover {
-  background-color: #b1b2b3;
+  background-color: #919191;
 }
 
 .top-three {

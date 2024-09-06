@@ -4,7 +4,7 @@ import { Button, Box, Heading, Flex } from '@chakra-ui/react';
 import QuizCategoryEnum from '../../common/category-enum';
 
 export default function QuizzesCategories() {
-    const categories = Object.values(QuizCategoryEnum);
+    const categories = ['all', ...Object.values(QuizCategoryEnum)];
     const navigate = useNavigate();
 
     const handleCategoryClick = (category) => {
@@ -31,6 +31,9 @@ export default function QuizzesCategories() {
                     </Button>
                 ))}
             </Box>
+            <Flex justifyContent="center" marginTop="40px" gap={4}>
+                <Button colorScheme="blue" onClick={() => navigate('/invitational-quizzes')}>Invitational Quizzes</Button>
+            </Flex>
         </div>
     );
 }

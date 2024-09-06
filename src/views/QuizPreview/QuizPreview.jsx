@@ -15,7 +15,6 @@ import {
     Input,
     Image,
     EditableTextarea,
-    Spinner,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -32,18 +31,18 @@ import EditableControls from '../../components/EditableControls/EditableControls
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.service';
 import InvitationEnum from '../../common/invitation-enum';
+import './QuizPreview.css';
+import QuizParticipantModal from '../../components/QuizParticipantModal/QuizParticipantModal';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
     const navigate = useNavigate();
-
     const [quiz, setQuiz] = useState({
         author: 'John Doe',
         type: QuizAccessEnum.PUBLIC,
         title: 'Sample Quiz',
         description: 'This is a sample quiz description.',
         timesTried: 0,
-        scoreboard: [],
         category: QuizCategoryEnum.GENERAL,
         totalPoints: 0,
         difficulty: QuizDifficultyEnum.MEDIUM,
@@ -52,12 +51,14 @@ export default function QuizPreview() {
         timeLimit: 0,
         isActive: false,
         imageFile: null,
+        summaries: [],
     });
     const [questions, setQuestions] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [reports, setReports] = useState([]);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
-    const [reports, setReports] = useState([]);
+    const { isOpen: isParticipantsOpen, onOpen: onParticipantsOpen, onClose: onParticipantsClose } = useDisclosure();
 
     useEffect(() => {
         if (quizId) {
@@ -70,11 +71,11 @@ export default function QuizPreview() {
         try {
             const fetchedQuiz = await getQuizById(quizId);
             setQuiz(fetchedQuiz);
-            if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
-                let fetchedQuestions = await Promise.all(fetchedQuiz.questions
-                    .map(async (questionId) => await getQuestionById(questionId)));
 
+            if (fetchedQuiz.questions && fetchedQuiz.questions.length > 0) {
+                const fetchedQuestions = await Promise.all(fetchedQuiz.questions.map(id => getQuestionById(id)));
                 const filteredQuestions = fetchedQuestions.filter(q => q !== null);
+
                 if (filteredQuestions.length < fetchedQuestions.length) {
                     await updateQuestions(filteredQuestions);
                 }
@@ -138,33 +139,13 @@ export default function QuizPreview() {
     };
 
     const handleToggleActive = async () => {
-        const currentDate = new Date();
-        const startDate = new Date(quiz.dateBegins);
-        const endDate = new Date(quiz.dateEnds);
-
-        if (startDate && currentDate < startDate) {
-            Swal.fire({
-                title: 'Quiz Not Yet Active',
-                text: `The quiz will be set to active on ${startDate.toLocaleString()}.`,
-                icon: 'info',
-            });
-            return;
-        }
-
-        if (endDate && currentDate > endDate) {
-            Swal.fire({
-                title: 'Quiz Ended',
-                text: 'The quiz cannot be set to active because the end date has passed.',
-                icon: 'warning',
-            });
-            return;
-        }
-
-        const newActiveState = !quiz.isActive;
-        setQuiz({ ...quiz, isActive: newActiveState });
-
         try {
-            await editQuiz(quizId, quiz);
+            const newActiveState = !quiz.isActive;
+
+            setQuiz(prevState => ({ ...prevState, isActive: newActiveState }));
+
+            await editQuiz(quizId, { ...quiz, isActive: newActiveState });
+
             Swal.fire({
                 title: `Quiz ${newActiveState ? 'Activated' : 'Deactivated'}`,
                 text: `The quiz has been ${newActiveState ? 'activated' : 'deactivated'}.`,
@@ -256,14 +237,13 @@ export default function QuizPreview() {
         }
     };
 
-
     return (
         <Box maxW="800px" mx="auto" py={8}>
             <VStack spacing={4} align="start">
                 <Heading as="h2" size="lg">Quiz Preview</Heading>
                 <Divider />
 
-                {quiz.imageUrl && <Image src={quiz.imageUrl} alt="Quiz Image" />}
+                {quiz.imageFile && <Image src={quiz.imageFile} alt="Quiz Image" />}
 
                 <Editable
                     value={quiz.title}
@@ -335,8 +315,8 @@ export default function QuizPreview() {
                 </HStack>
 
                 <HStack>
-                    <Text fontSize="xl" fontWeight="bold">Times Tried:</Text>
-                    <Text>{quiz.timesTried}</Text>
+                    <Text fontSize="xl" fontWeight="bold">Times Played:</Text>
+                    <Text>{quiz.summaries ? Object.values(quiz.summaries).flat().length : 0}</Text>
                 </HStack>
 
                 <HStack>
@@ -354,26 +334,28 @@ export default function QuizPreview() {
                     </Editable>
                 </HStack>
 
-                <HStack>
-                    <Text fontSize="xl" fontWeight="bold">Date Start:</Text>
-                    <Input
-                        type="datetime-local"
-                        value={quiz.dateBegins ? new Date(quiz.dateBegins).toISOString().slice(0, -8) : ''}
-                        onChange={(e) => setQuiz({ ...quiz, dateBegins: new Date(e.target.value).toISOString() })}
-                    />
-                    <Text fontSize="xl" fontWeight="bold">Date End:</Text>
-                    <Input
-                        type="datetime-local"
-                        value={quiz.dateEnds ? new Date(quiz.dateEnds).toISOString().slice(0, -8) : ''}
-                        onChange={(e) => setQuiz({ ...quiz, dateEnds: new Date(e.target.value).toISOString() })}
-                    />
-                </HStack>
+                {quiz.type === QuizAccessEnum.PRIVATE && (
+                    <HStack>
+                        <Text fontSize="xl" fontWeight="bold">Date Start:</Text>
+                        <Input
+                            type="datetime-local"
+                            value={quiz.dateBegins ? new Date(quiz.dateBegins).toISOString().slice(0, -8) : ''}
+                            onChange={(e) => setQuiz({ ...quiz, dateBegins: new Date(e.target.value).toISOString() })}
+                        />
+                        <Text fontSize="xl" fontWeight="bold">Date End:</Text>
+                        <Input
+                            type="datetime-local"
+                            value={quiz.dateEnds ? new Date(quiz.dateEnds).toISOString().slice(0, -8) : ''}
+                            onChange={(e) => setQuiz({ ...quiz, dateEnds: new Date(e.target.value).toISOString() })}
+                        />
+                    </HStack>
+                )}
 
                 <HStack>
                     <Text fontSize="xl" fontWeight="bold">Time Limit (minutes):</Text>
                     <Editable
                         value={quiz.timeLimit ? quiz.timeLimit.toString() : ''}
-                        onChange={(value) => setQuiz({ ...quiz, timeLimit: value })}
+                        onChange={(value) => setQuiz({ ...quiz, timeLimit: parseInt(value, 10) })}
                         isPreviewFocusable={false}
                     >
                         <HStack>
@@ -383,16 +365,17 @@ export default function QuizPreview() {
                         </HStack>
                     </Editable>
                 </HStack>
-                <HStack>
-                    <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
-                        Save Changes
-                    </Button>
 
+                <Button colorScheme="teal" onClick={handleSaveChanges} isLoading={isSaving}>
+                    Save Changes
+                </Button>
+
+                <HStack spacing={4}>
                     <Button colorScheme="blue" onClick={onOpen}>
                         Add Question
                     </Button>
 
-                    <Button onClick={handleTestQuiz} colorScheme="teal" >
+                    <Button colorScheme="teal" onClick={handleTestQuiz}>
                         Test Quiz
                     </Button>
 
@@ -402,12 +385,14 @@ export default function QuizPreview() {
                         </Button>
                     )}
                 </HStack>
+                <Button colorScheme="blue" onClick={onParticipantsOpen}>
+                    Quiz Participants
+                </Button>
 
-                <HStack>
-                    <Button colorScheme={quiz.isActive ? 'green' : 'red'} onClick={handleToggleActive}>
-                        {quiz.isActive ? 'Activate Quiz' : 'Deactivate Quiz'}
+                <HStack spacing={4}>
+                    <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>
+                        {quiz.isActive ? 'Deactivate Quiz' : 'Activate Quiz'}
                     </Button>
-
 
                     <Button colorScheme="red" onClick={handleDeleteQuiz}>
                         Delete Quiz
@@ -471,6 +456,7 @@ export default function QuizPreview() {
 
             <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
             <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} objId={quizId} objType={InvitationEnum.QUIZ} />
+            <QuizParticipantModal isOpen={isParticipantsOpen} onClose={onParticipantsClose} quiz={quiz} />
         </Box>
     );
 }

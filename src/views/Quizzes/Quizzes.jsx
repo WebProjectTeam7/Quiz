@@ -68,9 +68,14 @@ export default function Quizzes() {
     };
 
 
+    // const hexagonClass = (quizId, level) => (
+    //     `hexagon ${level} ${clickedHexagon === `${quizId}-${level}` ? 'clicked' : ''}`
+    // );
+
     const hexagonClass = (quizId, level) => (
-        `hexagon ${level} ${clickedHexagon === `${quizId}-${level}` ? 'clicked' : ''}`
+        `hexagon ${level} ${clickedHexagon === `${quizId}-${level}` ? 'clicked' : ''} ${level === 'done' ? 'done' : ''}`
     );
+    
 
     const renderHexagons = (quizzes, level) => (
         <Flex className="hexagon-group" wrap="wrap" gap={4}>

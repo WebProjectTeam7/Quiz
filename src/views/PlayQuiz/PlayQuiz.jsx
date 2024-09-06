@@ -17,6 +17,7 @@ import Swal from 'sweetalert2';
 import QuestionView from '../../components/QuestionView/QuestionView';
 import UserRoleEnum from '../../common/role-enum';
 import { updateUser } from '../../services/user.service';
+import './PlayQuiz.css';
 
 export default function PlayQuiz() {
     const { userData } = useContext(AppContext);
@@ -60,9 +61,7 @@ export default function PlayQuiz() {
 
         setTimer(interval);
 
-        return () => {
-            clearInterval(interval);
-        };
+        return () => { clearInterval(interval); };
     }, [timeLeft, isLoading, quizId]);
 
     const fetchQuizData = async () => {
