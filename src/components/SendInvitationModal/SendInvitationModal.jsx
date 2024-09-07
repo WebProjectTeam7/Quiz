@@ -1,16 +1,17 @@
+import { SearchIcon } from '@chakra-ui/icons';
+import { AppContext } from '../../state/app.context';
 import { useContext, useEffect, useState } from 'react';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, Button, Th, Table, Thead, Tr, Tbody, Td, Badge, Box, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
-import { SearchIcon } from '@chakra-ui/icons';
+import { sendNotificationToUser } from '../../services/notification.service';
+import { inviteUserToPrivateQuiz, uninviteUserFromPrivateQuiz, getInvitedUsers } from '../../services/quiz.service';
+import { getAllUsers } from '../../services/user.service';
+import NotificationEnum from '../../common/notification-enum';
+import UserRoleEnum from '../../common/role-enum';
 import useModal from '../../custom-hooks/useModal';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
-import { getAllUsers } from '../../services/user.service';
-import { inviteUserToPrivateQuiz, uninviteUserFromPrivateQuiz, getInvitedUsers } from '../../services/quiz.service';
-import UserRoleEnum from '../../common/role-enum';
 import PropTypes from 'prop-types';
-import { sendNotificationToUser } from '../../services/notification.service';
-import { NotificationEnum } from '../../common/notification-enum';
-import { AppContext } from '../../state/app.context';
+import { joinOrganization, leaveOrganization } from '../../services/organization.service';
 
 const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
     const { userData } = useContext(AppContext);
@@ -68,7 +69,7 @@ const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
 
     const handleInviteUninviteUser = async (user) => {
         if (objType === NotificationEnum.INVITE_TO_QUIZ) {
-            console.log(user);
+
             if (invitedUsers.includes(user.username)) {
                 await uninviteUserFromPrivateQuiz(objId, user.username);
                 setInvitedUsers(invitedUsers.filter((u) => u !== user.username));
@@ -86,23 +87,23 @@ const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
                     quizPoints: obj.totalPoints,
                     senderName: userData.username,
                 };
-                await sendNotificationToUser(user.uid, notificationData);
+                await sendNotificationToUser(user.username, notificationData);
                 setInvitedUsers([...invitedUsers, user.username]);
             }
         } else if (objType === NotificationEnum.INVITE_TO_ORGANIZATION) {
             if (invitedUsers.includes(user.username)) {
-                await removeUserFromOrganization(objId, user.username);
+                await joinOrganization(objId, user.username);
                 setInvitedUsers(invitedUsers.filter((u) => u !== user.username));
             } else {
-                await inviteUserToOrganization(objId, user.username);
+                await leaveOrganization(objId, user.username);
                 const notificationContent = `I, ${userData.username}, invite you to join my organization ${userData.organizationName}.`;
                 const notificationData = {
                     message: notificationContent,
                     type: NotificationEnum.INVITE_TO_ORGANIZATION,
-                    organizationId: obj.organizationId,
-                    organizationName: obj.organizationName,
+                    organizationId: obj.id,
+                    organizationName: obj.name,
                 };
-                await sendNotificationToUser(user.uid, notificationData);
+                await sendNotificationToUser(user.username, notificationData);
                 setInvitedUsers([...invitedUsers, user.username]);
             }
         }
@@ -162,12 +163,22 @@ const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
                                                 <Button onClick={() => handleOpenProfile(user)}>Profile</Button>
                                             </Td>
                                             <Td>
-                                                <Button
-                                                    colorScheme={invitedUsers.includes(user.username) ? 'red' : 'blue'}
-                                                    onClick={() => handleInviteUninviteUser(user)}
-                                                >
-                                                    {invitedUsers.includes(user.username) ? 'Uninvite' : 'Invite'}
-                                                </Button>
+                                                {objType === NotificationEnum.INVITE_TO_QUIZ ?
+                                                    <Button
+                                                        colorScheme={invitedUsers.includes(user.username) ? 'red' : 'blue'}
+                                                        onClick={() => handleInviteUninviteUser(user)}
+                                                    >
+                                                        {invitedUsers.includes(user.username) ? 'Uninvite' : 'Invite'}
+                                                    </Button>
+                                                    :
+                                                    !user.organizationId && (
+                                                        <Button
+                                                            colorScheme={invitedUsers.includes(user.username) ? 'red' : 'blue'}
+                                                            onClick={() => handleInviteUninviteUser(user)}
+                                                        >
+                                                            {invitedUsers.includes(user.username) ? 'Remove' : 'Invite'}
+                                                        </Button>
+                                                    )}
                                             </Td>
                                         </Tr>
                                     ))}
@@ -203,7 +214,15 @@ SendInvitationModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     objId: PropTypes.string.isRequired,
-    objType: PropTypes.oneOf([NotificationEnum.INVITE_TO_ORGANIZATION, NotificationEnum.INVITE_TO_QUIZ]).isRequired,
+    obj: PropTypes.shape({
+        id: PropTypes.string,
+        title: PropTypes.string,
+        category: PropTypes.string,
+        difficulty: PropTypes.string,
+        totalPoints: PropTypes.number,
+        name: PropTypes.string,
+    }).isRequired,
+    objType: PropTypes.oneOf([NotificationEnum.INVITE_TO_ORGANIZATION, NotificationEnum.INVITE_TO_QUIZ]).isRequired, // Enum to differentiate quiz vs organization
 };
 
 export default SendInvitationModal;

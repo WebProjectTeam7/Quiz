@@ -1,5 +1,3 @@
-import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
     Box,
     Button,
@@ -15,17 +13,17 @@ import {
     useDisclosure,
     HStack,
 } from '@chakra-ui/react';
+import Swal from 'sweetalert2';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
+import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/quiz.service';
+import { joinOrganization, leaveOrganization, getOrganizationById } from '../../services/organization.service';
 import CreateQuizModal from '../../components/CreateQuiz/CreateQuiz';
 import CreateOrganizationModal from '../../components/CreateOrganizationModal/CreateOrganizationModal';
-import { getQuizzesByAuthor, getQuizzesByOrganizationId } from '../../services/quiz.service';
-import {
-    joinOrganization,
-    leaveOrganization,
-    getOrganizationById
-} from '../../services/organization.service';
-import './OrganizerDashboard.css';
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
+import NotificationEnum from '../../common/notification-enum';
+import './OrganizerDashboard.css';
 
 export default function OrganizerDashboard() {
     const { userData } = useContext(AppContext);
@@ -100,14 +98,38 @@ export default function OrganizerDashboard() {
     };
 
     const handleLeaveOrganization = async () => {
-        try {
-            await leaveOrganization(userData.username);
-            userData.organizationId = null;
-            userData.organizationName = null;
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this action!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, leave the organization!',
+            cancelButtonText: 'Cancel',
+        });
 
-            setOrganization(null);
-        } catch (error) {
-            console.error('Error leaving organization:', error);
+        if (result.isConfirmed) {
+            try {
+                await leaveOrganization(userData.username);
+                userData.organizationId = null;
+                userData.organizationName = null;
+                setOrganization(null);
+
+                Swal.fire(
+                    'Left!',
+                    'You have successfully left the organization.',
+                    'success'
+                );
+            } catch (error) {
+                console.error('Error leaving organization:', error);
+
+                Swal.fire(
+                    'Error',
+                    'There was an issue leaving the organization. Please try again later.',
+                    'error'
+                );
+            }
         }
     };
 
@@ -129,6 +151,9 @@ export default function OrganizerDashboard() {
 
                     {userData && userData.organizationId ? (
                         <>
+                            <Button colorScheme="blue" onClick={onInviteOpen}>
+                                Invite to Organization
+                            </Button>
                             <Button colorScheme="red" onClick={handleLeaveOrganization}>
                                 Leave Organization
                             </Button>
@@ -143,9 +168,7 @@ export default function OrganizerDashboard() {
                             </Button>
                         </>
                     )}
-                    <Button colorScheme="blue" onClick={onInviteOpen}>
-                        Send Invitation
-                    </Button>
+
                 </HStack>
 
                 <Box w="full" mt={8}>
@@ -200,7 +223,13 @@ export default function OrganizerDashboard() {
                 onClose={onOrganizationModalClose}
                 onOrganizationCreated={handleOrganizationCreated}
             />
-            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose}   />
+            <SendInvitationModal
+                isOpen={isInviteOpen}
+                onClose={onInviteClose}
+                objId={userData.organizationId}
+                obj={organization}
+                objType={NotificationEnum.INVITE_TO_ORGANIZATION}
+            />
         </Box>
     );
 }

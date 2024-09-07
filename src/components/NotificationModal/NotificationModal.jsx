@@ -13,7 +13,7 @@ import {
 import { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { sendNotificationToUser } from '../../services/notification.service';
-import { NotificationEnum } from '../../common/notification-enum';
+import NotificationEnum from '../../common/notification-enum';
 import { MAX_NOTIFICATION_LENGTH } from '../../common/components.constants';
 import Swal from 'sweetalert2';
 import { AppContext } from '../../state/app.context';
