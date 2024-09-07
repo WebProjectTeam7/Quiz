@@ -1,19 +1,21 @@
 import './Quizzes.css';
-import Swal from 'sweetalert2';
 import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import Hexagon from '../../components/Hexagon/Hexagon';
-import { Popover, PopoverTrigger, PopoverContent, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverFooter, Portal, Button, Box, Flex, PopoverBody } from '@chakra-ui/react';
+import { Popover, PopoverTrigger, Button, Box, Flex, useDisclosure } from '@chakra-ui/react';
 import { useState, useEffect, useContext } from 'react';
 import { getQuizzesByCategory } from '../../services/quiz.service';
 import { AppContext } from '../../state/app.context';
+import StartQuizModal from '../../components/StartQuizModal/StartQuizModal';
 
 export default function Quizzes() {
     const { userData } = useContext(AppContext);
     const { categoryName } = useParams();
     const navigate = useNavigate();
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
     const [clickedHexagon, setClickedHexagon] = useState(null);
     const [quizzes, setQuizzes] = useState({ easy: [], medium: [], hard: [], done: [] });
+    const [selectedQuiz, setSelectedQuiz] = useState(null);
 
     useEffect(() => {
         fetchQuizzes();
@@ -40,42 +42,15 @@ export default function Quizzes() {
     };
 
     const handleHexagonClick = (quizId, level) => {
-        if (level === 'done') {
-            Swal.fire({
-                icon: 'info',
-                title: 'Quiz Completed',
-                text: 'You have already completed this quiz!',
-                confirmButtonText: 'OK'
-            });
-        } else {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: 'You will have only one chance to complete this quiz.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, start the quiz!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    navigate(`/play-quiz/${quizId}`);
-                }
-            });
-        }
-
+        const quiz = quizzes[level].find(q => q.id === quizId);
+        setSelectedQuiz(quiz);
         setClickedHexagon(`${quizId}-${level}`);
-        setTimeout(() => setClickedHexagon(null), 200);
+        onOpen();
     };
-
-
-    // const hexagonClass = (quizId, level) => (
-    //     `hexagon ${level} ${clickedHexagon === `${quizId}-${level}` ? 'clicked' : ''}`
-    // );
 
     const hexagonClass = (quizId, level) => (
         `hexagon ${level} ${clickedHexagon === `${quizId}-${level}` ? 'clicked' : ''} ${level === 'done' ? 'done' : ''}`
     );
-    
 
     const renderHexagons = (quizzes, level) => (
         <Flex className="hexagon-group" wrap="wrap" gap={4}>
@@ -110,13 +85,13 @@ export default function Quizzes() {
 
     return (
         <Box className="quizzes-container" padding="20px">
-
             <Flex className="hexagon-grid" justifyContent="center" wrap="wrap" gap={6}>
                 {renderHexagons(quizzes.easy, 'easy')}
                 {renderHexagons(quizzes.medium, 'medium')}
                 {renderHexagons(quizzes.hard, 'hard')}
                 {renderHexagons(quizzes.done, 'done')}
             </Flex>
+            <StartQuizModal isOpen={isOpen} onClose={onClose} quiz={selectedQuiz} />
 
             <Button className="back-button" onClick={() => navigate('/quiz-categories')}>
                 Back

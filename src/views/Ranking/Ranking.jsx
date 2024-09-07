@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 import { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Avatar, Text, Heading, Spinner, Icon } from '@chakra-ui/react';
+import { Box, VStack, HStack, Avatar, Text, Heading, Spinner, Icon, Button } from '@chakra-ui/react';
 import { ref, onValue } from 'firebase/database';
 import { db } from '../../config/firebase-config';
 import './Ranking.css';
@@ -9,6 +9,10 @@ import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
 import { PER_PAGE } from '../../common/components.constants';
+import useModal from '../../custom-hooks/useModal';
+import RankingModal from '../../components/RankingModal/RankingModal';
+import { getQuizSummariesByCategory } from '../../services/quiz.service';
+import { getUserByUsername } from '../../services/user.service';
 
 const Ranking = () => {
   const [users, setUsers] = useState([]);
@@ -16,6 +20,11 @@ const Ranking = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [rankingData, setRankingData] = useState([]);
+  const [isFetchingData, setIsFetchingData] = useState(false);
+
+  const { isModalVisible: isRankingModalOpen, openModal: openRankingModal, closeModal: closeRankingModal } = useModal();
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     const usersRef = ref(db, 'users');
@@ -33,6 +42,35 @@ const Ranking = () => {
       setLoading(false);
     });
   }, []);
+
+  const handleCategoryClick = async (category) => {
+    setIsFetchingData(true);
+    setSelectedCategory(category);
+
+    try {
+      const rankingData = await getQuizSummariesByCategory(category);
+      rankingData.sort((a, b) => b.points - a.points);
+
+      const rankingDataWithUserDetails = await Promise.all(
+        rankingData.map(async (item) => {
+          const userInfo = await getUserByUsername(item.username);
+          return {
+            ...item,
+            uid: userInfo?.uid || 'unknown',
+            avatar: userInfo?.avatar || userInfo?.avatarUrl || '',
+            onlineStatus: userInfo?.onlineStatus || 'offline',
+          };
+        })
+      );
+
+      setRankingData(rankingDataWithUserDetails);
+    } catch (error) {
+      console.error('Error fetching category data:', error);
+    } finally {
+      setIsFetchingData(false);
+      openRankingModal();
+    }
+  };
 
   if (loading) {
     return <Spinner size="xl" />;
@@ -69,6 +107,14 @@ const Ranking = () => {
       <Heading as="h2" size="lg" className="ranking-title">
       Who’s the Quiz Champion?
       </Heading>
+      <HStack spacing={2} mt={4}>
+        <Button colorScheme="blue" onClick={() => handleCategoryClick('History')}>History</Button>
+        <Button colorScheme="blue" onClick={() => handleCategoryClick('Geography')}>Geography</Button>
+        <Button colorScheme="blue" onClick={() => handleCategoryClick('Science')}>Science</Button>
+        <Button colorScheme="blue" onClick={() => handleCategoryClick('Literature')}>Literature</Button>
+        <Button colorScheme="blue" onClick={() => handleCategoryClick('General')}>General</Button>
+      </HStack>
+
       {currentUsers.map((user, index) => (
         <Box
           key={user.id}
@@ -109,6 +155,13 @@ const Ranking = () => {
           username={selectedUser.username}
         />
       )}
+      <RankingModal
+        isOpen={isRankingModalOpen}
+        onClose={closeRankingModal}
+        title={selectedCategory ? `${selectedCategory} Rankings` : 'Rankings'}
+        data={rankingData}
+        isLoading={isFetchingData}
+      />
     </VStack>
   );
 };
