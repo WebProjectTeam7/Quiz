@@ -25,6 +25,7 @@ export const createOrganization = async (organization) => {
         throw new Error('Failed to create organization');
     }
 };
+
 export const uploadOrganizationLogo = async (orgId, file) => {
     try {
         const logoRef = storageRef(storage, `organizations/${orgId}/logo`);
@@ -36,7 +37,6 @@ export const uploadOrganizationLogo = async (orgId, file) => {
         throw new Error('Failed to upload organization logo');
     }
 };
-
 
 // RETRIEVE
 
@@ -116,9 +116,9 @@ export const removeQuizIdFromOrganization = async (orgId, quizId) => {
     }
 };
 
-export const joinOrganization = async (orgId, userId) => {
+export const joinOrganization = async (orgId, username) => {
     try {
-        const userRef = dbRef(db, `users/${userId}`);
+        const userRef = dbRef(db, `users/${username}`);
         await update(userRef, { organizationId: orgId });
     } catch (error) {
         console.error('Error joining organization:', error);
@@ -126,9 +126,9 @@ export const joinOrganization = async (orgId, userId) => {
     }
 };
 
-export const leaveOrganization = async (userId) => {
+export const leaveOrganization = async (username) => {
     try {
-        const userRef = dbRef(db, `users/${userId}`);
+        const userRef = dbRef(db, `users/${username}`);
         await update(userRef, { organizationId: null, organizationName: null });
     } catch (error) {
         console.error('Error leaving organization:', error);
@@ -150,4 +150,5 @@ export const updateUserWithOrganization = async (username, organizationId, organ
         throw new Error('Failed to update user with organization: ' + error.message);
     }
 };
+
 // DELETE

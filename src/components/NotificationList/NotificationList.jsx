@@ -15,7 +15,7 @@ import { useEffect, useState, useContext } from 'react';
 import { deleteNotification, getNotifications } from '../../services/notification.service';
 import { AppContext } from '../../state/app.context';
 import PropTypes from 'prop-types';
-import { notificationEnum } from '../../common/notification-enum';
+import { NotificationEnum } from '../../common/notification-enum';
 import { updateUserWithOrganization } from '../../services/organization.service';
 import Swal from 'sweetalert2';
 import { getQuizById } from '../../services/quiz.service';
@@ -53,7 +53,7 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
 
     const handleAcceptNotification = async (notification) => {
         try {
-            if (notification.type === notificationEnum.INVITE_TO_ORGANIZATION) {
+            if (notification.type === NotificationEnum.INVITE_TO_ORGANIZATION) {
                 const organizationName = notification.organizationName;
                 const organizationId = notification.organizationId;
 
@@ -64,7 +64,7 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
                     text: `You have successfully joined the organization ${organizationName}.`,
                     confirmButtonText: 'OK',
                 });
-            } else if (notification.type === notificationEnum.INVITE_TO_QUIZ) {
+            } else if (notification.type === NotificationEnum.INVITE_TO_QUIZ) {
                 await handleAcceptInvite(notification);
             }
         } catch (error) {
@@ -152,7 +152,7 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
                                     bg={'white'}
                                 >
                                     <Text>{notification.message}</Text>
-                                    {notification.type === notificationEnum.INVITE_TO_QUIZ && (
+                                    {notification.type === NotificationEnum.INVITE_TO_QUIZ && (
                                         <>
                                             <Text>Quiz Title: {notification.quizTitle}</Text>
                                             <Text>Category: {notification.quizCategory}</Text>
@@ -161,7 +161,7 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
                                         </>
                                     )}
 
-                                    {notification.type === notificationEnum.INVITE_TO_ORGANIZATION || notification.type === notificationEnum.INVITE_TO_QUIZ ? (
+                                    {notification.type === NotificationEnum.INVITE_TO_ORGANIZATION || notification.type === NotificationEnum.INVITE_TO_QUIZ ? (
                                         <HStack spacing={4} mt={2}>
                                             <Button
                                                 size="sm"

@@ -13,7 +13,7 @@ import {
 import { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { sendNotificationToUser } from '../../services/notification.service';
-import { notificationEnum } from '../../common/notification-enum';
+import { NotificationEnum } from '../../common/notification-enum';
 import { MAX_NOTIFICATION_LENGTH } from '../../common/components.constants';
 import Swal from 'sweetalert2';
 import { AppContext } from '../../state/app.context';
@@ -23,7 +23,7 @@ import QuizAccessEnum from '../../common/access-enum';
 
 export default function NotificationModal({ isOpen, onClose, recipientUid }) {
     const [message, setMessage] = useState('');
-    const [notificationType, setNotificationType] = useState(notificationEnum.INVITE_TO_ORGANIZATION);
+    const [notificationType, setNotificationType] = useState(NotificationEnum.INVITE_TO_ORGANIZATION);
     const { user } = useContext(AppContext);
     const [customUserData, setCustomUserData] = useState(null);
     const [selectedQuizId, setSelectedQuizId] = useState('');
@@ -79,7 +79,7 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
             let notificationContent;
             let notificationData = {};
 
-            if (notificationType === notificationEnum.INVITE_TO_ORGANIZATION) {
+            if (notificationType === NotificationEnum.INVITE_TO_ORGANIZATION) {
                 if (!customUserData.username || !customUserData.organizationName || !customUserData.organizationId) {
                     Swal.fire({
                         icon: 'error',
@@ -97,7 +97,7 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
                     organizationId: customUserData.organizationId,
                     organizationName: customUserData.organizationName,
                 };
-            } else if (notificationType === notificationEnum.INVITE_TO_QUIZ) {
+            } else if (notificationType === NotificationEnum.INVITE_TO_QUIZ) {
                 if (!selectedQuizId) {
                     Swal.fire({
                         icon: 'warning',
@@ -130,9 +130,8 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
                     quizPoints: selectedQuiz.totalPoints,
                     senderName: customUserData.username,
                 };
-                await inviteUserToPrivateQuiz(user.username);
 
-            } else if (notificationType === notificationEnum.TEXT && message.trim()) {
+            } else if (notificationType === NotificationEnum.TEXT && message.trim()) {
                 notificationContent = message.trim();
                 notificationData = {
                     message: notificationContent,
@@ -157,7 +156,7 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
                 confirmButtonText: 'OK',
             });
             setMessage('');
-            setNotificationType(notificationEnum.INVITE_TO_ORGANIZATION);
+            setNotificationType(NotificationEnum.INVITE_TO_ORGANIZATION);
             onClose();
         } catch (error) {
             Swal.fire({
@@ -181,11 +180,11 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
                         onChange={(e) => setNotificationType(e.target.value)}
                         mb={4}
                     >
-                        <option value={notificationEnum.INVITE_TO_ORGANIZATION}>Invite to Organization</option>
-                        <option value={notificationEnum.INVITE_TO_QUIZ}>Invite to Quiz</option>
-                        <option value={notificationEnum.TEXT}>Text</option>
+                        <option value={NotificationEnum.INVITE_TO_ORGANIZATION}>Invite to Organization</option>
+                        <option value={NotificationEnum.INVITE_TO_QUIZ}>Invite to Quiz</option>
+                        <option value={NotificationEnum.TEXT}>Text</option>
                     </Select>
-                    {notificationType === notificationEnum.TEXT && (
+                    {notificationType === NotificationEnum.TEXT && (
                         <Textarea
                             placeholder="Enter your message"
                             value={message}
@@ -193,7 +192,7 @@ export default function NotificationModal({ isOpen, onClose, recipientUid }) {
                             maxLength={MAX_NOTIFICATION_LENGTH}
                         />
                     )}
-                    {notificationType === notificationEnum.INVITE_TO_QUIZ && (
+                    {notificationType === NotificationEnum.INVITE_TO_QUIZ && (
                         <Select
                             placeholder="Select Quiz"
                             value={selectedQuizId}

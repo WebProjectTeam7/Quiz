@@ -26,15 +26,20 @@ export const getNotifications = async (uid) => {
 };
 
 export const sendNotificationToUser = async (uid, notificationData) => {
-    const notificationsRef = ref(db, `notifications/${uid}`);
-    const newNotificationRef = push(notificationsRef);
+    try {
+        const notificationsRef = ref(db, `notifications/${uid}`);
+        const newNotificationRef = push(notificationsRef);
 
-    const notification = {
-        ...notificationData,
-        timestamp: Date.now(),
-    };
+        const notification = {
+            ...notificationData,
+            timestamp: Date.now(),
+        };
 
-    await set(newNotificationRef, notification);
+        await set(newNotificationRef, notification);
+    } catch (error) {
+        console.error('Error sending notification:', error);
+        throw new Error('Failed to send notification');
+    }
 };
 
 export const deleteNotification = async (uid, notificationId) => {

@@ -30,9 +30,9 @@ import Swal from 'sweetalert2';
 import EditableControls from '../../components/EditableControls/EditableControls';
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 import { deleteReportedBugs, getAllReportedBugs } from '../../services/admin.service';
-import InvitationEnum from '../../common/invitation-enum';
 import './QuizPreview.css';
 import QuizParticipantModal from '../../components/QuizParticipantModal/QuizParticipantModal';
+import { NotificationEnum } from '../../common/notification-enum';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -455,7 +455,7 @@ export default function QuizPreview() {
             </VStack>
 
             <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
-            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} objId={quizId} objType={InvitationEnum.QUIZ} />
+            <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} objId={quizId} obj={quiz} objType={NotificationEnum.INVITE_TO_QUIZ} />
             <QuizParticipantModal isOpen={isParticipantsOpen} onClose={onParticipantsClose} quiz={quiz} />
         </Box>
     );

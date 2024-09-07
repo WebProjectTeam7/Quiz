@@ -118,7 +118,8 @@ export default function InvitationalQuizzes() {
 
                                 {quiz.dateBegins && quiz.dateEnds && (
                                     <Text mt={2} fontSize="sm" color="gray.500">
-                                        Available from: {new Date(quiz.dateBegins).toLocaleDateString()} to {new Date(quiz.dateEnds).toLocaleDateString()}
+                                        Available from:
+                                        {new Date(quiz.dateBegins).toLocaleDateString()} to {new Date(quiz.dateEnds).toLocaleDateString()}
                                     </Text>
                                 )}
 
