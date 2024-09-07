@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, Button, Th, Table, Thead, Tr, Tbody, Td, Badge, Box, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
 import { sendNotificationToUser } from '../../services/notification.service';
 import { inviteUserToPrivateQuiz, uninviteUserFromPrivateQuiz, getInvitedUsers } from '../../services/quiz.service';
+import { joinOrganization, leaveOrganization } from '../../services/organization.service';
 import { getAllUsers } from '../../services/user.service';
 import NotificationEnum from '../../common/notification-enum';
 import UserRoleEnum from '../../common/role-enum';
@@ -11,7 +12,6 @@ import useModal from '../../custom-hooks/useModal';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
 import PropTypes from 'prop-types';
-import { joinOrganization, leaveOrganization } from '../../services/organization.service';
 
 const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
     const { userData } = useContext(AppContext);

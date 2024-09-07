@@ -6,13 +6,15 @@ import { AppContext } from '../state/app.context';
 const useNotifications = () => {
     const { userData } = useContext(AppContext);
     const [notifications, setNotifications] = useState([]);
+    const [newNotifications, setNewNotifications] = useState([]);
 
     useEffect(() => {
         if (!userData?.username) return;
 
         const unsubscribe = listenForNotifications(userData.username, (allNotifications) => {
+            setNotifications(allNotifications);
             const unreadNotifications = allNotifications.filter(notification => !notification.isRead);
-            setNotifications(unreadNotifications);
+            setNewNotifications(unreadNotifications);
         });
 
         return () => {
@@ -20,7 +22,7 @@ const useNotifications = () => {
         };
     }, [userData?.username]);
 
-    return notifications;
+    return { notifications, newNotifications };
 };
 
 export default useNotifications;

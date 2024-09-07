@@ -12,91 +12,56 @@ import {
     ModalBody,
     Badge
 } from '@chakra-ui/react';
-import { useEffect, useState, useContext } from 'react';
-import { deleteNotification, getNotifications, markNotificationAsRead } from '../../services/notification.service';
+import { useContext } from 'react';
+import { deleteNotification, markNotificationAsRead } from '../../services/notification.service';
 import { AppContext } from '../../state/app.context';
 import PropTypes from 'prop-types';
 import NotificationEnum from '../../common/notification-enum';
-import { updateUserWithOrganization } from '../../services/organization.service';
+import { joinOrganization } from '../../services/organization.service';
 import Swal from 'sweetalert2';
+import useNotifications from '../../custom-hooks/UseNotifications';
 
-export default function NotificationList({ isOpen, onClose, onNotificationsChange }) {
+export default function NotificationList({ isOpen, onClose }) {
     const { userData } = useContext(AppContext);
-    const [notifications, setNotifications] = useState([]);
 
-    useEffect(() => {
-        fetchNotifications(userData.username);
-    }, [userData]);
-
-    const fetchNotifications = async (username) => {
-        try {
-            const notificationsData = await getNotifications(username);
-            setNotifications(notificationsData);
-            onNotificationsChange(notificationsData);
-        } catch (error) {
-            console.error('Error fetching notifications:', error);
-        }
-    };
+    const { notifications, newNotifications } = useNotifications();
 
     const handleDeleteNotification = async (notificationId) => {
         try {
             await deleteNotification(userData.username, notificationId);
-            const updatedNotifications = notifications.filter(n => n.id !== notificationId);
-            setNotifications(updatedNotifications);
-            onNotificationsChange(updatedNotifications);
         } catch (error) {
             console.error('Error deleting notification:', error);
         }
-        fetchNotifications(userData.username);
     };
 
     const handleAcceptNotification = async (notification) => {
         try {
             if (notification.type === NotificationEnum.INVITE_TO_ORGANIZATION) {
-                const organizationName = notification.organizationName;
-                const organizationId = notification.organizationId;
-
-                await updateUserWithOrganization(userData.username, organizationId, organizationName);
+                const { organizationId, organizationName } = notification;
+                await joinOrganization(userData.username, organizationId, organizationName);
                 Swal.fire({
                     icon: 'success',
                     title: 'Joined Organization',
                     text: `You have successfully joined the organization ${organizationName}.`,
                     confirmButtonText: 'OK',
                 });
-            } else if (notification.type === NotificationEnum.INVITE_TO_QUIZ) {
-                await handleAcceptInvite(notification);
             }
+            handleReadNotification(notification);
         } catch (error) {
             console.error('Error accepting notification:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: `Failed to accept the invitation: ${error.message}`,
-                confirmButtonText: 'OK',
-            });
         }
-        fetchNotifications(userData.username);
     };
 
-    const handleAcceptInvite = async (notification) => {
+    const handleReadNotification = async (notification) => {
         try {
             await markNotificationAsRead(userData.username, notification.id);
         } catch (error) {
-            console.error('Error accepting quiz invitation:', error);
+            console.error('Error marking notification as read', error);
         }
-        fetchNotifications(userData.username);
     };
 
-    const handleDeclineNotification = async (notification) => {
-        try {
-            await markNotificationAsRead(userData.username, notification.id);
-        } catch (error) {
-            console.error('Error declining notification:', error);
-        }
-        fetchNotifications(userData.username);
-    };
 
-    const unreadNotifications = notifications.filter(n => !n.isRead);
+    const unreadNotifications = newNotifications;
     const readNotifications = notifications.filter(n => n.isRead);
 
     return (
@@ -139,17 +104,35 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
                                                 <Text>Category: {notification.quizCategory}</Text>
                                                 <Text>Difficulty: {notification.quizDifficulty}</Text>
                                                 <Text>Points: {notification.quizPoints}</Text>
+                                                <HStack spacing={4} mt={2}>
+                                                    <Button
+                                                        size="sm"
+                                                        colorScheme="green"
+                                                        onClick={() => handleReadNotification(notification)}
+                                                    >
+                                                        OK
+                                                    </Button>
+                                                </HStack>
                                             </>
                                         )}
-                                        <HStack spacing={4} mt={2}>
-                                            <Button
-                                                size="sm"
-                                                colorScheme="green"
-                                                onClick={() => handleAcceptNotification(notification)}
-                                            >
-                                                OK
-                                            </Button>
-                                        </HStack>
+                                        {notification.type === NotificationEnum.INVITE_TO_ORGANIZATION && (
+                                            <HStack spacing={4} mt={2}>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="green"
+                                                    onClick={() => handleAcceptNotification(notification)}
+                                                >
+                                                    Accept
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="red"
+                                                    onClick={() => handleReadNotification(notification)}
+                                                >
+                                                    Decline
+                                                </Button>
+                                            </HStack>
+                                        )}
                                     </Box>
                                 ))}
                             </Box>
@@ -194,7 +177,7 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
                     </VStack>
                 </ModalBody>
             </ModalContent>
-        </Modal>
+        </Modal >
     );
 }
 

@@ -8,11 +8,10 @@ import {
     Input,
     Stack,
     Text,
-    Flex,
     Divider,
     HStack,
 } from '@chakra-ui/react';
-import { useContext, useState, useEffect, useRef } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../state/app.context';
 import { updateUser, getUserData, uploadUserAvatar, changeUserPassword, reauthenticateUser, getOrganizerCodes, deleteOrganizerCode } from '../../services/user.service';
 import Swal from 'sweetalert2';
@@ -20,8 +19,8 @@ import EditableControls from '../../components/EditableControls/EditableControls
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import NotificationList from '../../components/NotificationList/NotificationList';
 import useModal from '../../custom-hooks/useModal';
-import { getNotifications } from '../../services/notification.service';
 import { getOrganizationById } from '../../services/organization.service';
+import useNotifications from '../../custom-hooks/UseNotifications';
 
 export default function MyProfile() {
     const { user, userData, setAppState } = useContext(AppContext);
@@ -32,10 +31,9 @@ export default function MyProfile() {
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
     const [organizerCode, setOrganizerCode] = useState('');
-    const [notifications, setNotifications] = useState([]);
-    const [hasNewNotifications, setHasNewNotifications] = useState(false);
-    const previousNotificationsRef = useRef([]);
     const [organizationData, setOrganizationData] = useState(null);
+
+    const { notifications, newNotifications } = useNotifications();
 
     const {
         isModalVisible: isNotificationModalOpen,
@@ -43,49 +41,33 @@ export default function MyProfile() {
         closeModal: closeNotificationModal,
     } = useModal();
 
-    const fetchNotifications = async () => {
-        const fetchedNotifications = await getNotifications(user.uid);
-        setNotifications(fetchedNotifications);
-    };
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const fetchedData = await getUserData(user.uid);
-                if (fetchedData) {
-                    setFormData(fetchedData);
-                    setAvatarPreviewUrl(fetchedData.avatar);
-
-                    if (fetchedData.organizationId) {
-                        const orgData = await getOrganizationById(fetchedData.organizationId);
-                        setOrganizationData(orgData);
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-
         const fetchData = async () => {
             if (user && user.uid) {
                 await fetchUserData();
-                await fetchNotifications();
             }
         };
 
         fetchData();
     }, [user]);
 
-    const checkForNewNotifications = () => {
-        const previousNotifications = previousNotificationsRef.current;
-        const isNewNotification = notifications.length > previousNotifications.length;
-        setHasNewNotifications(isNewNotification);
-        previousNotificationsRef.current = notifications;
-    };
+    const fetchUserData = async () => {
+        try {
+            const fetchedData = await getUserData(user.uid);
+            if (fetchedData) {
+                setFormData(fetchedData);
+                setAvatarPreviewUrl(fetchedData.avatar);
 
-    useEffect(() => {
-        checkForNewNotifications();
-    }, [notifications]);
+                if (fetchedData.organizationId) {
+                    const orgData = await getOrganizationById(fetchedData.organizationId);
+                    setOrganizationData(orgData);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
 
     const updateUserData = (prop) => (value) => {
         setFormData((prevData) => ({
@@ -306,7 +288,7 @@ export default function MyProfile() {
                     <Box mt={4} width="100%">
                         <button
                             id="notificationButton"
-                            className={`button ${hasNewNotifications ? 'has-notifications' : ''}`}
+                            className={`button ${newNotifications.length === 0 ? 'has-notifications' : ''}`}
                             onClick={openNotificationModal}
                             style={{ marginLeft: '25px' }}
                         >
@@ -432,7 +414,6 @@ export default function MyProfile() {
             <NotificationList
                 isOpen={isNotificationModalOpen}
                 onClose={closeNotificationModal}
-                onNotificationsChange={checkForNewNotifications}
             />
         </Box>
     );

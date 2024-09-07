@@ -116,10 +116,15 @@ export const removeQuizIdFromOrganization = async (orgId, quizId) => {
     }
 };
 
-export const joinOrganization = async (orgId, username) => {
+export const joinOrganization = async (username, organizationId, organizationName) => {
     try {
         const userRef = dbRef(db, `users/${username}`);
-        await update(userRef, { organizationId: orgId });
+        const updates = {
+            organizationId,
+            organizationName
+        };
+
+        await update(userRef, updates);
     } catch (error) {
         console.error('Error joining organization:', error);
         throw new Error('Failed to join organization');
@@ -133,21 +138,6 @@ export const leaveOrganization = async (username) => {
     } catch (error) {
         console.error('Error leaving organization:', error);
         throw new Error('Failed to leave organization');
-    }
-};
-
-export const updateUserWithOrganization = async (username, organizationId, organizationName) => {
-    try {
-        const userRef = dbRef(db, `users/${username}`);
-        const updates = {
-            organizationId,
-            organizationName
-        };
-
-        await update(userRef, updates);
-    } catch (error) {
-        console.error('Error updating user with organization:', error);
-        throw new Error('Failed to update user with organization: ' + error.message);
     }
 };
 

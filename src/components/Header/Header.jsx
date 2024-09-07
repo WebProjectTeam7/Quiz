@@ -8,15 +8,22 @@ import { Menu, MenuButton, MenuList, MenuItem, Button, Box, Icon, Badge } from '
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import { FiBell } from 'react-icons/fi';
 import { FaHome } from 'react-icons/fa';
+import NotificationList from '../../components/NotificationList/NotificationList';
+import useModal from '../../custom-hooks/useModal';
 import UserRoleEnum from '../../common/role-enum';
 import useNotifications from '../../custom-hooks/UseNotifications';
 import './Header.css';
 
-
 export default function Header({ registrationModal, loginModal }) {
     const { user, userData, setAppState } = useContext(AppContext);
     const navigate = useNavigate();
-    const notifications = useNotifications();
+    const { newNotifications } = useNotifications();
+
+    const {
+        isModalVisible: isNotificationModalOpen,
+        openModal: openNotificationModal,
+        closeModal: closeNotificationModal,
+    } = useModal();
 
     const logout = async () => {
         const result = await Swal.fire({
@@ -39,9 +46,12 @@ export default function Header({ registrationModal, loginModal }) {
         <header className="site-header">
             <nav>
                 <div className="nav-buttons">
+                    {/* Home Button */}
                     <button className="home-button-home-page" onClick={() => navigate('/')}>
                         <FaHome size="24px" />
                     </button>
+
+                    {/* Menu Button */}
                     <Menu>
                         <MenuButton as={Button} rightIcon={<ChevronDownIcon />} className="chakra-menu__menu-button">
                             MENU
@@ -59,11 +69,14 @@ export default function Header({ registrationModal, loginModal }) {
                         </MenuList>
                     </Menu>
 
+                    {/* Welcome Text */}
                     {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
 
+                    {/* Notifications Bell */}
                     <Box position="relative" ml={4} cursor="pointer">
-                        <Icon as={FiBell} boxSize={6} onClick={() => navigate('/notifications')} />
-                        {notifications.length > 0 && (
+                        <Icon as={FiBell} boxSize={6} onClick={openNotificationModal} />
+                        {/* Display Badge only if there are new notifications */}
+                        {newNotifications.length > 0 && (
                             <Badge
                                 colorScheme="red"
                                 position="absolute"
@@ -73,7 +86,7 @@ export default function Header({ registrationModal, loginModal }) {
                                 py={1}
                                 fontSize="0.75em"
                                 sx={{
-                                    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)', // Hexagon shape
+                                    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
                                     backgroundColor: 'red.500',
                                     color: 'white',
                                     display: 'flex',
@@ -83,12 +96,12 @@ export default function Header({ registrationModal, loginModal }) {
                                     height: '25px',
                                 }}
                             >
-                                {notifications.length}
+                                {newNotifications.length}
                             </Badge>
                         )}
                     </Box>
 
-
+                    {/* Auth Buttons */}
                     {!user && (
                         <div className="auth-buttons">
                             <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
@@ -101,6 +114,12 @@ export default function Header({ registrationModal, loginModal }) {
                     )}
                 </div>
             </nav>
+
+            {/* Notification Modal */}
+            <NotificationList
+                isOpen={isNotificationModalOpen}
+                onClose={closeNotificationModal}
+            />
         </header>
     );
 }
