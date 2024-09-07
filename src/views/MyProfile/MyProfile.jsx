@@ -33,7 +33,7 @@ export default function MyProfile() {
     const [organizerCode, setOrganizerCode] = useState('');
     const [organizationData, setOrganizationData] = useState(null);
 
-    const { notifications, newNotifications } = useNotifications();
+    const { newNotifications } = useNotifications();
 
     const {
         isModalVisible: isNotificationModalOpen,

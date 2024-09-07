@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import {
     Box,
     Heading,
@@ -7,6 +8,7 @@ import {
     HStack,
     Divider,
     Spinner,
+    Progress,
 } from '@chakra-ui/react';
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -186,9 +188,10 @@ export default function PlayQuiz() {
 
             await saveQuizSummary(quizId, userData.username, summary);
 
-            const updatedUser = { ...userData, points: userData.points + finalScore };
-            await updateUser(userData.uid, updatedUser);
-
+            if (userData.role === UserRoleEnum.STUDENT) {
+                const updatedUser = { ...userData, points: userData.points + finalScore };
+                await updateUser(userData.uid, updatedUser);
+            }
             localStorage.removeItem(`quiz-${quizId}-timeLeft`);
             localStorage.removeItem(`quiz-${quizId}-answers`);
 
@@ -200,6 +203,12 @@ export default function PlayQuiz() {
 
     const handleQuestionClick = (index) => {
         setCurrentQuestionIndex(index);
+    };
+
+    const getTimeProgress = () => {
+        if (!quiz || !quiz.timeLimit) return 100;
+        const totalTime = quiz.timeLimit * 60;
+        return (timeLeft / totalTime) * 100;
     };
 
     if (isLoading) {
@@ -229,7 +238,7 @@ export default function PlayQuiz() {
                     <Text fontSize="lg" fontWeight="bold">
                         Time Left: {Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}
                     </Text>
-
+                    <Progress value={getTimeProgress()} size="lg" colorScheme="blue" width="100%" />
                     <HStack align="start" spacing={8} width="100%">
                         <Box flex="3">
                             {questions.length > 0 && (
