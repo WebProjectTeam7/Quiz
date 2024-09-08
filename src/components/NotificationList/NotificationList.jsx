@@ -26,6 +26,7 @@ export default function NotificationList({ isOpen, onClose }) {
 
     const { notifications, newNotifications } = useNotifications();
 
+    console.log(notifications);
     const handleDeleteNotification = async (notificationId) => {
         try {
             await deleteNotification(userData.username, notificationId);
@@ -97,6 +98,7 @@ export default function NotificationList({ isOpen, onClose }) {
                                         >
                                             New
                                         </Badge>
+                                        <Text>{new Date(notification.timestamp).toLocaleString()}</Text>
                                         <Text>{notification.message}</Text>
                                         {notification.type === NotificationEnum.INVITE_TO_QUIZ && (
                                             <>
@@ -104,16 +106,19 @@ export default function NotificationList({ isOpen, onClose }) {
                                                 <Text>Category: {notification.quizCategory}</Text>
                                                 <Text>Difficulty: {notification.quizDifficulty}</Text>
                                                 <Text>Points: {notification.quizPoints}</Text>
-                                                <HStack spacing={4} mt={2}>
-                                                    <Button
-                                                        size="sm"
-                                                        colorScheme="green"
-                                                        onClick={() => handleReadNotification(notification)}
-                                                    >
-                                                        OK
-                                                    </Button>
-                                                </HStack>
+
                                             </>
+                                        )}
+                                        {(notification.type === NotificationEnum.INVITE_TO_QUIZ || notification.type === NotificationEnum.TEXT) && (
+                                            <HStack spacing={4} mt={2}>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="green"
+                                                    onClick={() => handleReadNotification(notification)}
+                                                >
+                                                    OK
+                                                </Button>
+                                            </HStack>
                                         )}
                                         {notification.type === NotificationEnum.INVITE_TO_ORGANIZATION && (
                                             <HStack spacing={4} mt={2}>
@@ -149,6 +154,7 @@ export default function NotificationList({ isOpen, onClose }) {
                                         mb={2}
                                         bg={'white'}
                                     >
+                                        <Text>{new Date(notification.timestamp).toLocaleString()}</Text>
                                         <Text>{notification.message}</Text>
                                         {notification.type === NotificationEnum.INVITE_TO_QUIZ && (
                                             <>
