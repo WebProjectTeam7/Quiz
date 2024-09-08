@@ -31,7 +31,7 @@ const QuizSummary = () => {
             </Text>
 
             <VStack spacing={6} align="start">
-                {summary.questions.map((q, index) => (
+                {summary.questions && summary.questions.map((q, index) => (
                     <Box key={index} width="100%" p={4} borderWidth="1px" borderRadius="md" boxShadow="sm">
                         <Heading as="h3" size="md" mb={2} color="rgb(237, 243, 182)">
                             Question {index + 1}

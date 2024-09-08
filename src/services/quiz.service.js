@@ -216,23 +216,36 @@ export const getQuizzesByOrganizationId = async (organizationId) => {
     }
 };
 
-export const getPrivateQuizzes = async () => {
+export const getPrivateQuizzes = async (username) => {
     try {
-        const quizRef = dbRef(db, 'quizzes');
-        const organizationQuery = query(quizRef, orderByChild('type'), equalTo('private'));
-        const snapshot = await get(organizationQuery);
+        const quizzesRef = dbRef(db, 'quizzes');
+        const snapshot = await get(quizzesRef);
 
         if (!snapshot.exists()) {
             return [];
         }
-        const quizzes = snapshot.val();
-        return Object.keys(quizzes).map(key => ({
-            id: key,
-            ...quizzes[key]
-        }));
+        const allQuizzes = snapshot.val();
+
+        const privateQuizzes = Object.keys(allQuizzes).map((quizId) => {
+            const quiz = allQuizzes[quizId];
+            if (
+                quiz.type === 'private' &&
+                quiz.isActive === true &&
+                quiz.invitedUsers &&
+                quiz.invitedUsers.includes(username)
+            ) {
+                return {
+                    id: quizId,
+                    ...quiz,
+                };
+            }
+            return null;
+        }).filter(quiz => quiz !== null);
+
+        return privateQuizzes;
     } catch (error) {
         console.error('Error fetching private quizzes:', error);
-        throw new Error('Failed to fetch private quizzes');
+        throw new Error('Failed to retrieve private quizzes');
     }
 };
 

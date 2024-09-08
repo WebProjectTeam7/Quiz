@@ -13,7 +13,6 @@ import {
     Tr,
     Th,
     Td,
-    Box,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
