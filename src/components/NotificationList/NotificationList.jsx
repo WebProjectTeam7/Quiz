@@ -26,7 +26,6 @@ export default function NotificationList({ isOpen, onClose }) {
 
     const { notifications, newNotifications } = useNotifications();
 
-    console.log(notifications);
     const handleDeleteNotification = async (notificationId) => {
         try {
             await deleteNotification(userData.username, notificationId);
