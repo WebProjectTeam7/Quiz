@@ -326,7 +326,7 @@ export default function MyProfile() {
                     <Box mt={4} width="100%">
                         <button
                             id="notificationButton"
-                            className={`button ${newNotifications.length === 0 ? 'has-notifications' : ''}`}
+                            className={`button ${newNotifications.length === 0 ? '' : 'has-notifications'}`}
                             onClick={openNotificationModal}
                             style={{ marginLeft: '25px' }}
                         >

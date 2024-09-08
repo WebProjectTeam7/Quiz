@@ -10,7 +10,6 @@ import {
     Box,
     Flex,
     Button,
-    Input,
 } from '@chakra-ui/react';
 import { getUserByUsername } from '../../services/user.service';
 import PropTypes from 'prop-types';
@@ -21,6 +20,12 @@ import { banUser, unbanUser } from '../../services/admin.service';
 import NotificationModal from '../NotificationModal/NotificationModal';
 import useModal from '../../custom-hooks/useModal';
 import { getOrganizationById } from '../../services/organization.service';
+import { getQuizzesByAuthor } from '../../services/quiz.service';
+import QuizAccessEnum from '../../common/access-enum';
+import { inviteUserToPrivateQuiz } from '../../services/quiz.service';
+import { sendNotificationToUser } from '../../services/notification.service';
+import { NOTIFICATION_QUIZ_INVITE } from '../../common/notification-messages';
+import NotificationEnum from '../../common/notification-enum';
 
 export default function UserProfileModal({ isOpen, onClose, username, onBanUnban }) {
     const [userData, setUserData] = useState(null);
@@ -31,6 +36,7 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
         openModal: openNotificationModal,
         closeModal: closeNotificationModal,
     } = useModal();
+    const [privateQuizzes, setPrivateQuizzes] = useState([]);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -49,10 +55,23 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
             }
         };
 
+        const fetchPrivateQuizzes = async () => {
+            if (currentUserData?.username) {
+                try {
+                    const userQuizzes = await getQuizzesByAuthor(currentUserData.username);
+                    const privateQuizzesList = userQuizzes.filter(quiz => quiz.type === QuizAccessEnum.PRIVATE);
+                    setPrivateQuizzes(privateQuizzesList);
+                } catch (error) {
+                    console.error('Error fetching private quizzes:', error);
+                }
+            }
+        };
+
         if (username) {
             fetchUserData();
+            fetchPrivateQuizzes();
         }
-    }, [username]);
+    }, [username, currentUserData?.username]);
 
     const handleBanUnbanUser = async () => {
         const isBanned = userData.banned;
@@ -61,7 +80,7 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
             title: `Are you sure you want to ${isBanned ? 'unban' : 'ban'} this user?`,
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: `Yes, ${isBanned ? 'unban' : 'ban'} it!`,
+            confirmButtonText: `Yes, ${isBanned ? 'unban' : 'ban'} them!`,
             cancelButtonText: 'No, cancel!',
         }).then(async (result) => {
             if (result.isConfirmed) {
@@ -92,6 +111,39 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
                 }
             }
         });
+    };
+
+    const handleInviteUserToQuiz = async (quizId, recipientUsername, quizTitle) => {
+        try {
+            await inviteUserToPrivateQuiz(quizId, recipientUsername);
+
+            const notificationContent = NOTIFICATION_QUIZ_INVITE(currentUserData.username, quizTitle);
+
+            const notificationData = {
+                message: notificationContent,
+                type: NotificationEnum.INVITE_TO_QUIZ,
+                quizId: quizId,
+                quizTitle: quizTitle,
+                senderName: currentUserData.username,
+            };
+
+            await sendNotificationToUser(recipientUsername, notificationData);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Invitation Sent',
+                text: `User has been invited to the quiz "${quizTitle}"`,
+                confirmButtonText: 'OK',
+            });
+        } catch (error) {
+            console.error('Error sending quiz invitation:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed to Send Invitation',
+                text: 'There was an error sending the invitation. Please try again.',
+                confirmButtonText: 'OK',
+            });
+        }
     };
 
     if (!userData) return null;
@@ -170,7 +222,9 @@ export default function UserProfileModal({ isOpen, onClose, username, onBanUnban
             <NotificationModal
                 isOpen={isNotificationModalOpen}
                 onClose={closeNotificationModal}
-                recipientUid={userData?.uid}
+                recipientUid={userData?.username}
+                quizzes={privateQuizzes || []}
+                onInvite={handleInviteUserToQuiz}
             />
         </>
     );

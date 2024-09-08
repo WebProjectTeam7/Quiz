@@ -20,9 +20,10 @@ import NotificationEnum from '../../common/notification-enum';
 import { joinOrganization } from '../../services/organization.service';
 import Swal from 'sweetalert2';
 import useNotifications from '../../custom-hooks/UseNotifications';
+import { getUserData } from '../../services/user.service';
 
 export default function NotificationList({ isOpen, onClose }) {
-    const { userData } = useContext(AppContext);
+    const { userData, setAppState } = useContext(AppContext);
 
     const { notifications, newNotifications } = useNotifications();
 
@@ -39,6 +40,12 @@ export default function NotificationList({ isOpen, onClose }) {
             if (notification.type === NotificationEnum.INVITE_TO_ORGANIZATION) {
                 const { organizationId, organizationName } = notification;
                 await joinOrganization(userData.username, organizationId, organizationName);
+
+                const updatedUserData = await getUserData(userData.uid);
+                setAppState((prev) => ({
+                    ...prev,
+                    userData: updatedUserData,
+                }));
                 Swal.fire({
                     icon: 'success',
                     title: 'Joined Organization',
