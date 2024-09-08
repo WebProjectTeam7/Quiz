@@ -107,7 +107,6 @@ const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
                 await sendNotificationToUser(user.username, notificationData);
                 setInvitedUsers(invitedUsers.filter((u) => u !== user.username));
             } else {
-                await joinOrganization(objId, user.username);
                 const notificationContent = NOTIFICATION_ORGANIZATION_INVITE(userData.organizationName);
                 const notificationData = {
                     message: notificationContent,
