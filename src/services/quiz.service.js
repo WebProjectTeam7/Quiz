@@ -119,6 +119,24 @@ export const getQuizSummariesByCategory = async (category) => {
     }
 };
 
+export const getAllQuizzes = async () => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const snapshot = await get(quizRef);
+        if (snapshot.exists()) {
+            const quizzes = snapshot.val();
+            return Object.keys(quizzes).map((key) => ({
+                id: key,
+                ...quizzes[key],
+            }));
+        }
+        return [];
+    } catch (error) {
+        console.error('Error retrieving all quizzes:', error);
+        throw new Error('Failed to retrieve all quizzes');
+    }
+};
+
 export const getQuizById = async (quizId) => {
     try {
         const quizRef = dbRef(db, `quizzes/${quizId}`);
@@ -310,7 +328,6 @@ export const saveQuizSummary = async (quizId, username, summary) => {
             createdAt: new Date().toISOString(),
             questions: summary.questions,
         });
-
         await set(quizSummaryRef, userSummaries);
     } catch (error) {
         console.error('Error saving quiz summary:', error);
