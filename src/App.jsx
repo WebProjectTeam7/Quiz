@@ -26,6 +26,8 @@ import SampleQuiz from './views/SampleQuiz/SampleQuiz';
 import QuizCategories from './views/QuizCategories/QuizCategories';
 import QuizSummary from './views/QuizSummary/QuizSummary';
 import InvitationalQuizzes from './views/InvitationalQuizzes/InvitationalQuizzes';
+import QuizBattle from './views/QuizBattle/QuizBattle';
+import QuizBattleLobby from './views/QuizBattleLobby/QuizBattleLobby';
 
 export default function App() {
     const [appState, setAppState] = useState({
@@ -104,6 +106,8 @@ export default function App() {
                             <Route path="/quiz-categories" element={<QuizCategories />} />
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/tournament" element={<Tournament />} />
+                            <Route path="/quiz-battle-lobby" element={<QuizBattleLobby/>}/>
+                            <Route path="/quiz-battle" element={<QuizBattle />} />
                             <Route path="/play-quiz/:quizId" element={<PlayQuiz />} />
                             <Route path="/quiz-summary" element={<QuizSummary />} />
                             <Route path="/invitational-quizzes" element={<InvitationalQuizzes />} />

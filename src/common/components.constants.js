@@ -18,6 +18,8 @@ export const MAX_NOTIFICATION_LENGTH = 50;
 
 export const MIN_QUIZ_TIME_LIMIT = 5;
 
+export const CHAT_COMMENTS_LIMIT = 100;
+
 // export const MILLISECONDS_IN_A_MINUTE = 1000 * 60;
 
 // export const MILLISECONDS_IN_AN_HOUR = MILLISECONDS_IN_A_MINUTE * 60;

@@ -104,7 +104,7 @@ export default function Header({ registrationModal, loginModal }) {
                         </Button>
                         <Button
                             as={NavLink}
-                            to="/tournament"
+                            to="/quiz-battle-lobby"
                             leftIcon={<Icon as={FaGamepad} />}
                             colorScheme="teal"
                             variant="outline"
