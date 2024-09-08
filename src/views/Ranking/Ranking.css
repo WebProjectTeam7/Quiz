@@ -14,7 +14,7 @@
   background: url('..//../images/header.jpg') no-repeat center center fixed, linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%);
   background-size: cover;
   background-blend-mode: overlay;
-  margin-top: 10px;
+  margin-top: 5px;
   padding: 0;
   min-height: 100vh;
   display: flex;
@@ -111,4 +111,12 @@
 
 .css-1ik4h6n {
   color: rgba(237, 243, 182, 0.815);
+}
+
+.ranking-category {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 140px !important;
+  max-width: fit-content;
 }

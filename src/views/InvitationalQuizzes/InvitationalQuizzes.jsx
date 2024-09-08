@@ -5,19 +5,23 @@ import { Box, Flex, Text, Icon, Button, Spinner, Badge } from '@chakra-ui/react'
 import { FaLock } from 'react-icons/fa';
 import Swal from 'sweetalert2';
 import './InvitationalQuizzes.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function InvitationalQuizzes() {
     const { userData } = useContext(AppContext);
+    const navigate = useNavigate();
     const [quizzes, setQuizzes] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchPrivateQuizzes();
-    }, []);
+        if (userData && userData.username) {
+            fetchPrivateQuizzes();
+        }
+    }, [userData]);
 
     const fetchPrivateQuizzes = async () => {
         try {
-            const result = await getPrivateQuizzes();
+            const result = await getPrivateQuizzes(userData.username);
             setQuizzes(result);
         } catch (error) {
             console.error('Error fetching private quizzes:', error);
@@ -34,9 +38,35 @@ export default function InvitationalQuizzes() {
             const beginDate = new Date(dateBegins);
             const endDate = new Date(dateEnds);
             return currentDate >= beginDate && currentDate <= endDate;
+        } else if (dateBegins) {
+            const beginDate = new Date(dateBegins);
+            return currentDate >= beginDate;
+        } else if (dateEnds) {
+            const endDate = new Date(dateEnds);
+            return currentDate <= endDate;
         }
 
         return true;
+    };
+
+    const isQuizDone = (quiz) => {
+        if (quiz.summaries) {
+            return quiz.summaries[userData.username];
+        }
+        return false;
+    };
+
+    const getQuizStatus = (quiz) => {
+        const isDone = isQuizDone(quiz);
+        const isAccessible = isQuizAccessible(quiz);
+
+        if (isDone) {
+            return 'Done';
+        } else if (isAccessible) {
+            return 'Available';
+        } else {
+            return 'Timeframe Not Open';
+        }
     };
 
     const handleJoinQuiz = (quiz) => {
@@ -70,7 +100,11 @@ export default function InvitationalQuizzes() {
         }
     };
 
-    if (loading) {
+    const handleViewSummary = (summary) => {
+        navigate('/quiz-summary', { state: { summary } });
+    };
+
+    if (loading || !userData) {
         return (
             <Flex justifyContent="center" alignItems="center" minHeight="100vh">
                 <Spinner size="xl" />
@@ -84,8 +118,9 @@ export default function InvitationalQuizzes() {
             <Flex direction="column" gap={4}>
                 {quizzes.length > 0 ? (
                     quizzes.map((quiz) => {
-                        const isInvited = true;
+                        const isDone = isQuizDone(quiz);
                         const isAccessible = isQuizAccessible(quiz);
+                        const status = getQuizStatus(quiz);
 
                         return (
                             <Flex
@@ -93,21 +128,39 @@ export default function InvitationalQuizzes() {
                                 direction="column"
                                 padding="15px"
                                 borderRadius="md"
-                                bg={isInvited && isAccessible ? 'green.100' : 'red.100'}
+                                bg={isDone ? 'gray.200' : isAccessible ? 'green.100' : 'red.100'}
                                 border="1px"
-                                borderColor={isInvited && isAccessible ? 'green.300' : 'red.300'}
+                                borderColor={isDone ? 'gray.400' : isAccessible ? 'green.300' : 'red.300'}
                                 boxShadow="md"
+                                position="relative"
                             >
+                                <Badge
+                                    position="absolute"
+                                    top="-10px"
+                                    right="50px"
+                                    bg={isDone ? 'gray.600' : isAccessible ? 'green.500' : 'red.500'}
+                                    color="white"
+                                    px={3}
+                                    py={1}
+                                    borderRadius="full"
+                                    fontSize="md"
+                                    border="2px solid"
+                                    borderColor={isDone ? 'gray.800' : isAccessible ? 'green.700' : 'red.700'}
+                                    boxShadow="lg"
+                                >
+                                    {status}
+                                </Badge>
+
                                 <Flex justifyContent="space-between" alignItems="center">
                                     <Text fontSize="xl" fontWeight="bold" color="black">
                                         {quiz.title}
                                     </Text>
-                                    {!isInvited || !isAccessible ? (
+                                    {!isAccessible ? (
                                         <Icon as={FaLock} color="red.500" boxSize={5} />
                                     ) : null}
                                 </Flex>
 
-                                <Text mt={2} fontStyle="italic">{quiz.description}</Text>
+                                <Text mt={2} color="black" fontStyle="italic">{quiz.description}</Text>
 
                                 <Flex mt={4} justifyContent="space-between" wrap="wrap" gap={3}>
                                     <Badge colorScheme="purple">{quiz.category}</Badge>
@@ -117,21 +170,24 @@ export default function InvitationalQuizzes() {
                                     <Badge colorScheme="yellow">Total Points: {quiz.totalPoints}</Badge>
                                 </Flex>
 
-                                {quiz.dateBegins && quiz.dateEnds && (
-                                    <Text mt={2} fontSize="sm" color="gray.500">
-                                        Available from:
-                                        {new Date(quiz.dateBegins).toLocaleDateString()} to {new Date(quiz.dateEnds).toLocaleDateString()}
-                                    </Text>
-                                )}
+                                <Text mt={2} fontSize="sm" color="gray.500">
+                                    {quiz.dateBegins ? `Available from: ${new Date(quiz.dateBegins).toLocaleDateString()}` : ''}
+                                    {quiz.dateEnds ? ` to ${new Date(quiz.dateEnds).toLocaleDateString()}` : ''}
+                                </Text>
 
                                 <Flex mt={4} justifyContent="flex-end">
-                                    <Button
-                                        colorScheme={isInvited && isAccessible ? 'green' : 'red'}
-                                        onClick={() => handleJoinQuiz(quiz)}
-                                        isDisabled={!isInvited || !isAccessible}
-                                    >
-                                        {isInvited && isAccessible ? 'Join Quiz' : 'Locked'}
-                                    </Button>
+                                    {isDone ?
+                                        <Button colorScheme="gray" onClick={() => handleViewSummary(quiz.summaries[userData.username][0])}>
+                                            View Summary
+                                        </Button> :
+                                        <Button
+                                            colorScheme={!isDone && isAccessible ? 'green' : 'red'}
+                                            onClick={() => handleJoinQuiz(quiz)}
+                                            isDisabled={isDone || !isAccessible}
+                                        >
+                                            {!isDone && isAccessible ? 'Join Quiz' : 'Locked'}
+                                        </Button>
+                                    }
                                 </Flex>
                             </Flex>
                         );

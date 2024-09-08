@@ -105,9 +105,9 @@ const Ranking = () => {
   return (
     <VStack spacing={4} align="center" className="ranking-container">
       <Heading as="h2" size="lg" className="ranking-title">
-      Who’s the Quiz Champion?
+      Who is the Quiz Champion?
       </Heading>
-      <HStack spacing={2} mt={4}>
+      <HStack className="ranking-category" spacing={2} mt={4}>
         <Button colorScheme="blue" onClick={() => handleCategoryClick('History')}>History</Button>
         <Button colorScheme="blue" onClick={() => handleCategoryClick('Geography')}>Geography</Button>
         <Button colorScheme="blue" onClick={() => handleCategoryClick('Science')}>Science</Button>
