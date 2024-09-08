@@ -4,9 +4,11 @@
     height: 138px;
     cursor: pointer;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background: linear-gradient(145deg, #dcdcdc, #b8b8b8);
+    background: linear-gradient(rgb(56, 48, 148) 1.1%, rgb(223, 19, 94) 130.5%) !important;
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8),
-                inset 0 6px 12px rgba(0, 0, 0, 0.5);
+                inset 0 6px 12px rgba(0, 0, 0, 0.5),
+                0 0 15px rgba(223, 19, 94, 0.8),
+                0 0 25px rgba(223, 19, 94, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -19,21 +21,11 @@
 }
 
 .hexagon.clicked {
-    background: linear-gradient(60deg, #333333, #555555);
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgb(223, 19, 94) 130.5%) !important;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8),
-                inset 0 8px 16px rgba(0, 0, 0, 0.6);
-}
-
-.hexagon.easy {
-    background: linear-gradient(145deg, #58f058, #388e3c);
-}
-
-.hexagon.medium {
-    background: linear-gradient(145deg, #8181e4, #5c2a8d);
-}
-
-.hexagon.hard {
-    background: linear-gradient(145deg, #aa1111dc, #c2185b);
+                inset 0 8px 16px rgba(0, 0, 0, 0.6),
+                0 0 20px rgba(223, 19, 94, 0.8),
+                0 0 30px rgba(223, 19, 94, 0.6);
 }
 
 .hexagon-in {
@@ -50,3 +42,22 @@
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
     transform: rotate(-90deg);
 }
+
+
+/* .hexagon.clicked {
+    background: linear-gradient(60deg, #333333, #555555);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8),
+                inset 0 8px 16px rgba(0, 0, 0, 0.6);
+}
+
+.hexagon.easy {
+    background: linear-gradient(145deg, #58f058, #388e3c);
+}
+
+.hexagon.medium {
+    background: linear-gradient(145deg, #8181e4, #5c2a8d);
+}
+
+.hexagon.hard {
+    background: linear-gradient(145deg, #aa1111dc, #c2185b);
+} */

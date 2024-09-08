@@ -42,7 +42,6 @@
 }
 
 .site-header .auth-buttons {
-    position: absolute;
     bottom: 20px;
     right: 20px;
     display: flex;
@@ -167,3 +166,41 @@
     font-size: 24px;
     padding-left: 30px;
 }
+
+.css-1ut02yo {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+}
+
+.css-1ut02yo:hover {
+    background: linear-gradient(rgb(26, 17, 128) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+}
+
+.css-dsexd7:hover {
+    background: linear-gradient(rgb(26, 17, 128) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+}
+
+.css-6ey7w3 {
+    margin-top: 10px !important;
+}
+
+.css-pv22qu {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.897) 130.5%) !important;
+    box-shadow: rgb(188, 16, 79) !important;
+}
+
+.css-ljjl4g {
+    height: 40px !important;
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+}
+
+/* .site-header .auth-buttons {
+    margin-left: 830px !important;
+}
+
+.css-ljjl4g {
+    margin-left: 400px !important;
+} */

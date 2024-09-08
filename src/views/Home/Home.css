@@ -53,6 +53,16 @@
     margin-bottom: 30px;
 }
 
+.css-1ut02yo {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+}
+
+.css-1ut02yo:hover {
+    background: linear-gradient(rgb(26, 17, 128) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
+}
+
 .hero-banner .cta-button {
     background: rgb(237, 243, 182);
     color: rgb(12, 8, 58);
@@ -64,8 +74,8 @@
 }
 
 .hero-banner .cta-button:hover {
-    background-color: rgba(188, 16, 79, 0.8);
-    color: #fff;
+    background: linear-gradient(rgb(26, 17, 128) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    color: rgb(237, 243, 182) !important;
 }
 
 .how-it-works {
