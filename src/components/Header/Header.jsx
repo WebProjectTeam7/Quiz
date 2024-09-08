@@ -1,18 +1,29 @@
 import PropTypes from 'prop-types';
-import { useContext } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { AppContext } from '../../state/app.context';
-import { logoutUser } from '../../services/auth.service';
 import Swal from 'sweetalert2';
-import './Header.css';
-import { Menu, MenuButton, MenuList, MenuItem, Button } from '@chakra-ui/react';
+import { useContext } from 'react';
+import { AppContext } from '../../state/app.context';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { logoutUser } from '../../services/auth.service';
+import { Menu, MenuButton, MenuList, MenuItem, Button, Box, Icon, Badge } from '@chakra-ui/react';
 import { ChevronDownIcon } from '@chakra-ui/icons';
-import UserRoleEnum from '../../common/role-enum';
+import { FiBell } from 'react-icons/fi';
 import { FaHome } from 'react-icons/fa';
+import NotificationList from '../../components/NotificationList/NotificationList';
+import useModal from '../../custom-hooks/useModal';
+import UserRoleEnum from '../../common/role-enum';
+import useNotifications from '../../custom-hooks/UseNotifications';
+import './Header.css';
 
 export default function Header({ registrationModal, loginModal }) {
     const { user, userData, setAppState } = useContext(AppContext);
     const navigate = useNavigate();
+    const { newNotifications } = useNotifications();
+
+    const {
+        isModalVisible: isNotificationModalOpen,
+        openModal: openNotificationModal,
+        closeModal: closeNotificationModal,
+    } = useModal();
 
     const logout = async () => {
         const result = await Swal.fire({
@@ -30,6 +41,7 @@ export default function Header({ registrationModal, loginModal }) {
             navigate('/');
         }
     };
+
     return (
         <header className="site-header">
             <nav>
@@ -37,6 +49,7 @@ export default function Header({ registrationModal, loginModal }) {
                     <button className="home-button-home-page" onClick={() => navigate('/')}>
                         <FaHome size="24px" />
                     </button>
+
                     <Menu>
                         <MenuButton as={Button} rightIcon={<ChevronDownIcon />} className="chakra-menu__menu-button">
                             MENU
@@ -53,19 +66,53 @@ export default function Header({ registrationModal, loginModal }) {
                             {user && <MenuItem onClick={logout}>Logout</MenuItem>}
                         </MenuList>
                     </Menu>
+
                     {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
+
+                    <Box position="relative" ml={4} cursor="pointer">
+                        <Icon as={FiBell} boxSize={6} onClick={openNotificationModal} />
+                        {newNotifications.length > 0 && (
+                            <Badge
+                                colorScheme="red"
+                                position="absolute"
+                                top="-1"
+                                right="-3"
+                                px={2}
+                                py={1}
+                                fontSize="0.75em"
+                                sx={{
+                                    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+                                    backgroundColor: 'red.500',
+                                    color: 'white',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    width: '30px',
+                                    height: '25px',
+                                }}
+                            >
+                                {newNotifications.length}
+                            </Badge>
+                        )}
+                    </Box>
+
+                    {!user && (
+                        <div className="auth-buttons">
+                            <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
+                                Register
+                            </Button>
+                            <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
+                                Login
+                            </Button>
+                        </div>
+                    )}
                 </div>
-                {!user && (
-                    <div className="auth-buttons">
-                        <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
-                            Register
-                        </Button>
-                        <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
-                            Login
-                        </Button>
-                    </div>
-                )}
             </nav>
+
+            <NotificationList
+                isOpen={isNotificationModalOpen}
+                onClose={closeNotificationModal}
+            />
         </header>
     );
 }

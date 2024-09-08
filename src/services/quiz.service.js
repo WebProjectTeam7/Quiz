@@ -10,6 +10,7 @@ export const createQuiz = async (quiz) => {
         const quizId = quizRef.key;
         const newQuiz = {
             ...quiz,
+            id: quizId,
             isActive: false,
             createdAt: new Date().toISOString(),
         };
@@ -235,6 +236,24 @@ export const getPrivateQuizzes = async () => {
     }
 };
 
+export const getInvitedUsers = async (quizId) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+        const snapshot = await get(quizRef);
+
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+
+        const quizData = snapshot.val();
+        return quizData.invitedUsers || [];
+    } catch (error) {
+        console.error('Error fetching invited users:', error);
+        throw new Error('Failed to fetch invited users');
+    }
+};
+
+
 // UPDATE
 
 export const editQuiz = async (quizId, updatedData) => {
@@ -328,7 +347,8 @@ export const inviteUserToPrivateQuiz = async (quizId, username) => {
         let invitedUsers = quizData.invitedUsers || [];
 
         if (invitedUsers.includes(username)) {
-            throw new Error(`User ${username} is already invited to the quiz.`);
+            // throw new Error(`User ${username} is already invited to the quiz.`);
+            return;
         }
 
         invitedUsers.push(username);
@@ -336,6 +356,28 @@ export const inviteUserToPrivateQuiz = async (quizId, username) => {
     } catch (error) {
         console.error('Error inviting user to quiz:', error);
         throw new Error('Failed to invite user to quiz');
+    }
+};
+
+export const uninviteUserFromPrivateQuiz = async (quizId, username) => {
+    try {
+        const quizRef = dbRef(db, `quizzes/${quizId}`);
+
+        const snapshot = await get(quizRef);
+        if (!snapshot.exists()) {
+            throw new Error('Quiz not found');
+        }
+        const quizData = snapshot.val();
+        let invitedUsers = quizData.invitedUsers || [];
+
+        if (!invitedUsers.includes(username)) {
+            throw new Error(`User ${username} is not invited to the quiz.`);
+        }
+        invitedUsers = invitedUsers.filter(user => user !== username);
+        await update(quizRef, { invitedUsers });
+    } catch (error) {
+        console.error('Error uninviting user from quiz:', error);
+        throw new Error('Failed to uninvite user from quiz');
     }
 };
 

@@ -25,6 +25,7 @@ export const createOrganization = async (organization) => {
         throw new Error('Failed to create organization');
     }
 };
+
 export const uploadOrganizationLogo = async (orgId, file) => {
     try {
         const logoRef = storageRef(storage, `organizations/${orgId}/logo`);
@@ -36,7 +37,6 @@ export const uploadOrganizationLogo = async (orgId, file) => {
         throw new Error('Failed to upload organization logo');
     }
 };
-
 
 // RETRIEVE
 
@@ -116,27 +116,7 @@ export const removeQuizIdFromOrganization = async (orgId, quizId) => {
     }
 };
 
-export const joinOrganization = async (orgId, userId) => {
-    try {
-        const userRef = dbRef(db, `users/${userId}`);
-        await update(userRef, { organizationId: orgId });
-    } catch (error) {
-        console.error('Error joining organization:', error);
-        throw new Error('Failed to join organization');
-    }
-};
-
-export const leaveOrganization = async (userId) => {
-    try {
-        const userRef = dbRef(db, `users/${userId}`);
-        await update(userRef, { organizationId: null, organizationName: null });
-    } catch (error) {
-        console.error('Error leaving organization:', error);
-        throw new Error('Failed to leave organization');
-    }
-};
-
-export const updateUserWithOrganization = async (username, organizationId, organizationName) => {
+export const joinOrganization = async (username, organizationId, organizationName) => {
     try {
         const userRef = dbRef(db, `users/${username}`);
         const updates = {
@@ -146,8 +126,19 @@ export const updateUserWithOrganization = async (username, organizationId, organ
 
         await update(userRef, updates);
     } catch (error) {
-        console.error('Error updating user with organization:', error);
-        throw new Error('Failed to update user with organization: ' + error.message);
+        console.error('Error joining organization:', error);
+        throw new Error('Failed to join organization');
     }
 };
+
+export const leaveOrganization = async (username) => {
+    try {
+        const userRef = dbRef(db, `users/${username}`);
+        await update(userRef, { organizationId: null, organizationName: null });
+    } catch (error) {
+        console.error('Error leaving organization:', error);
+        throw new Error('Failed to leave organization');
+    }
+};
+
 // DELETE

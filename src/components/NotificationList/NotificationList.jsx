@@ -10,42 +10,25 @@ import {
     ModalHeader,
     ModalCloseButton,
     ModalBody,
+    Badge
 } from '@chakra-ui/react';
-import { useEffect, useState, useContext } from 'react';
-import { deleteNotification, getNotifications } from '../../services/notification.service';
+import { useContext } from 'react';
+import { deleteNotification, markNotificationAsRead } from '../../services/notification.service';
 import { AppContext } from '../../state/app.context';
 import PropTypes from 'prop-types';
-import { notificationEnum } from '../../common/notification-enum';
-import { updateUserWithOrganization } from '../../services/organization.service';
+import NotificationEnum from '../../common/notification-enum';
+import { joinOrganization } from '../../services/organization.service';
 import Swal from 'sweetalert2';
-import { getQuizById } from '../../services/quiz.service';
-import { useNavigate } from 'react-router-dom';
+import useNotifications from '../../custom-hooks/UseNotifications';
 
-export default function NotificationList({ isOpen, onClose, onNotificationsChange }) {
+export default function NotificationList({ isOpen, onClose }) {
     const { userData } = useContext(AppContext);
-    const [notifications, setNotifications] = useState([]);
-    const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchNotifications(userData.uid);
-    }, [userData]);
-
-    const fetchNotifications = async (uid) => {
-        try {
-            const notificationsData = await getNotifications(uid);
-            setNotifications(notificationsData);
-            onNotificationsChange(notificationsData);
-        } catch (error) {
-            console.error('Error fetching notifications:', error);
-        }
-    };
+    const { notifications, newNotifications } = useNotifications();
 
     const handleDeleteNotification = async (notificationId) => {
         try {
-            await deleteNotification(userData.uid, notificationId);
-            const updatedNotifications = notifications.filter(n => n.id !== notificationId);
-            setNotifications(updatedNotifications);
-            onNotificationsChange(updatedNotifications);
+            await deleteNotification(userData.username, notificationId);
         } catch (error) {
             console.error('Error deleting notification:', error);
         }
@@ -53,83 +36,33 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
 
     const handleAcceptNotification = async (notification) => {
         try {
-            if (notification.type === notificationEnum.INVITE_TO_ORGANIZATION) {
-                const organizationName = notification.organizationName;
-                const organizationId = notification.organizationId;
-
-                await updateUserWithOrganization(userData.username, organizationId, organizationName);
+            if (notification.type === NotificationEnum.INVITE_TO_ORGANIZATION) {
+                const { organizationId, organizationName } = notification;
+                await joinOrganization(userData.username, organizationId, organizationName);
                 Swal.fire({
                     icon: 'success',
                     title: 'Joined Organization',
                     text: `You have successfully joined the organization ${organizationName}.`,
                     confirmButtonText: 'OK',
                 });
-            } else if (notification.type === notificationEnum.INVITE_TO_QUIZ) {
-                await handleAcceptInvite(notification);
             }
+            handleReadNotification(notification);
         } catch (error) {
             console.error('Error accepting notification:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: `Failed to accept the invitation: ${error.message}`,
-                confirmButtonText: 'OK',
-            });
         }
     };
 
-    const handleAcceptInvite = async (notification) => {
+    const handleReadNotification = async (notification) => {
         try {
-            const quizData = await getQuizById(notification.quizId);
-
-            if (!quizData) {
-                throw new Error('Quiz not found');
-            }
-
-            await deleteNotification(userData.uid, notification.id);
-            navigate(`/play-quiz/${notification.quizId}`, { state: { quizData } });
+            await markNotificationAsRead(userData.username, notification.id);
         } catch (error) {
-            console.error('Error accepting quiz invitation:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: `Failed to load the quiz: ${error.message}`,
-                confirmButtonText: 'OK',
-            });
+            console.error('Error marking notification as read', error);
         }
     };
 
-    const handleDeclineNotification = async (notification) => {
-        try {
-            await deleteNotification(userData.uid, notification.id);
-            const updatedNotifications = notifications.filter(n => n.id !== notification.id);
-            setNotifications(updatedNotifications);
-            onNotificationsChange(updatedNotifications);
-            Swal.fire({
-                icon: 'info',
-                title: 'Declined',
-                text: 'You have declined the invitation.',
-                confirmButtonText: 'OK',
-            });
-        } catch (error) {
-            console.error('Error declining notification:', error);
-        }
-    };
 
-    if (notifications.length === 0) {
-        return (
-            <Modal isOpen={isOpen} onClose={onClose}>
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Notifications</ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <Text>No notifications available.</Text>
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
-        );
-    }
+    const unreadNotifications = newNotifications;
+    const readNotifications = notifications.filter(n => n.isRead);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -139,66 +72,121 @@ export default function NotificationList({ isOpen, onClose, onNotificationsChang
                 <ModalCloseButton />
                 <ModalBody>
                     <VStack spacing={4}>
-                        {notifications.length === 0 ? (
-                            <Text>No notifications available.</Text>
-                        ) : (
-                            notifications.map((notification) => (
-                                <Box
-                                    key={notification.id}
-                                    p={4}
-                                    borderWidth="1px"
-                                    borderRadius="md"
-                                    mb={2}
-                                    bg={'white'}
-                                >
-                                    <Text>{notification.message}</Text>
-                                    {notification.type === notificationEnum.INVITE_TO_QUIZ && (
-                                        <>
-                                            <Text>Quiz Title: {notification.quizTitle}</Text>
-                                            <Text>Category: {notification.quizCategory}</Text>
-                                            <Text>Difficulty: {notification.quizDifficulty}</Text>
-                                            <Text>Points: {notification.quizPoints}</Text>
-                                        </>
-                                    )}
+                        {unreadNotifications.length > 0 && (
+                            <Box>
+                                <Text fontSize="lg" fontWeight="bold">New Notifications</Text>
+                                {unreadNotifications.map((notification) => (
+                                    <Box
+                                        key={notification.id}
+                                        p={4}
+                                        borderWidth="1px"
+                                        borderRadius="md"
+                                        mb={2}
+                                        bg={'white'}
+                                        position="relative"
+                                    >
+                                        <Badge
+                                            colorScheme="red"
+                                            borderRadius="full"
+                                            position="absolute"
+                                            top={-1}
+                                            right={-1}
+                                            px={2}
+                                            py={0.5}
+                                            fontSize="0.75em"
+                                        >
+                                            New
+                                        </Badge>
+                                        <Text>{new Date(notification.timestamp).toLocaleString()}</Text>
+                                        <Text>{notification.message}</Text>
+                                        {notification.type === NotificationEnum.INVITE_TO_QUIZ && (
+                                            <>
+                                                <Text>Quiz Title: {notification.quizTitle}</Text>
+                                                <Text>Category: {notification.quizCategory}</Text>
+                                                <Text>Difficulty: {notification.quizDifficulty}</Text>
+                                                <Text>Points: {notification.quizPoints}</Text>
 
-                                    {notification.type === notificationEnum.INVITE_TO_ORGANIZATION || notification.type === notificationEnum.INVITE_TO_QUIZ ? (
+                                            </>
+                                        )}
+                                        {(notification.type === NotificationEnum.INVITE_TO_QUIZ || notification.type === NotificationEnum.TEXT) && (
+                                            <HStack spacing={4} mt={2}>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="green"
+                                                    onClick={() => handleReadNotification(notification)}
+                                                >
+                                                    OK
+                                                </Button>
+                                            </HStack>
+                                        )}
+                                        {notification.type === NotificationEnum.INVITE_TO_ORGANIZATION && (
+                                            <HStack spacing={4} mt={2}>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="green"
+                                                    onClick={() => handleAcceptNotification(notification)}
+                                                >
+                                                    Accept
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    colorScheme="red"
+                                                    onClick={() => handleReadNotification(notification)}
+                                                >
+                                                    Decline
+                                                </Button>
+                                            </HStack>
+                                        )}
+                                    </Box>
+                                ))}
+                            </Box>
+                        )}
+                        {readNotifications.length > 0 && (
+                            <Box>
+                                <Text fontSize="lg" fontWeight="bold">Read Notifications</Text>
+                                {readNotifications.map((notification) => (
+                                    <Box
+                                        key={notification.id}
+                                        p={4}
+                                        borderWidth="1px"
+                                        borderRadius="md"
+                                        mb={2}
+                                        bg={'white'}
+                                    >
+                                        <Text>{new Date(notification.timestamp).toLocaleString()}</Text>
+                                        <Text>{notification.message}</Text>
+                                        {notification.type === NotificationEnum.INVITE_TO_QUIZ && (
+                                            <>
+                                                <Text>Quiz Title: {notification.quizTitle}</Text>
+                                                <Text>Category: {notification.quizCategory}</Text>
+                                                <Text>Difficulty: {notification.quizDifficulty}</Text>
+                                                <Text>Points: {notification.quizPoints}</Text>
+                                            </>
+                                        )}
                                         <HStack spacing={4} mt={2}>
                                             <Button
                                                 size="sm"
-                                                colorScheme="green"
-                                                onClick={() => handleAcceptNotification(notification)}
+                                                colorScheme="gray"
+                                                onClick={() => handleDeleteNotification(notification.id)}
                                             >
-                                                Accept
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                colorScheme="red"
-                                                onClick={() => handleDeclineNotification(notification)}
-                                            >
-                                                Decline
+                                                Delete
                                             </Button>
                                         </HStack>
-                                    ) : (
-                                        <Button
-                                            size="sm"
-                                            colorScheme="gray"
-                                            onClick={() => handleDeleteNotification(notification.id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    )}
-                                </Box>
-                            ))
+                                    </Box>
+                                ))}
+                            </Box>
+                        )}
+                        {unreadNotifications.length === 0 && readNotifications.length === 0 && (
+                            <Text>No notifications available.</Text>
                         )}
                     </VStack>
                 </ModalBody>
             </ModalContent>
-        </Modal>
+        </Modal >
     );
 }
 
 NotificationList.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onNotificationsChange: PropTypes.func.isRequired,
 };

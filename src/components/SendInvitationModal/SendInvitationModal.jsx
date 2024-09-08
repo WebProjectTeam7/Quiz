@@ -1,49 +1,32 @@
-import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    ModalCloseButton,
-    Input,
-    Button,
-    Th,
-    Table,
-    Thead,
-    Tr,
-    Tbody,
-    Td,
-    Badge,
-    Box,
-    InputGroup,
-    InputLeftElement,
-    Icon
-} from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { SearchIcon } from '@chakra-ui/icons';
+import { AppContext } from '../../state/app.context';
+import { useContext, useEffect, useState } from 'react';
+import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, Button, Th, Table, Thead, Tr, Tbody, Td, Badge, Box, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
+import { sendNotificationToUser } from '../../services/notification.service';
+import { inviteUserToPrivateQuiz, uninviteUserFromPrivateQuiz, getInvitedUsers } from '../../services/quiz.service';
+import { joinOrganization, leaveOrganization } from '../../services/organization.service';
+import { getAllUsers } from '../../services/user.service';
+import NotificationEnum from '../../common/notification-enum';
+import UserRoleEnum from '../../common/role-enum';
 import useModal from '../../custom-hooks/useModal';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import Pagination from '../../components/Pagination/Pagination';
-import { getAllUsers } from '../../services/user.service';
-import UserRoleEnum from '../../common/role-enum';
-import { SearchIcon } from '@chakra-ui/icons';
-import InvitationEnum from '../../common/invitation-enum';
 import PropTypes from 'prop-types';
-import NotificationModal from '../NotificationModal/NotificationModal';
+import { NOTIFICATION_ORGANIZATION_INVITE, NOTIFICATION_ORGANIZATION_REMOVE, NOTIFICATION_QUIZ_INVITE, NOTIFICATION_QUIZ_UNINVITE } from '../../common/notification-messages';
 
-const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
+const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
+    const { userData } = useContext(AppContext);
     const [users, setUsers] = useState([]);
-    const [view, setView] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedUser, setSelectedUser] = useState(null);
     const { isModalVisible, openModal, closeModal } = useModal();
     const [currentPage, setCurrentPage] = useState(1);
     const [usersPerPage] = useState(10);
-    const { isModalVisible: isNotificationModalOpen, openModal: openNotificationModal, closeModal: closeNotificationModal } = useModal();
-    const [recipientUid, setRecipientUid] = useState(null);
+    const [invitedUsers, setInvitedUsers] = useState([]);
 
     useEffect(() => {
         fetchAllUsers();
+        fetchInvitedUsers();
     }, []);
 
     const fetchAllUsers = async () => {
@@ -52,6 +35,15 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
             setUsers(users);
         } catch (error) {
             console.error(error.message);
+        }
+    };
+
+    const fetchInvitedUsers = async () => {
+        try {
+            const invited = await getInvitedUsers(objId);
+            setInvitedUsers(invited);
+        } catch (error) {
+            console.error('Error fetching invited users:', error);
         }
     };
 
@@ -76,11 +68,58 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
         openModal();
     };
 
-    const handleInviteUser = (user) => {
-        setRecipientUid(user.uid);
-        openNotificationModal();
-    };
+    const handleInviteUninviteUser = async (user) => {
+        if (objType === NotificationEnum.INVITE_TO_QUIZ) {
 
+            if (invitedUsers.includes(user.username)) {
+                await uninviteUserFromPrivateQuiz(objId, user.username);
+                const notificationContent = NOTIFICATION_QUIZ_UNINVITE(obj.title);
+                const notificationData = {
+                    message: notificationContent,
+                    type: NotificationEnum.TEXT,
+                };
+                await sendNotificationToUser(user.username, notificationData);
+                setInvitedUsers(invitedUsers.filter((u) => u !== user.username));
+            } else {
+                await inviteUserToPrivateQuiz(objId, user.username);
+                const notificationContent = NOTIFICATION_QUIZ_INVITE(userData.username, obj.title);
+                const notificationData = {
+                    message: notificationContent,
+                    type: NotificationEnum.INVITE_TO_QUIZ,
+                    quizId: obj.id,
+                    quizTitle: obj.title,
+                    quizCategory: obj.category,
+                    quizDifficulty: obj.difficulty,
+                    quizPoints: obj.totalPoints,
+                    senderName: userData.username,
+                };
+                await sendNotificationToUser(user.username, notificationData);
+                setInvitedUsers([...invitedUsers, user.username]);
+            }
+        } else if (objType === NotificationEnum.INVITE_TO_ORGANIZATION) {
+            if (invitedUsers.includes(user.username)) {
+                await leaveOrganization(objId, user.username);
+                const notificationContent = NOTIFICATION_ORGANIZATION_REMOVE(userData.organizationName);
+                const notificationData = {
+                    message: notificationContent,
+                    type: NotificationEnum.TEXT,
+                };
+                await sendNotificationToUser(user.username, notificationData);
+                setInvitedUsers(invitedUsers.filter((u) => u !== user.username));
+            } else {
+                await joinOrganization(objId, user.username);
+                const notificationContent = NOTIFICATION_ORGANIZATION_INVITE(userData.organizationName);
+                const notificationData = {
+                    message: notificationContent,
+                    type: NotificationEnum.INVITE_TO_ORGANIZATION,
+                    organizationId: obj.id,
+                    organizationName: obj.name,
+                };
+                await sendNotificationToUser(user.username, notificationData);
+                setInvitedUsers([...invitedUsers, user.username]);
+            }
+        }
+    };
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -98,57 +137,72 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
                                 placeholder="username, email, name or organization"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                maxW='350px'
+                                maxW="350px"
                             />
                         </InputGroup>
-                        {(view === 'all' || view === 'banned') && (
-                            <>
-                                <Table variant="simple">
-                                    <Thead>
-                                        <Tr>
-                                            <Th>Username</Th>
-                                            <Th>Email</Th>
-                                            <Th>First Name</Th>
-                                            <Th>Organization</Th>
-                                            <Th>Details</Th>
-                                            <Th></Th>
-                                            <Th></Th>
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {currentUsers.map(user => (
-                                            <Tr key={user.uid}>
-                                                <Td>
-                                                    {user.username}{' '}
-                                                    {user.role && (
-                                                        <Badge
-                                                            colorScheme={user.role === UserRoleEnum.ADMIN ? 'red' : user.role === UserRoleEnum.ORGANIZER ? 'orange' : 'blue'}
-                                                            fontSize="0.6em"
+                        <>
+                            <Table variant="simple">
+                                <Thead>
+                                    <Tr>
+                                        <Th>Username</Th>
+                                        <Th>Email</Th>
+                                        <Th>First Name</Th>
+                                        <Th>Last Name</Th>
+                                        <Th>Organization</Th>
+                                        <Th>Details</Th>
+                                        <Th>Invite Status</Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {currentUsers.map((user) => (
+                                        <Tr key={user.uid}>
+                                            <Td>
+                                                {user.username}{' '}
+                                                {user.role && (
+                                                    <Badge
+                                                        colorScheme={user.role === UserRoleEnum.ADMIN ? 'red' : user.role === UserRoleEnum.ORGANIZER ? 'orange' : 'blue'}
+                                                        fontSize="0.6em"
+                                                    >
+                                                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                                    </Badge>
+                                                )}
+                                            </Td>
+                                            <Td>{user.email}</Td>
+                                            <Td>{user.firstName}</Td>
+                                            <Td>{user.lastName}</Td>
+                                            <Td>{user.organizationName || ''}</Td>
+                                            <Td>
+                                                <Button onClick={() => handleOpenProfile(user)}>Profile</Button>
+                                            </Td>
+                                            <Td>
+                                                {objType === NotificationEnum.INVITE_TO_QUIZ ?
+                                                    <Button
+                                                        colorScheme={invitedUsers.includes(user.username) ? 'red' : 'blue'}
+                                                        onClick={() => handleInviteUninviteUser(user)}
+                                                    >
+                                                        {invitedUsers.includes(user.username) ? 'Uninvite' : 'Invite'}
+                                                    </Button>
+                                                    :
+                                                    !user.organizationId && (
+                                                        <Button
+                                                            colorScheme={invitedUsers.includes(user.username) ? 'red' : 'blue'}
+                                                            onClick={() => handleInviteUninviteUser(user)}
                                                         >
-                                                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                                                        </Badge>
+                                                            {invitedUsers.includes(user.username) ? 'Remove' : 'Invite'}
+                                                        </Button>
                                                     )}
-                                                </Td>
-                                                <Td>{user.email}</Td>
-                                                <Td>{user.firstName}</Td>
-                                                <Td>{user.organizationName || ''}</Td>
-                                                <Td>
-                                                    <Button onClick={() => handleOpenProfile(user)}>Profile</Button>
-                                                </Td>
-                                                <Td>
-                                                    <Button onClick={() => handleInviteUser(user)}>Invite</Button>
-                                                </Td>
-                                            </Tr>
-                                        ))}
-                                    </Tbody>
-                                </Table>
-                                <Pagination
-                                    currentPage={currentPage}
-                                    totalPages={totalPages}
-                                    onPageChange={handlePageChange}
-                                />
-                            </>
-                        )}
+                                            </Td>
+                                        </Tr>
+                                    ))}
+                                </Tbody>
+                            </Table>
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+                        </>
+
                         {selectedUser && (
                             <UserProfileModal
                                 isOpen={isModalVisible}
@@ -156,17 +210,12 @@ const SendInvitationModal = ({ isOpen, onClose, objId, objType }) => {
                                 username={selectedUser.username}
                             />
                         )}
-                        {recipientUid && (
-                            <NotificationModal
-                                isOpen={isNotificationModalOpen}
-                                onClose={closeNotificationModal}
-                                recipientUid={recipientUid}
-                            />
-                        )}
                     </Box>
                 </ModalBody>
                 <ModalFooter>
-                    <Button variant="ghost" onClick={onClose}>Close</Button>
+                    <Button variant="ghost" onClick={onClose}>
+                        Close
+                    </Button>
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -177,7 +226,15 @@ SendInvitationModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     objId: PropTypes.string.isRequired,
-    objType: PropTypes.oneOf([InvitationEnum.ORGANIZATION, InvitationEnum.QUIZ]).isRequired,
+    obj: PropTypes.shape({
+        id: PropTypes.string,
+        title: PropTypes.string,
+        category: PropTypes.string,
+        difficulty: PropTypes.string,
+        totalPoints: PropTypes.number,
+        name: PropTypes.string,
+    }).isRequired,
+    objType: PropTypes.oneOf([NotificationEnum.INVITE_TO_ORGANIZATION, NotificationEnum.INVITE_TO_QUIZ]).isRequired, // Enum to differentiate quiz vs organization
 };
 
 export default SendInvitationModal;
