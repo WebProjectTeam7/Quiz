@@ -184,5 +184,4 @@ export default function NotificationList({ isOpen, onClose }) {
 NotificationList.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onNotificationsChange: PropTypes.func.isRequired,
 };

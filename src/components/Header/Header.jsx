@@ -46,12 +46,10 @@ export default function Header({ registrationModal, loginModal }) {
         <header className="site-header">
             <nav>
                 <div className="nav-buttons">
-                    {/* Home Button */}
                     <button className="home-button-home-page" onClick={() => navigate('/')}>
                         <FaHome size="24px" />
                     </button>
 
-                    {/* Menu Button */}
                     <Menu>
                         <MenuButton as={Button} rightIcon={<ChevronDownIcon />} className="chakra-menu__menu-button">
                             MENU
@@ -69,13 +67,10 @@ export default function Header({ registrationModal, loginModal }) {
                         </MenuList>
                     </Menu>
 
-                    {/* Welcome Text */}
                     {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
 
-                    {/* Notifications Bell */}
                     <Box position="relative" ml={4} cursor="pointer">
                         <Icon as={FiBell} boxSize={6} onClick={openNotificationModal} />
-                        {/* Display Badge only if there are new notifications */}
                         {newNotifications.length > 0 && (
                             <Badge
                                 colorScheme="red"
@@ -101,7 +96,6 @@ export default function Header({ registrationModal, loginModal }) {
                         )}
                     </Box>
 
-                    {/* Auth Buttons */}
                     {!user && (
                         <div className="auth-buttons">
                             <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
@@ -115,7 +109,6 @@ export default function Header({ registrationModal, loginModal }) {
                 </div>
             </nav>
 
-            {/* Notification Modal */}
             <NotificationList
                 isOpen={isNotificationModalOpen}
                 onClose={closeNotificationModal}
