@@ -72,6 +72,30 @@ export const getQuestionsByQuizId = async (quizId) => {
     }
 };
 
+export const getRandomQuestion = async () => {
+    try {
+        const questionsRef = dbRef(db, 'questions');
+        const queryRef = query(questionsRef, orderByChild('access'), equalTo('public'));
+        const snapshot = await get(queryRef);
+
+        if (!snapshot.exists()) {
+            throw new Error('No questions available');
+        }
+
+        const questionsObject = snapshot.val();
+        const questionsArray = Object.keys(questionsObject).map((key) => ({
+            id: key,
+            ...questionsObject[key]
+        }));
+
+        const randomIndex = Math.floor(Math.random() * questionsArray.length);
+        return questionsArray[randomIndex];
+    } catch (error) {
+        console.error('Error fetching random question:', error);
+        throw new Error('Failed to retrieve a random question', { cause: error });
+    }
+};
+
 // UPDATE
 
 export const updateQuestion = async (questionId, updatedData) => {
