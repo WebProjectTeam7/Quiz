@@ -4,10 +4,10 @@ import { useContext } from 'react';
 import { AppContext } from '../../state/app.context';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../../services/auth.service';
-import { Menu, MenuButton, MenuList, MenuItem, Button, Box, Icon, Badge } from '@chakra-ui/react';
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { Button, Box, Icon, Badge, HStack } from '@chakra-ui/react';
 import { FiBell } from 'react-icons/fi';
-import { FaHome } from 'react-icons/fa';
+import { FaHome, FaUserAlt, FaList, FaGamepad, FaSignInAlt, FaUserPlus } from 'react-icons/fa';
+import { MdQuiz } from 'react-icons/md';
 import NotificationList from '../../components/NotificationList/NotificationList';
 import useModal from '../../custom-hooks/useModal';
 import UserRoleEnum from '../../common/role-enum';
@@ -51,63 +51,130 @@ export default function Header({ registrationModal, loginModal }) {
                         <FaHome size="24px" />
                     </button>
 
-                    {/* Menu Button */}
-                    <Menu>
-                        <MenuButton as={Button} rightIcon={<ChevronDownIcon />} className="chakra-menu__menu-button">
-                            MENU
-                        </MenuButton>
-                        <MenuList className="chakra-menu__menu-list">
-                            <MenuItem as={NavLink} to="/quiz-categories">Quizzes</MenuItem>
-                            <MenuItem as={NavLink} to="/ranking">Ranking</MenuItem>
-                            <MenuItem as={NavLink} to="/tournament">Quiz Battle</MenuItem>
-                            {user && <MenuItem as={NavLink} to="/my-profile">My Profile</MenuItem>}
-                            <MenuItem as={NavLink} to="/organizer-dashboard">Organizer Dashboard</MenuItem>
-                            {userData?.role === UserRoleEnum.ADMIN && (
-                                <MenuItem as={NavLink} to="/admin">Admin Dashboard</MenuItem>
+                    {user && (
+                        <Box position="relative" ml={4} cursor="pointer">
+                            <Icon as={FiBell} boxSize={6} onClick={openNotificationModal} />
+                            {newNotifications.length > 0 && (
+                                <Badge
+                                    colorScheme="red"
+                                    position="absolute"
+                                    top="-1"
+                                    right="-3"
+                                    px={2}
+                                    py={1}
+                                    fontSize="0.75em"
+                                    sx={{
+                                        clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+                                        backgroundColor: 'red.500',
+                                        color: 'white',
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        width: '30px',
+                                        height: '25px',
+                                    }}
+                                >
+                                    {newNotifications.length}
+                                </Badge>
                             )}
-                            {user && <MenuItem onClick={logout}>Logout</MenuItem>}
-                        </MenuList>
-                    </Menu>
-
+                        </Box>
+                    )}
                     {/* Welcome Text */}
                     {userData && <span className="welcome-text">Welcome, {userData.username}</span>}
 
-                    {/* Notifications Bell */}
-                    <Box position="relative" ml={4} cursor="pointer">
-                        <Icon as={FiBell} boxSize={6} onClick={openNotificationModal} />
-                        {/* Display Badge only if there are new notifications */}
-                        {newNotifications.length > 0 && (
-                            <Badge
-                                colorScheme="red"
-                                position="absolute"
-                                top="-1"
-                                right="-3"
-                                px={2}
-                                py={1}
-                                fontSize="0.75em"
-                                sx={{
-                                    clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
-                                    backgroundColor: 'red.500',
-                                    color: 'white',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    width: '30px',
-                                    height: '25px',
-                                }}
+                    {/* Navigation Buttons without Dropdown */}
+                    <HStack spacing={4}>
+                        <Button
+                            as={NavLink}
+                            to="/quiz-categories"
+                            leftIcon={<Icon as={MdQuiz} />}
+                            colorScheme="teal"
+                            variant="outline"
+                        >
+                            Quizzes
+                        </Button>
+                        <Button
+                            as={NavLink}
+                            to="/ranking"
+                            leftIcon={<Icon as={FaList} />}
+                            colorScheme="teal"
+                            variant="outline"
+                        >
+                            Ranking
+                        </Button>
+                        <Button
+                            as={NavLink}
+                            to="/tournament"
+                            leftIcon={<Icon as={FaGamepad} />}
+                            colorScheme="teal"
+                            variant="outline"
+                        >
+                            Quiz Battle
+                        </Button>
+                        {user && (
+                            <Button
+                                as={NavLink}
+                                to="/my-profile"
+                                leftIcon={<Icon as={FaUserAlt} />}
+                                colorScheme="teal"
+                                variant="outline"
                             >
-                                {newNotifications.length}
-                            </Badge>
+                                My Profile
+                            </Button>
                         )}
-                    </Box>
+                        <Button
+                            as={NavLink}
+                            to="/organizer-dashboard"
+                            colorScheme="teal"
+                            variant="outline"
+                        >
+                            Organizer Dashboard
+                        </Button>
+                        {userData?.role === UserRoleEnum.ADMIN && (
+                            <Button
+                                as={NavLink}
+                                to="/admin"
+                                colorScheme="red"
+                                variant="outline"
+                            >
+                                Admin Dashboard
+                            </Button>
+                        )}
+                        {user && (
+                            <Button
+                                onClick={logout}
+                                colorScheme="teal"
+                                size="lg"
+                                leftIcon={<FaSignInAlt />}
+                                variant="solid"
+                                _hover={{ bg: 'teal.600' }}
+                            >
+                                Logout
+                            </Button>
+                        )}
+                    </HStack>
 
                     {/* Auth Buttons */}
                     {!user && (
                         <div className="auth-buttons">
-                            <Button onClick={registrationModal.openModal} colorScheme="teal" m={2}>
+                            <Button
+                                onClick={registrationModal.openModal}
+                                colorScheme="teal"
+                                size="lg"
+                                leftIcon={<FaUserPlus />}
+                                variant="solid"
+                                _hover={{ bg: 'teal.600' }}
+                            >
                                 Register
                             </Button>
-                            <Button onClick={loginModal.openModal} colorScheme="teal" m={2}>
+                            <Button
+                                onClick={loginModal.openModal}
+                                colorScheme="teal"
+                                size="lg"
+                                leftIcon={<FaSignInAlt />}
+                                variant="solid"
+                                _hover={{ bg: 'teal.600' }}
+                            >
                                 Login
                             </Button>
                         </div>
