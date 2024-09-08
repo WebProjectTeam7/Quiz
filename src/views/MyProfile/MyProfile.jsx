@@ -22,6 +22,8 @@ import NotificationList from '../../components/NotificationList/NotificationList
 import useModal from '../../custom-hooks/useModal';
 import { getNotifications } from '../../services/notification.service';
 import { getOrganizationById } from '../../services/organization.service';
+import QuizHistoryModal from '../../components/QuizHistoryModal/QuizHistoryModal';
+import { getAllQuizzes } from '../../services/quiz.service';
 
 export default function MyProfile() {
     const { user, userData, setAppState } = useContext(AppContext);
@@ -36,11 +38,18 @@ export default function MyProfile() {
     const [hasNewNotifications, setHasNewNotifications] = useState(false);
     const previousNotificationsRef = useRef([]);
     const [organizationData, setOrganizationData] = useState(null);
+    const [quizHistory, setQuizHistory] = useState([]);
 
     const {
         isModalVisible: isNotificationModalOpen,
         openModal: openNotificationModal,
         closeModal: closeNotificationModal,
+    } = useModal();
+
+    const {
+        isModalVisible: isQuizHistoryModalVisible,
+        openModal: openQuizHistoryModal,
+        closeModal: closeQuizHistoryModal,
     } = useModal();
 
     const fetchNotifications = async () => {
@@ -258,6 +267,36 @@ export default function MyProfile() {
         }
     };
 
+    const fetchQuizHistory = async () => {
+        try {
+            if (userData) {
+                const quizzes = await getAllQuizzes();
+
+                const history = [];
+                quizzes.forEach((quiz) => {
+                    if (quiz.summaries && quiz.summaries[userData.username]) {
+                        quiz.summaries[userData.username].forEach((summary) => {
+                            history.push({
+                                title: quiz.title,
+                                points: summary.points,
+                                date: summary.createdAt || 'Unknown Date',
+                            });
+                        });
+                    }
+                });
+
+                setQuizHistory(history.sort((a, b) => new Date(b.date) - new Date(a.date)));
+            }
+        } catch (error) {
+            console.error('Error fetching quiz history:', error);
+        }
+    };
+
+    const handleViewQuizHistory = async () => {
+        await fetchQuizHistory();
+        openQuizHistoryModal();
+    };
+
     if (!formData) return <div>Loading...</div>;
 
     return (
@@ -424,6 +463,9 @@ export default function MyProfile() {
                                     Discard
                                 </Button>
                             </Box>
+                            <Button colorScheme="green"  onClick={handleViewQuizHistory} size="sm">
+                                Quiz History
+                            </Button>
                         </Box>
                     </form>
                 </Box>
@@ -433,6 +475,12 @@ export default function MyProfile() {
                 isOpen={isNotificationModalOpen}
                 onClose={closeNotificationModal}
                 onNotificationsChange={checkForNewNotifications}
+            />
+
+            <QuizHistoryModal
+                isOpen={isQuizHistoryModalVisible}
+                onClose={closeQuizHistoryModal}
+                quizHistory={quizHistory}
             />
         </Box>
     );
