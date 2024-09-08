@@ -1,0 +1,9 @@
+
+.chakra-modal__content {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    border-radius: 10px;
+    box-shadow: rgb(188, 16, 79) !important;
+    color: rgb(237, 243, 182);
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
