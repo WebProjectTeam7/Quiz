@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, Button, Th, Table, Thead, Tr, Tbody, Td, Badge, Box, InputGroup, InputLeftElement, Icon } from '@chakra-ui/react';
 import { sendNotificationToUser } from '../../services/notification.service';
 import { inviteUserToPrivateQuiz, uninviteUserFromPrivateQuiz, getInvitedUsers } from '../../services/quiz.service';
-import { joinOrganization, leaveOrganization } from '../../services/organization.service';
+import { leaveOrganization } from '../../services/organization.service';
 import { getAllUsers } from '../../services/user.service';
 import NotificationEnum from '../../common/notification-enum';
 import UserRoleEnum from '../../common/role-enum';
@@ -26,7 +26,9 @@ const SendInvitationModal = ({ isOpen, onClose, objId, obj, objType }) => {
 
     useEffect(() => {
         fetchAllUsers();
-        fetchInvitedUsers();
+        if (objType === NotificationEnum.INVITE_TO_QUIZ) {
+            fetchInvitedUsers();
+        }
     }, []);
 
     const fetchAllUsers = async () => {
@@ -232,8 +234,8 @@ SendInvitationModal.propTypes = {
         difficulty: PropTypes.string,
         totalPoints: PropTypes.number,
         name: PropTypes.string,
-    }).isRequired,
-    objType: PropTypes.oneOf([NotificationEnum.INVITE_TO_ORGANIZATION, NotificationEnum.INVITE_TO_QUIZ]).isRequired, // Enum to differentiate quiz vs organization
+    }),
+    objType: PropTypes.oneOf([NotificationEnum.INVITE_TO_ORGANIZATION, NotificationEnum.INVITE_TO_QUIZ]),
 };
 
 export default SendInvitationModal;
