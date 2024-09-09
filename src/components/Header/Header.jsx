@@ -122,14 +122,16 @@ export default function Header({ registrationModal, loginModal }) {
                                 My Profile
                             </Button>
                         )}
-                        <Button
-                            as={NavLink}
-                            to="/organizer-dashboard"
-                            colorScheme="teal"
-                            variant="outline"
-                        >
-                            Organizer Dashboard
-                        </Button>
+                        {(userData?.role === UserRoleEnum.ORGANIZER || userData?.role === UserRoleEnum.ADMIN) && (
+                            <Button
+                                as={NavLink}
+                                to="/organizer-dashboard"
+                                colorScheme="teal"
+                                variant="outline"
+                            >
+                                Organizer Dashboard
+                            </Button>
+                        )}
                         {userData?.role === UserRoleEnum.ADMIN && (
                             <Button
                                 as={NavLink}
