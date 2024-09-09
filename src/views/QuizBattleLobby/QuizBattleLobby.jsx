@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { AppContext } from '../../state/app.context';
-import { addUserToLobby, updateUserStatus, subscribeToLobbyUpdates, removeUserFromLobby } from '../../services/lobby.service';
+import { addUserToLobby, updateUserStatus, subscribeToLobbyUpdates, removeUserFromLobby, updateUserBattleId } from '../../services/lobby.service';
+import { createBattle } from '../../services/quiz-battle.service';
 import { getUserByUsername } from '../../services/user.service';
 import { useNavigate, useLocation } from 'react-router-dom';
 import ChatComponent from '../../components/ChatComponent/ChatComponent';
@@ -17,18 +18,26 @@ import {
     Badge,
     VStack,
     HStack,
-    useToast
 } from '@chakra-ui/react';
+import useModal from '../../custom-hooks/useModal';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import './QuizBattleLobby.css';
+import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 
 const QuizBattleLobby = () => {
     const { userData } = useContext(AppContext);
-    const [lobbyUsers, setLobbyUsers] = useState([]);
-    const [readyUsers, setReadyUsers] = useState([]);
-    const [userDetails, setUserDetails] = useState([]);
+    const { isModalVisible, openModal, closeModal } = useModal();
+
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [lobbyUsers, setLobbyUsers] = useState([]);
+    const lobbyUsersRef = useRef(lobbyUsers);
+
+    const [userDetails, setUserDetails] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [battleInProgress, setBattleInProgress] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (userData) {
@@ -36,7 +45,10 @@ const QuizBattleLobby = () => {
         }
         const unsubscribe = subscribeToLobbyUpdates((users) => {
             setLobbyUsers(users);
-            handleQueueAndReadyUsers(users);
+            lobbyUsersRef.current = users;
+            if (!battleInProgress) {
+                handleQueueAndReadyUsers(users);
+            }
         });
 
         return () => {
@@ -45,7 +57,7 @@ const QuizBattleLobby = () => {
                 removeUserFromLobby(userData.username);
             }
         };
-    }, [userData, location.pathname]);
+    }, [userData, location.pathname, battleInProgress]);
 
     useEffect(() => {
         loadUsers();
@@ -73,7 +85,6 @@ const QuizBattleLobby = () => {
     const handleQueueAndReadyUsers = (users) => {
         const sortedQueue = users.sort((a, b) => a.timestamp - b.timestamp);
         const readyUsers = sortedQueue.filter((user) => user.status === 'ready');
-        setReadyUsers(readyUsers);
 
         if (readyUsers.length >= 2) {
             const [user1, user2] = readyUsers.slice(0, 2);
@@ -91,22 +102,68 @@ const QuizBattleLobby = () => {
         }
     };
 
-    const initiateQuizBattle = (user1, user2) => {
+    const initiateQuizBattle = async (user1, user2) => {
+        if (battleInProgress) return;
+
+        setBattleInProgress(true);
+
+        try {
+            if (user1.username === userData.username) {
+                const battleId = await createBattle(user1.username, user2.username, [[1, 0, 0], [0, 0, 0], [0, 0, 2]]);
+                await updateUserBattleId(user2.username, battleId);
+                navigateToBattle(battleId);
+            } else if (user2.username === userData.username) {
+                setLoading(true);
+                setTimeout(() => {
+                    const checkBattleId = async () => {
+                        const currentLobbyUsers = lobbyUsersRef.current;
+                        const user = currentLobbyUsers.find(user => user.username === user2.username);
+
+                        if (user && user.battleId) {
+                            setLoading(false);
+                            navigateToBattle(user.battleId);
+                            return;
+                        }
+                        setTimeout(checkBattleId, 2000);
+                    };
+
+                    checkBattleId();
+                }, 8000);
+            }
+        } catch (error) {
+            console.error('Error initiating quiz battle:', error);
+            setLoading(false);
+        } finally {
+            setBattleInProgress(false);
+        }
+    };
+
+    const navigateToBattle = (battleId) => {
         Swal.fire({
             title: 'Get ready!',
-            text: 'The quiz battle will start in 3 seconds...',
-            icon: 'warning',
+            html: 'Starting in <b></b> seconds.',
             timer: 3000,
             timerProgressBar: true,
-            showConfirmButton: false,
+            didOpen: () => {
+                setInterval(() => {
+                    const content = Swal.getHtmlContainer();
+                    if (content) {
+                        content.querySelector('b').textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+                    }
+                }, 1000);
+            },
             willClose: () => {
-                navigate('/quiz-battle', { state: { user1, user2 } });
+                navigate(`/quiz-battle/${battleId}`);
             },
         });
     };
 
     const viewProfile = (username) => {
-        navigate(`/user-profile/${username}`);
+        const user = userDetails.find((user) => user.username === username);
+        if (user) {
+            setSelectedUser(user);
+            openModal();
+        }
     };
 
     return (
@@ -118,10 +175,18 @@ const QuizBattleLobby = () => {
                     Quiz Battle Lobby
                 </Heading>
 
-                {userDetails.length === 0 ? (
+                {loading && (
                     <Flex justify="center" align="center" height="100px">
                         <Spinner size="lg" />
                     </Flex>
+                )}
+
+                {userDetails.length === 0 ? (
+                    !loading && (
+                        < Flex justify="center" align="center" height="100px">
+                            <Spinner size="lg" />
+                        </Flex>
+                    )
                 ) : (
                     <VStack align="stretch" spacing={4}>
                         <Text fontSize="lg" fontWeight="bold" textAlign="center" color="gray.700">
@@ -141,7 +206,7 @@ const QuizBattleLobby = () => {
                                     <Flex justify="space-between" align="center">
                                         <HStack>
                                             <StatusAvatar uid={user.uid} src={user.avatar} size="lg" />
-                                            <Text>{user.username}</Text>
+                                            <Text color="black" fontSize="xl" >{user.username}</Text>
                                         </HStack>
                                         <Badge colorScheme={user.status === 'ready' ? 'green' : 'orange'}>
                                             {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
@@ -162,8 +227,15 @@ const QuizBattleLobby = () => {
                         </Button>
                     </VStack>
                 )}
+                {selectedUser && (
+                    <UserProfileModal
+                        isOpen={isModalVisible}
+                        onClose={closeModal}
+                        username={selectedUser.username}
+                    />
+                )}
             </Box>
-        </VStack>
+        </VStack >
     );
 };
 
