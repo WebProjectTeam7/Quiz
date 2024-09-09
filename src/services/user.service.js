@@ -6,7 +6,7 @@ import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 
 // CREATE
 
 export const createUser = async (username, uid, email, firstName, lastName, role, phoneNumber, organizerCode = null) => {
-    const user = { username, uid, email, firstName, lastName, role, phoneNumber, points: 1000, organizerCode, createdOn: new Date().toString() };
+    const user = { username, uid, email, firstName, lastName, role, phoneNumber, points: 0, organizerCode, createdOn: new Date().toString() };
     const userRef = ref(db, `users/${username}`);
     try {
         await set(userRef, user);
