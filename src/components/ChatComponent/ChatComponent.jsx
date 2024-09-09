@@ -23,6 +23,7 @@ const ChatComponent = () => {
     const [chatMessages, setChatMessages] = useState([]);
     const toast = useToast();
     const messagesEndRef = useRef(null);
+    const [userAvatars, setUserAvatars] = useState({});
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,6 +41,9 @@ const ChatComponent = () => {
                 if (messages.length > CHAT_COMMENTS_LIMIT) {
                     await chatCleanUp(CHAT_COMMENTS_LIMIT);
                 }
+                const avatars = await loadAvatarsForMessages(messages);
+                setUserAvatars(avatars);
+
                 setChatMessages(messages);
             });
 
@@ -50,6 +54,23 @@ const ChatComponent = () => {
         } catch (error) {
             console.error('Error fetching chat messages:', error);
         }
+    };
+
+    const loadAvatarsForMessages = async (messages) => {
+        const avatars = {};
+        const uniqueSenders = [...new Set(messages.map(msg => msg.sender))];
+
+        for (const username of uniqueSenders) {
+            if (username !== userData.username) {
+                const userInfo = await getUserByUsername(username);
+                avatars[username] = {
+                    uid: userInfo?.uid || 'unknown',
+                    avatar: userInfo?.avatar || userInfo?.avatarUrl || '',
+                    onlineStatus: userInfo?.onlineStatus || 'offline',
+                };
+            }
+        }
+        return avatars;
     };
 
     const handleSendMessage = async () => {
@@ -66,19 +87,6 @@ const ChatComponent = () => {
                     isClosable: true,
                 });
             }
-        }
-    };
-
-    const loadUserData = async (username) => {
-        try {
-            const userInfo = await getUserByUsername(username);
-            return {
-                uid: userInfo?.uid || 'unknown',
-                avatar: userInfo?.avatar || userInfo?.avatarUrl || '',
-                onlineStatus: userInfo?.onlineStatus || 'offline',
-            };
-        } catch (error) {
-            console.error(error);
         }
     };
 
@@ -118,7 +126,7 @@ const ChatComponent = () => {
                 <VStack align="stretch" spacing={4}>
                     {chatMessages.map((msg, index) => {
                         const isCurrentUser = msg.sender === (userData && userData.username);
-                        const user = isCurrentUser ? userData : loadUserData(msg.sender);
+                        const user = isCurrentUser ? userData : userAvatars[msg.sender] || {};
                         return (
                             <Flex
                                 key={index}
