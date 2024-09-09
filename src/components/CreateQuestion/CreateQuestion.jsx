@@ -34,6 +34,7 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
     const { userData } = useContext(AppContext);
     const [question, setQuestion] = useState({
         author: userData?.username || 'anonymous',
+        organizationId: userData?.organizationId || '',
         quizId: quizId && null,
         title: '',
         imageFile: null,
@@ -107,11 +108,17 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
         e.preventDefault();
         setLoading(true);
 
+        const organizationId = userData?.organizationId || '';
+
+        const questionData = {
+            ...question,
+            organizationId,
+            authorId: userData?.uid,
+            options: isOpenEnded ? [] : question.options
+        };
+
         try {
-            const createdQuestionId = await createQuestion({
-                ...question,
-                options: isOpenEnded ? [] : question.options,
-            });
+            const createdQuestionId = await createQuestion(questionData);
             Swal.fire({
                 icon: 'success',
                 title: 'Question Created',
@@ -121,6 +128,7 @@ export default function CreateQuestion({ isVisible, onClose, onAddQuestion, quiz
             onAddQuestion(createdQuestionId);
             setQuestion({
                 author: userData?.username || '',
+                organizationId: userData?.organizationId || '',
                 title: '',
                 imageFile: null,
                 description: '',
