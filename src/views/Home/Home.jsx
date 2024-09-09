@@ -1,8 +1,8 @@
 /* eslint-disable react/no-unescaped-entities */
 import './Home.css';
-import quizFriendsImg from '../../images/home-home-play-with-friends.png';
+import quizFriendsImg from '../../images/friends-playing.png';
 import funAndEngagingImg from '../../images/home-funny.png';
-import competitiveAndExciting from '../../images/home-competitive.png';
+import competitiveAndExciting from '../../images/competitive.png';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../state/app.context';
 import { useContext } from 'react';
@@ -16,15 +16,15 @@ export default function Home() {
     };
 
     const handleGoToQuizzes = () => {
-        navigate('/quizzes');
+        navigate('/quiz-categories');
     };
 
     const handleGoToBattle = () => {
-        navigate('/tournament');
+        navigate('/quiz-battle-lobby');
     };
 
     const handleGoToQuestion = () => {
-        navigate('/tournament'); /* must create a questions and after that add nav*/
+        navigate('/quizzes/all'); /* must create a questions and after that add nav*/
     };
     return (
         <div className="main-page">
@@ -46,13 +46,13 @@ export default function Home() {
                     </div>
                     <div className="step">
                         <h3>Join the Game</h3>
-                        <p>Play with up to 4 players in real-time.</p>
+                        <p>Play with other players in real-time.</p>
                         <button className='home-page-tournament' onClick={handleGoToBattle}>Join now</button>
                     </div>
                     <div className="step">
                         <h3>Answer Questions</h3>
-                        <p>Each question has a 20-second timer. Answer quickly!</p>
-                        <button className='home-page-question' onClick={handleGoToQuestion}>Go to question</button>
+                        <p>Each quiz has 10-15 minutes. Answer quickly!</p>
+                        <button className='home-page-question' onClick={handleGoToQuestion}>Go to all quizzes.</button>
                     </div>
                 </div>
             </section>
