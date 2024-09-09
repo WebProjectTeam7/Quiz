@@ -107,7 +107,7 @@ export default function App() {
                             <Route path="/ranking" element={<Ranking />} />
                             <Route path="/tournament" element={<Tournament />} />
                             <Route path="/quiz-battle-lobby" element={<QuizBattleLobby/>}/>
-                            <Route path="/quiz-battle" element={<QuizBattle />} />
+                            <Route path="/quiz-battle/:battleId" element={<QuizBattle />} />
                             <Route path="/play-quiz/:quizId" element={<PlayQuiz />} />
                             <Route path="/quiz-summary" element={<QuizSummary />} />
                             <Route path="/invitational-quizzes" element={<InvitationalQuizzes />} />

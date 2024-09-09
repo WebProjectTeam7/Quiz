@@ -56,6 +56,16 @@ export const updateUserStatus = async (username, status) => {
     }
 };
 
+export const updateUserBattleId = async (username, battleId) => {
+    try {
+        const userRef = ref(db, `lobby/${username}`);
+        await update(userRef, { battleId });
+    } catch (error) {
+        console.error('Error updating user with battleID:', error);
+        throw new Error('Failed to update user with battleID');
+    }
+};
+
 // DELETE
 
 export const removeUserFromLobby = async (username) => {
