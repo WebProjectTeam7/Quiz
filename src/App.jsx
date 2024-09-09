@@ -102,13 +102,13 @@ export default function App() {
                             <Route path="/invitational-quizzes" element={<Authenticated><InvitationalQuizzes /></Authenticated>} />
                             <Route path="/quiz-categories" element={<QuizCategories />} />
                             <Route path="/quizzes/:categoryName" element={<Authenticated><Quizzes /></Authenticated>} />
-                            <Route path="/my-profile" element={<Authenticated><MyProfile /></Authenticated>} />
                             <Route path="/quiz-of-the-week" element={<Authenticated><QuizOfTheWeek /></Authenticated>} />
                             <Route path="/quiz-of-the-week-detail" element={<Authenticated><QuizOfTheWeekDetail /></Authenticated>} />
                             <Route path="/quiz-preview/:quizId" element={<Authenticated><QuizPreview /></Authenticated>} />
                             <Route path="/quiz-summary" element={<Authenticated><QuizSummary /></Authenticated>} />
                             <Route path="/quiz-battle-lobby" element={<Authenticated><QuizBattleLobby /></Authenticated>} />
                             <Route path="/quiz-battle/:battleId" element={<Authenticated><QuizBattle /></Authenticated>} />
+                            <Route path="/my-profile" element={<Authenticated><MyProfile /></Authenticated>} />
                             <Route path="/organizer-dashboard" element={<Authenticated requiredRoles={[UserRoleEnum.ADMIN, UserRoleEnum.ORGANIZER]}><OrganizerDashboard /></Authenticated>} />
                             <Route path="/play-quiz/:quizId" element={<Authenticated><PlayQuiz /></Authenticated>} />
                             <Route path="/ranking" element={<Ranking />} />

@@ -29,9 +29,10 @@ const QuizBattleLobby = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const lobbyUsersRef = useRef(lobbyUsers);
 
     const [lobbyUsers, setLobbyUsers] = useState([]);
+    const lobbyUsersRef = useRef(lobbyUsers);
+
     const [userDetails, setUserDetails] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [battleInProgress, setBattleInProgress] = useState(false);
