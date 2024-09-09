@@ -84,15 +84,27 @@ export default function Quizzes() {
     );
 
     return (
-        <Box className="quizzes-container" padding="20px">
-            <Flex className="hexagon-grid" justifyContent="center" wrap="wrap" gap={6}>
-                {renderHexagons(quizzes.easy, 'easy')}
-                {renderHexagons(quizzes.medium, 'medium')}
-                {renderHexagons(quizzes.hard, 'hard')}
+        <Box className="quizzes-container">
+            <div className="difficulty-level">Difficulty Level</div>
+            <div className="hexagon-grid">
+                <div className="hexagon-row">
+                    <div className="hexagon-column">
+                        <div className="category-title">EASY</div>
+                        {renderHexagons(quizzes.easy, 'easy')}
+                    </div>
+                    <div className="hexagon-column">
+                        <div className="category-title">MEDIUM</div>
+                        {renderHexagons(quizzes.medium, 'medium')}
+                    </div>
+                    <div className="hexagon-column">
+                        <div className="category-title">HARD</div>
+                        {renderHexagons(quizzes.hard, 'hard')}
+                    </div>
+                </div>
+                <div className="category-title completed">Completed Quizzes</div>
                 {renderHexagons(quizzes.done, 'done')}
-            </Flex>
+            </div>
             <StartQuizModal isOpen={isOpen} onClose={onClose} quiz={selectedQuiz} />
-
             <Button className="back-button" onClick={() => navigate('/quiz-categories')}>
                 Back
             </Button>
