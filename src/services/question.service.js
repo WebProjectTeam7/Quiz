@@ -81,7 +81,6 @@ export const getQuestionsByCategoryAndOrganization = async (category, organizati
         if (!snapshot.exists()) {
             return [];
         }
-
         const questionsObject = snapshot.val();
         const questionsArray = Object.keys(questionsObject)
             .map((key) => ({ id: key, ...questionsObject[key] }))

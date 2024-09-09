@@ -14,6 +14,8 @@ export const FILE_SIZE = 200 * 1024;
 
 export const PER_PAGE = 10;
 
+export const SMALL_PAGE = 5;
+
 export const MAX_NOTIFICATION_LENGTH = 50;
 
 export const MIN_QUIZ_TIME_LIMIT = 5;

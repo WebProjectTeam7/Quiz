@@ -17,7 +17,7 @@ import {
     EditableTextarea,
 } from '@chakra-ui/react';
 import { ArrowDownIcon, ArrowUpIcon, DeleteIcon } from '@chakra-ui/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getQuizById, editQuiz, updateQuestionsIdsArray, deleteQuiz } from '../../services/quiz.service';
 import { getQuestionById } from '../../services/question.service';
@@ -33,6 +33,8 @@ import EditableControls from '../../components/EditableControls/EditableControls
 import SendInvitationModal from '../../components/SendInvitationModal/SendInvitationModal';
 import QuizParticipantModal from '../../components/QuizParticipantModal/QuizParticipantModal';
 import './QuizPreview.css';
+import QuestionsFromDatabaseModal from '../../components/QuestionFromDatabaseModal/QuestionFromDatabaseModal';
+import { AppContext } from '../../state/app.context';
 
 export default function QuizPreview() {
     const { quizId } = useParams();
@@ -59,6 +61,9 @@ export default function QuizPreview() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const { isOpen: isInviteOpen, onOpen: onInviteOpen, onClose: onInviteClose } = useDisclosure();
     const { isOpen: isParticipantsOpen, onOpen: onParticipantsOpen, onClose: onParticipantsClose } = useDisclosure();
+    const [isModalVisible, setModalVisible] = useState(false);
+    const { userData } = useContext(AppContext);
+    const organizationId = userData.organizationId;
 
     useEffect(() => {
         if (quizId) {
@@ -107,7 +112,7 @@ export default function QuizPreview() {
         } catch (error) {
             console.error('Error adding question:', error);
         } finally {
-            onClose();
+            closeModal();
         }
     };
 
@@ -236,6 +241,9 @@ export default function QuizPreview() {
             Swal.fire('Error', 'Failed to resolve the bug.', 'error');
         }
     };
+
+    const openModal = () => setModalVisible(true);
+    const closeModal = () => setModalVisible(false);
 
     return (
         <Box maxW="800px" mx="auto" py={8}>
@@ -375,6 +383,10 @@ export default function QuizPreview() {
                         Add Question
                     </Button>
 
+                    <Button colorScheme="blue" onClick={openModal}>
+                        Question from Database
+                    </Button>
+
                     <Button colorScheme="teal" onClick={handleTestQuiz}>
                         Test Quiz
                     </Button>
@@ -457,6 +469,14 @@ export default function QuizPreview() {
             <CreateQuestion isVisible={isOpen} onClose={onClose} onAddQuestion={handleAddQuestion} quizId={quizId} />
             <SendInvitationModal isOpen={isInviteOpen} onClose={onInviteClose} objId={quizId} obj={quiz} objType={NotificationEnum.INVITE_TO_QUIZ} />
             <QuizParticipantModal isOpen={isParticipantsOpen} onClose={onParticipantsClose} quiz={quiz} />
+            <QuestionsFromDatabaseModal
+                isOpen={isModalVisible}
+                onClose={closeModal}
+                onAddQuestion={handleAddQuestion}
+                categories={Object.values(QuizCategoryEnum)}
+                organizationId={organizationId}
+                currentUsername={userData.username}
+            />
         </Box>
     );
 }

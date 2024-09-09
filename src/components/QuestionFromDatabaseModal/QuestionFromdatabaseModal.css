@@ -1,0 +1,58 @@
+.css-1kho826 {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgb(237, 243, 182);
+    border-radius: 8px;
+}
+
+.css-hxzjzg {
+    background: linear-gradient(rgb(12, 8, 58) 1.1%, rgba(188, 16, 79, 0.74) 130.5%) !important;
+    box-shadow: 0px 4px 6px rgb(0, 0, 0);
+    color: rgb(237, 243, 182) !important;
+    border-radius: 8px;
+}
+
+.css-hxzjzg:hover {
+    background-color: rgb(77, 77, 77) !important;
+    transition-duration: .2s;
+}
+
+.css-drf6cr {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1px;
+    gap: 10px;
+    margin-right: 10px;
+}
+
+.css-drf6cr button {
+    padding: 2px 6px;
+    font-size: 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    height: 28px;
+}
+
+.css-drf6cr button:disabled {
+    background-color: rgb(77, 77, 77) !important;
+    cursor: not-allowed;
+}
+
+.css-drf6cr button:hover:not(:disabled) {
+    background-color: rgb(77, 77, 77); 
+}
+
+.css-drf6cr input {
+    width: 40px;
+    height: 28px;
+    font-size: 12px;
+    text-align: center;
+    padding: 2px;
+    border: 1px solid #cbd5e0;
+    border-radius: 3px;
+}
+
+.css-drf6cr .page-info {
+    font-size: 12px;
+    color: #4a5568;
+}

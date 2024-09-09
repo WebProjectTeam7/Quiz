@@ -13,6 +13,7 @@ import useModal from '../../custom-hooks/useModal';
 import RankingModal from '../../components/RankingModal/RankingModal';
 import { getQuizSummariesByCategory } from '../../services/quiz.service';
 import { getUserByUsername } from '../../services/user.service';
+import QuizCategoryEnum from '../../common/category-enum';
 
 const Ranking = () => {
   const [users, setUsers] = useState([]);
@@ -108,11 +109,15 @@ const Ranking = () => {
       Who is the Quiz Champion?
       </Heading>
       <HStack className="ranking-category" spacing={2} mt={4}>
-        <Button colorScheme="blue" onClick={() => handleCategoryClick('History')}>History</Button>
-        <Button colorScheme="blue" onClick={() => handleCategoryClick('Geography')}>Geography</Button>
-        <Button colorScheme="blue" onClick={() => handleCategoryClick('Science')}>Science</Button>
-        <Button colorScheme="blue" onClick={() => handleCategoryClick('Literature')}>Literature</Button>
-        <Button colorScheme="blue" onClick={() => handleCategoryClick('General')}>General</Button>
+        {Object.values(QuizCategoryEnum).map((category) => (
+          <Button
+            key={category}
+            colorScheme="blue"
+            onClick={() => handleCategoryClick(category)}
+          >
+            {category}
+          </Button>
+        ))}
       </HStack>
 
       {currentUsers.map((user, index) => (
