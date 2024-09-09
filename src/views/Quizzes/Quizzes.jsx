@@ -57,11 +57,13 @@ export default function Quizzes() {
             {quizzes.map((quiz) => (
                 <Popover key={quiz.id}>
                     <PopoverTrigger>
-                        <NavLink onClick={() => handleHexagonClick(quiz.id, level)}>
+                        <NavLink>
                             <Hexagon
                                 className={hexagonClass(quiz.id, level)}
                                 quiz={quiz}
                                 userId={quiz.id}
+                                level={level}
+                                onClick={() => handleHexagonClick(quiz.id, level)}
                             />
                         </NavLink>
                     </PopoverTrigger>

@@ -72,7 +72,7 @@ export const getQuestionsByQuizId = async (quizId) => {
     }
 };
 
-export const getQuestionsByCategoryAndOrganization = async (category, organizationId, currentUsername) => {
+export const getQuestionsByCategoryAndOrganization = async (category, organizationId) => {
     try {
         const questionsRef = dbRef(db, 'questions');
         const questionsQuery = query(questionsRef, orderByChild('category'), equalTo(category));
@@ -85,7 +85,7 @@ export const getQuestionsByCategoryAndOrganization = async (category, organizati
         const questionsArray = Object.keys(questionsObject)
             .map((key) => ({ id: key, ...questionsObject[key] }))
             .filter((question) => {
-                return question.organizationId === organizationId && question.author !== currentUsername;
+                return question.organizationId === organizationId ;
             });
 
         return questionsArray;

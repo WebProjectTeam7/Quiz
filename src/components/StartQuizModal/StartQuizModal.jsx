@@ -3,7 +3,7 @@ import './StartQuizModal.css';
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Button, Flex, Badge, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
-export default function StartQuizModal({ isOpen, onClose, quiz }) { 
+export default function StartQuizModal({ isOpen, onClose, quiz }) {
     const navigate = useNavigate();
 
     if (!quiz) return null;
@@ -46,5 +46,5 @@ StartQuizModal.propTypes = {
         totalPoints: PropTypes.number.isRequired,
         description: PropTypes.string,
         id: PropTypes.string.isRequired
-    }).isRequired,
+    }),
 };

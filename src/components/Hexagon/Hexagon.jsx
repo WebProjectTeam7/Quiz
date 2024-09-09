@@ -23,6 +23,7 @@ Hexagon.propTypes = {
     level: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     userId: PropTypes.string.isRequired,
+    quiz: PropTypes.object.isRequired,
 };
 
 export default Hexagon;
