@@ -20,6 +20,7 @@ import {
     useToast
 } from '@chakra-ui/react';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
+import './QuizBattleLobby.css';
 
 const QuizBattleLobby = () => {
     const { userData } = useContext(AppContext);
