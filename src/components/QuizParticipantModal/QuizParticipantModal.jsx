@@ -83,7 +83,7 @@ QuizParticipantModal.propTypes = {
             PropTypes.arrayOf(
                 PropTypes.shape({
                     points: PropTypes.number.isRequired,
-                    date: PropTypes.string.isRequired,
+                    date: PropTypes.string,
                     questions: PropTypes.array.isRequired,
                 })
             )
