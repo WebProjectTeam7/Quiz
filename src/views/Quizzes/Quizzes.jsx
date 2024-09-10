@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import Hexagon from '../../components/Hexagon/Hexagon';
 import { Popover, PopoverTrigger, Button, Box, Flex, useDisclosure } from '@chakra-ui/react';
 import { useState, useEffect, useContext } from 'react';
-import { getQuizzesByCategory } from '../../services/quiz.service';
+import { checkIfQuizCompleted, fetchQuizSummary, getQuizzesByCategory } from '../../services/quiz.service';
 import { AppContext } from '../../state/app.context';
 import StartQuizModal from '../../components/StartQuizModal/StartQuizModal';
 
@@ -41,11 +41,23 @@ export default function Quizzes() {
         }
     };
 
-    const handleHexagonClick = (quizId, level) => {
+    const handleHexagonClick = async (quizId, level) => {
         const quiz = quizzes[level].find(q => q.id === quizId);
-        setSelectedQuiz(quiz);
-        setClickedHexagon(`${quizId}-${level}`);
-        onOpen();
+
+        try {
+            const isCompleted = await checkIfQuizCompleted(quizId, userData.username);
+
+            let summary = null;
+            if (isCompleted) {
+                summary = await fetchQuizSummary(quizId, userData.username);
+            }
+
+            setSelectedQuiz({ ...quiz, isCompleted, summary });
+            setClickedHexagon(`${quizId}-${level}`);
+            onOpen();
+        } catch (error) {
+            console.error('Error handling hexagon click:', error);
+        }
     };
 
     const hexagonClass = (quizId, level) => (
@@ -67,19 +79,6 @@ export default function Quizzes() {
                             />
                         </NavLink>
                     </PopoverTrigger>
-                    {/* <Portal>
-                        <PopoverContent>
-                            <PopoverArrow />
-                            <PopoverHeader>Select Option</PopoverHeader>
-                            <PopoverCloseButton />
-                            <PopoverBody>
-                                <Button colorScheme="blue" width="full" onClick={() => navigate('/quiz-of-the-week')}>Quiz of the Week</Button>
-                                <Button colorScheme="blue" width="full" onClick={() => navigate('/ranking')} marginTop={2}>Ranking</Button>
-                                <Button colorScheme="blue" width="full" onClick={() => navigate('/tournaments')} marginTop={2}>Tournament</Button>
-                            </PopoverBody>
-                            <PopoverFooter>Choose an option to proceed</PopoverFooter>
-                        </PopoverContent>
-                    </Portal> */}
                 </Popover>
             ))}
         </Flex>

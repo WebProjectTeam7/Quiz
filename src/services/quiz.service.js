@@ -394,6 +394,35 @@ export const uninviteUserFromPrivateQuiz = async (quizId, username) => {
     }
 };
 
+export const checkIfQuizCompleted = async (quizId, username) => {
+    try {
+        const summaryRef = dbRef(db, `quizzes/${quizId}/summaries/${username}`);
+        const snapshot = await get(summaryRef);
+
+        if (snapshot.exists()) {
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error checking quiz completion:', error);
+        throw new Error('Failed to check quiz completion');
+    }
+};
+
+export const fetchQuizSummary = async (quizId, username) => {
+    try {
+        const summaryRef = dbRef(db, `quizzes/${quizId}/summaries/${username}`);
+        const snapshot = await get(summaryRef);
+        if (snapshot.exists()) {
+            const summaries = snapshot.val();
+            return summaries.length > 0 ? summaries[0] : null;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching quiz summary:', error);
+        throw new Error('Failed to fetch quiz summary');
+    }
+};
 // DELETE
 
 export const deleteQuiz = async (quizId) => {

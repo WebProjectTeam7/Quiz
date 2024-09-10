@@ -25,10 +25,22 @@ export default function StartQuizModal({ isOpen, onClose, quiz }) {
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button colorScheme="blue" onClick={() => navigate(`/play-quiz/${quiz.id}`)}>
-                        Start Quiz
-                    </Button>
-                    <Button variant="ghost" onClick={onClose} ml={3}>Close</Button>
+                    {quiz.isCompleted ? (
+                        <Button
+                            colorScheme="blue"
+                            aria-hidden="false"
+                            onClick={() => navigate('/quiz-summary', { state: { summary: quiz.summary } })}
+                        >
+                            View Summary
+                        </Button>
+                    ) : (
+                        <Button
+                            colorScheme="blue"
+                            onClick={() => navigate(`/play-quiz/${quiz.id}`)}
+                        >
+                            Start Quiz
+                        </Button>
+                    )}
                 </ModalFooter>
             </ModalContent>
         </Modal>
@@ -45,6 +57,8 @@ StartQuizModal.propTypes = {
         timeLimit: PropTypes.number.isRequired,
         totalPoints: PropTypes.number.isRequired,
         description: PropTypes.string,
-        id: PropTypes.string.isRequired
+        id: PropTypes.string.isRequired,
+        isCompleted: PropTypes.bool,
+        summary: PropTypes.object,
     }),
 };
