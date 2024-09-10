@@ -188,10 +188,9 @@ export default function PlayQuiz() {
 
             await saveQuizSummary(quizId, userData.username, summary);
 
-            if (userData.role === UserRoleEnum.STUDENT) {
-                const updatedUser = { ...userData, points: userData.points + finalScore };
-                await updateUser(userData.uid, updatedUser);
-            }
+            const updatedUser = { ...userData, points: userData.points + finalScore };
+            await updateUser(userData.uid, updatedUser);
+
             localStorage.removeItem(`quiz-${quizId}-timeLeft`);
             localStorage.removeItem(`quiz-${quizId}-answers`);
 

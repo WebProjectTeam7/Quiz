@@ -3,7 +3,7 @@ import { ref, set, get, onValue, update, remove, push } from 'firebase/database'
 
 // CREATE
 
-export const createBattle = async (usernamePlayer1, usernamePlayer2, field) => {
+export const createBattle = async (usernamePlayer1, usernamePlayer2, field, moves) => {
     try {
         const battleRef = push(ref(db, 'battles'));
         const battleId = battleRef.key;
@@ -11,7 +11,7 @@ export const createBattle = async (usernamePlayer1, usernamePlayer2, field) => {
             id: battleId,
             player1: {
                 username: usernamePlayer1,
-                isReady: false,
+                isReady: true,
                 answer: null,
                 points: 0,
             },
@@ -22,7 +22,7 @@ export const createBattle = async (usernamePlayer1, usernamePlayer2, field) => {
                 points: 0,
             },
             field,
-            moves: 0,
+            moves,
             activeUser: usernamePlayer1,
             currentQuestion: null,
         });
@@ -103,6 +103,19 @@ export const updateQuestion = async (battleId, question) => {
         const battleRef = ref(db, 'battles/' + battleId);
         await update(battleRef, {
             currentQuestion: question,
+        });
+    } catch (error) {
+        console.error('Error updating current question:', error);
+        throw new Error('Failed to update current question');
+    }
+};
+
+
+export const updateMoves = async (battleId, moves) => {
+    try {
+        const battleRef = ref(db, 'battles/' + battleId);
+        await update(battleRef, {
+            moves,
         });
     } catch (error) {
         console.error('Error updating current question:', error);

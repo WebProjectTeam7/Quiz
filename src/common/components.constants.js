@@ -18,14 +18,10 @@ export const SMALL_PAGE = 5;
 
 export const MAX_NOTIFICATION_LENGTH = 50;
 
-export const MIN_QUIZ_TIME_LIMIT = 5;
+export const MIN_QUIZ_TIME_LIMIT = 5; // minutes
 
 export const CHAT_COMMENTS_LIMIT = 100;
 
-// export const MILLISECONDS_IN_A_MINUTE = 1000 * 60;
+export const QUESTION_TIME_LIMIT = 20; // seconds
 
-// export const MILLISECONDS_IN_AN_HOUR = MILLISECONDS_IN_A_MINUTE * 60;
-
-// export const MILLISECONDS_IN_A_DAY = MILLISECONDS_IN_AN_HOUR * 24;
-
-// export const REPORT_REASON_LENGTH = 20;
+export const QUIZ_BATTLE_MOVES_BY_PLAYER = 9;

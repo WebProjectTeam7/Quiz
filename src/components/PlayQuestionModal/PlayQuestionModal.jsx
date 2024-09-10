@@ -26,7 +26,7 @@ export default function PlayQuestionModal({ isOpen, onClose, question, onAnswerS
 
     useEffect(() => {
         if (isOpen) {
-            setTimer(timeLimit);
+            setTimer(Math.floor(timeLimit * (question.timeAmplifier ? question.timeAmplifier : 1)));
             const countdown = setInterval(() => {
                 setTimer((prevTimer) => Math.max(prevTimer - 1, 0));
             }, 1000);
@@ -121,6 +121,7 @@ PlayQuestionModal.propTypes = {
         imageUrl: PropTypes.string,
         options: PropTypes.arrayOf(PropTypes.string),
         answer: PropTypes.string.isRequired,
+        timeAmplifier: PropTypes.number,
     }).isRequired,
     onAnswerSubmit: PropTypes.func.isRequired,
     timeLimit: PropTypes.number,

@@ -23,6 +23,7 @@ import useModal from '../../custom-hooks/useModal';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import './QuizBattleLobby.css';
 import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
+import { QUIZ_BATTLE_MOVES_BY_PLAYER as QUIZ_BATTLE_MOVES_PER_PLAYER } from '../../common/components.constants';
 
 const QuizBattleLobby = () => {
     const { userData } = useContext(AppContext);
@@ -109,7 +110,7 @@ const QuizBattleLobby = () => {
 
         try {
             if (user1.username === userData.username) {
-                const battleId = await createBattle(user1.username, user2.username, [[1, 0, 0], [0, 0, 0], [0, 0, 2]]);
+                const battleId = await createBattle(user1.username, user2.username, [[1, 0, 0], [0, 0, 0], [0, 0, 2]], QUIZ_BATTLE_MOVES_PER_PLAYER * 2);
                 await updateUserBattleId(user2.username, battleId);
                 navigateToBattle(battleId);
             } else if (user2.username === userData.username) {
