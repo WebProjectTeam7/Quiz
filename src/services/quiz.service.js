@@ -144,7 +144,8 @@ export const getQuizById = async (quizId) => {
         if (!snapshot.exists()) {
             return null;
         }
-        return snapshot.val();
+        const quizData = snapshot.val();
+        return { id: quizId, ...quizData };
     } catch (error) {
         console.error('Error fetching quiz by ID:', error);
         throw new Error('Failed to retrieve quiz');
