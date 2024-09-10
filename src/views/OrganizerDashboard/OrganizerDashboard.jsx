@@ -87,16 +87,6 @@ export default function OrganizerDashboard() {
         navigate(`/quiz-preview/${quizId}`);
     };
 
-    const handleJoinOrganization = async (orgId) => {
-        try {
-            await joinOrganization(orgId, userData.id);
-            userData.organizationId = orgId;
-            fetchOrganizationDetails(orgId);
-        } catch (error) {
-            console.error('Error joining organization:', error);
-        }
-    };
-
     const handleLeaveOrganization = async () => {
         const result = await Swal.fire({
             title: 'Are you sure?',
@@ -115,15 +105,15 @@ export default function OrganizerDashboard() {
                 userData.organizationId = null;
                 userData.organizationName = null;
                 setOrganization(null);
-
                 Swal.fire(
                     'Left!',
                     'You have successfully left the organization.',
                     'success'
-                );
+                ).then(() => {
+                    window.location.reload();
+                });
             } catch (error) {
                 console.error('Error leaving organization:', error);
-
                 Swal.fire(
                     'Error',
                     'There was an issue leaving the organization. Please try again later.',
@@ -162,9 +152,6 @@ export default function OrganizerDashboard() {
                         <>
                             <Button colorScheme="green" onClick={onOrganizationModalOpen}>
                                 Create Organization
-                            </Button>
-                            <Button colorScheme="blue" onClick={handleJoinOrganization}>
-                                Join Organization
                             </Button>
                         </>
                     )}
