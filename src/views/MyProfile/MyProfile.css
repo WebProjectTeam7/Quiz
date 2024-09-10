@@ -167,6 +167,7 @@
     box-shadow: 0px 4px 6px rgb(0, 0, 0);
     color: rgb(237, 243, 182) !important;
     border-radius: 8px;
+    margin-top: 50px !important;
 }
 
 .css-1lp2lqs:hover {
@@ -204,4 +205,12 @@
 .css-h211ee:hover {
     background-color: rgb(237, 243, 182) !important;
     transition-duration: .2s;
+}
+
+.css-16ite8i {
+    margin-top: 26px;
+}
+
+.css-tc9vh3 {
+    margin-top: 50px ;
 }
