@@ -16,6 +16,7 @@ import {
 import StatusAvatar from '../StatusAvatar/StatusAvatar';
 import { getUserByUsername } from '../../services/user.service';
 import { CHAT_COMMENTS_LIMIT } from '../../common/components.constants';
+import './ChatComponent.css';
 
 const ChatComponent = () => {
     const { userData } = useContext(AppContext);

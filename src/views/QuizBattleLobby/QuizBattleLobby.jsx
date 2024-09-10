@@ -223,15 +223,16 @@ const QuizBattleLobby = () => {
                             ))}
                         </List>
 
-                        <Button
-                            colorScheme="teal"
-                            onClick={toggleUserStatus}
-                            _hover={{ boxShadow: 'lg' }}
-                        >
-                            {lobbyUsers.find((user) => user.username === userData?.username)?.status === 'ready'
-                                ? 'Switch to Waiting'
-                                : 'I\'m Ready'}
-                        </Button>
+                        {lobbyUsers.find((user) => user.username === userData?.username)?.status === 'ready' ? (
+                            <Button colorScheme="yellow" width="180px" onClick={toggleUserStatus}>
+                                Switch to Waiting
+                            </Button>
+                        ) : (
+                            <Button colorScheme="teal" width="100px" onClick={toggleUserStatus}>
+                                I'm Ready
+                            </Button>
+                        )}
+
                     </VStack>
                 )}
                 {selectedUser && (
