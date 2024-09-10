@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { Box, Text, Flex, Image, VStack, Spinner, Alert, AlertIcon, Tooltip } from '@chakra-ui/react';
+import { Box, Text, Flex, VStack, Spinner, Alert, AlertIcon } from '@chakra-ui/react';
 import Swal from 'sweetalert2';
 import { AppContext } from '../../state/app.context';
 import { getRandomQuestion } from '../../services/question.service';
@@ -20,7 +20,6 @@ const QuizBattle = () => {
     const [playersReady, setPlayersReady] = useState({ player1: false, player2: false });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalQuestion, setModalQuestion] = useState(null);
-    const [modalForBothPlayers, setModalForBothPlayers] = useState(false);
     const [currentBattleRow, setCurrentBattleRow] = useState(null);
     const [currentBattleCol, setCurrentBattleCol] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -83,31 +82,19 @@ const QuizBattle = () => {
         setCurrentBattleRow(row);
         setCurrentBattleCol(col);
 
-        if (currentField === 0) {
+        if (currentField === 0 || currentField === 3 - currentPlayer) {
             await askQuestionToSingleUser();
-        } else if (currentField === 3 - currentPlayer) {
-            await handleBattle(row, col);
         } else {
             Swal.fire('Invalid Move', 'The selected position is already occupied by you.', 'error');
         }
+
         setIsProcessingMove(false);
-    };
-
-
-    const handleBattle = async () => {
-        const question = await getRandomQuestion();
-        await updateQuestion(battleId, question);
-        setModalQuestion(question);
-        setModalForBothPlayers(true);
-        setIsModalOpen(true);
-        return true;
     };
 
     const askQuestionToSingleUser = async () => {
         const question = await getRandomQuestion();
         await updateQuestion(battleId, question);
         setModalQuestion(question);
-        setModalForBothPlayers(true);
         setIsModalOpen(true);
     };
 
@@ -146,6 +133,8 @@ const QuizBattle = () => {
     const isValidMove = (row, col, player) => {
         const numRows = quizField.length;
         const numCols = quizField[0].length;
+
+        if (quizField[row][col] === player) return false;
 
         if (row < 0 || row >= numRows || col < 0 || col >= numCols) return false;
 
@@ -204,7 +193,7 @@ const QuizBattle = () => {
             ) : (
                 <Flex justify="space-between" align="center">
 
-                    <VStack spacing={4} align="center" w="20%" marginRight="10">
+                    <VStack spacing={4} align="center" w="20%" marginRight="20">
                         <Box
                             p={6}
                             bg="yellow.100"
@@ -215,7 +204,7 @@ const QuizBattle = () => {
                             w="100%"
                         >
                             <StatusAvatar uid={userDetails[0]?.uid} src={userDetails[0]?.avatar || ''} size="lg" />
-                            <Text fontSize="lg" fontWeight="bold">{players[1] === userData.username ? 'You' : players[1]}</Text>
+                            <Text fontSize="lg" fontWeight="bold" color="teal.500">{players[1] === userData.username ? 'You' : players[1]}</Text>
                             <Text fontSize="lg">Score: {score.player1}</Text>
                         </Box>
                     </VStack>
@@ -229,7 +218,7 @@ const QuizBattle = () => {
                                         bg={cell === 0 ? 'gray.100' : playerColors[cell]}
                                         w={hexagonSize}
                                         h={hexagonSize}
-                                        m={1}
+                                        m={3}
                                         display="flex"
                                         justifyContent="center"
                                         alignItems="center"
@@ -237,8 +226,10 @@ const QuizBattle = () => {
                                         cursor="pointer"
                                         border={isValidMove(rowIndex, colIndex, playerNumber) ? '2px solid green' : '2px solid red'}
                                         _hover={{
-                                            bg: isValidMove(rowIndex, colIndex, playerNumber) ? 'green.200' : 'red.200',
-                                            transform: 'scale(1.1)',
+                                            bg: playerNumber === currentPlayer
+                                                ? (isValidMove(rowIndex, colIndex, playerNumber) ? 'green.200' : 'red.200')
+                                                : 'gray.200',
+                                            transform: playerNumber === currentPlayer && isValidMove(rowIndex, colIndex, playerNumber) ? 'scale(1.1)' : 'scale(1.01)',
                                         }}
                                         onClick={() => handleFieldClick(rowIndex, colIndex)}
                                     >
@@ -251,7 +242,7 @@ const QuizBattle = () => {
                         ))}
                     </Flex>
 
-                    <VStack spacing={4} align="center" w="20%" marginLeft="10">
+                    <VStack spacing={4} align="center" w="20%" marginLeft="20">
                         <Box
                             p={6}
                             bg="red.100"
@@ -262,29 +253,34 @@ const QuizBattle = () => {
                             w="100%"
                         >
                             <StatusAvatar uid={userDetails[1]?.uid} src={userDetails[1]?.avatar || ''} size="lg" />
-                            <Text fontSize="lg" fontWeight="bold">{players[2] === userData.username ? 'You' : players[2]}</Text>
+                            <Text fontSize="lg" fontWeight="bold" color="teal.500">{players[2] === userData.username ? 'You' : players[2]}</Text>
                             <Text fontSize="lg">Score: {score.player2}</Text>
                         </Box>
                     </VStack>
                 </Flex>
-            )}
+            )
+            }
 
-            {!playersReady.player1 || !playersReady.player2 ? (
-                <Alert status="info" mt={4}>
-                    <AlertIcon />
-                    Please wait for both players to be ready.
-                </Alert>
-            ) : null}
+            {
+                !playersReady.player1 || !playersReady.player2 ? (
+                    <Alert status="info" mt={4}>
+                        <AlertIcon />
+                        Please wait for both players to be ready.
+                    </Alert>
+                ) : null
+            }
 
-            {isModalOpen && (
-                <PlayQuestionModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    question={modalQuestion}
-                    onAnswerSubmit={handleModalSubmit}
-                />
-            )}
-        </Box>
+            {
+                isModalOpen && (
+                    <PlayQuestionModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        question={modalQuestion}
+                        onAnswerSubmit={handleModalSubmit}
+                    />
+                )
+            }
+        </Box >
     );
 };
 
