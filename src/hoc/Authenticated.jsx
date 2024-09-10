@@ -7,9 +7,9 @@ export default function Authenticated({ children, requiredRole }) {
     const { user, userData } = useContext(AppContext);
     const location = useLocation();
 
-    if (!user) {
-        return <Navigate replace to="/" state={{ from: location }} />;
-    }
+    // if (!user) {
+    //     return <Navigate replace to="/" state={{ from: location }} />;
+    // }
 
     if (!userData) {
         return <div>Loading...</div>;
