@@ -20,7 +20,7 @@ export default function Authenticated({ children, requiredRole }) {
     }, [user]);
 
     if (!user) {
-        return <Navigate replace to="/login" state={{ from: location }} />;
+        return <Navigate replace to="/" state={{ from: location }} />;
     }
 
     if (!userData) {
