@@ -13,15 +13,16 @@ export const createBattle = async (usernamePlayer1, usernamePlayer2, field) => {
                 username: usernamePlayer1,
                 isReady: false,
                 answer: null,
-                points: 0
+                points: 0,
             },
             player2: {
                 username: usernamePlayer2,
                 isReady: false,
                 answer: null,
-                points: 0
+                points: 0,
             },
             field,
+            moves: 0,
             activeUser: usernamePlayer1,
             currentQuestion: null,
         });
@@ -37,7 +38,6 @@ export const createBattle = async (usernamePlayer1, usernamePlayer2, field) => {
 export const getBattle = async (battleId, onBattleUpdate) => {
     try {
         const battleRef = ref(db, 'battles/' + battleId);
-
         onValue(battleRef, (snapshot) => {
             if (snapshot.exists()) {
                 const battleData = snapshot.val();
@@ -66,18 +66,6 @@ export const switchPlayer = async (battleId, username) => {
     }
 };
 
-export const switchQuestion = async (battleId, question) => {
-    try {
-        const battleRef = ref(db, 'battles/' + battleId);
-        await update(battleRef, {
-            currentQuestion: question
-        });
-    } catch (error) {
-        console.error('Error switching question:', error);
-        throw new Error('Failed to switch question');
-    }
-};
-
 export const addPointsToPlayer = async (battleId, username, points) => {
     try {
         const battleRef = ref(db, 'battles/' + battleId);
@@ -98,7 +86,7 @@ export const addPointsToPlayer = async (battleId, username, points) => {
     }
 };
 
-export const updateBattlefield = async (battleId, field) => {
+export const updateField = async (battleId, field) => {
     try {
         const battleRef = ref(db, 'battles/' + battleId);
         await update(battleRef, {
@@ -107,6 +95,18 @@ export const updateBattlefield = async (battleId, field) => {
     } catch (error) {
         console.error('Error updating battlefield:', error);
         throw new Error('Failed to update battlefield');
+    }
+};
+
+export const updateQuestion = async (battleId, question) => {
+    try {
+        const battleRef = ref(db, 'battles/' + battleId);
+        await update(battleRef, {
+            currentQuestion: question,
+        });
+    } catch (error) {
+        console.error('Error updating current question:', error);
+        throw new Error('Failed to update current question');
     }
 };
 
@@ -128,6 +128,26 @@ export const updateStatus = async (battleId, username, status) => {
         throw new Error('Failed to update status');
     }
 };
+
+export const updatePoints = async (battleId, username, points) => {
+    try {
+        const battleRef = ref(db, `battles/${battleId}`);
+        const snapshot = await get(battleRef);
+
+        if (snapshot.exists()) {
+            const battleData = snapshot.val();
+            const playerKey = battleData.player1.username === username ? 'player1' : 'player2';
+
+            await update(battleRef, {
+                [`${playerKey}/points`]: points,
+            });
+        }
+    } catch (error) {
+        console.error('Error updating points:', error);
+        throw new Error('Failed to update points');
+    }
+};
+
 
 export const updateAnswer = async (battleId, username, answer) => {
     try {
