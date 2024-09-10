@@ -139,20 +139,26 @@ const QuizBattleLobby = () => {
     };
 
     const navigateToBattle = (battleId) => {
+        let timerInterval;
+
         Swal.fire({
             title: 'Get ready!',
-            html: 'Starting in <b></b> seconds.',
+            html: 'Starting in <b>3</b> seconds.',
             timer: 3000,
             timerProgressBar: true,
             didOpen: () => {
-                setInterval(() => {
-                    const content = Swal.getHtmlContainer();
-                    if (content) {
-                        content.querySelector('b').textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-                    }
-                }, 1000);
+                const content = Swal.getHtmlContainer();
+                if (content) {
+                    timerInterval = setInterval(() => {
+                        const timerElement = content.querySelector('b');
+                        if (timerElement) {
+                            timerElement.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
+                        }
+                    }, 1000);
+                }
             },
             willClose: () => {
+                clearInterval(timerInterval);
                 navigate(`/quiz-battle/${battleId}`);
             },
         });

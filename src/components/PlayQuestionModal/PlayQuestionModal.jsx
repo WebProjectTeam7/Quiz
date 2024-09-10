@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import {
     Modal,
     ModalOverlay,
@@ -134,9 +135,6 @@ export default function PlayQuestionModal({ isOpen, onClose, question, onAnswerS
                     />
                     <Button colorScheme="blue" onClick={handleSubmitAnswer}>
                         Submit Answer
-                    </Button>
-                    <Button variant="ghost" onClick={onClose}>
-                        Cancel
                     </Button>
                 </ModalFooter>
             </ModalContent>
