@@ -33,15 +33,18 @@ const Ranking = () => {
     onValue(usersRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const usersArray = Object.keys(data).map((key) => ({
+        const usersArray = Object.keys(data)
+        .map((key) => ({
           id: key,
           ...data[key],
-        }));
-        usersArray.sort((a, b) => b.points - a.points);
-        setUsers(usersArray);
-      }
-      setLoading(false);
-    });
+        }))
+        .filter((user) => user.role !== 'admin' && user.role !== 'organizer')
+        .sort((a, b) => b.points - a.points);
+
+      setUsers(usersArray);
+    }
+    setLoading(false);
+  });
   }, []);
 
   const handleCategoryClick = async (category) => {
@@ -60,11 +63,16 @@ const Ranking = () => {
             uid: userInfo?.uid || 'unknown',
             avatar: userInfo?.avatar || userInfo?.avatarUrl || '',
             onlineStatus: userInfo?.onlineStatus || 'offline',
+            role: userInfo?.role || 'unknown',
           };
         })
       );
 
-      setRankingData(rankingDataWithUserDetails);
+      const filteredRankingData = rankingDataWithUserDetails.filter(
+        (user) => user.role !== 'admin' && user.role !== 'organizer'
+      );
+
+      setRankingData(filteredRankingData);
     } catch (error) {
       console.error('Error fetching category data:', error);
     } finally {
