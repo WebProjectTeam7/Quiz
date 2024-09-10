@@ -23,16 +23,17 @@ const QuizBattle = () => {
     const [playersReady, setPlayersReady] = useState({ player1: false, player2: false });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalQuestion, setModalQuestion] = useState(null);
-    const [currentBattleRow, setCurrentBattleRow] = useState(null);
     const [currentBattleCol, setCurrentBattleCol] = useState(null);
+    const [currentBattleRow, setCurrentBattleRow] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isProcessingMove, setIsProcessingMove] = useState(false);
     const [playerNumber, setPlayerNumber] = useState(1);
     const [userDetails, setUserDetails] = useState([]);
     const [moves, setMoves] = useState(18);
     const [gameOver, setGameOver] = useState(false);
+    const [cellColors, setCellColors] = useState(quizField.map(row => row.map(cell => null)));
 
-    const playerColors = [null, 'yellow.400', 'red.400'];
+    const playerColors = ['gray.100', 'yellow.400', 'red.400', 'yellow.400', 'red.400'];
     const hexagonSize = '220px';
     const hexagonShape = {
         clipPath: 'polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%)'
@@ -45,6 +46,12 @@ const QuizBattle = () => {
     useEffect(() => {
         checkGameOver();
     }, [moves]);
+
+    useEffect(() => {
+        const intervalId = setInterval(toggleColors, 600);
+
+        return () => clearInterval(intervalId);
+    }, [quizField]);
 
     const initBattle = async () => {
         await updateStatus(battleId, userData.username, true);
@@ -87,17 +94,19 @@ const QuizBattle = () => {
             Swal.fire('Invalid Move', 'You can only select adjacent hexagons that are occupied by you.', 'error');
             return;
         }
+
         setIsProcessingMove(true);
         const currentField = quizField[row][col];
         setCurrentBattleRow(row);
         setCurrentBattleCol(col);
 
         if (currentField === 0 || currentField === 3 - currentPlayer) {
+            const newValue = currentPlayer === 1 ? currentField + 10 : currentField + 20;
+            await updateQuizField(row, col, newValue);
             await askQuestionToSingleUser();
         } else {
             Swal.fire('Invalid Move', 'The selected position is already occupied by you.', 'error');
         }
-
         setIsProcessingMove(false);
     };
 
@@ -119,11 +128,13 @@ const QuizBattle = () => {
 
             await updatePoints(battleId, userData.username, updatedScore[`player${playerNumber}`]);
             if (currentBattleRow !== null && currentBattleCol !== null) {
-                updateQuizField(currentBattleRow, currentBattleCol, currentPlayer);
-                await updateField(battleId, quizField);
+                await updateQuizField(currentBattleRow, currentBattleCol, currentPlayer);
             }
             Swal.fire('Correct!', 'You have earned 1 point!', 'success');
         } else {
+            const cellValue = quizField[currentBattleRow][currentBattleCol];
+            const updatedValue = playerNumber === 1 ? cellValue - 10 : cellValue - 20;
+            await updateQuizField(currentBattleRow, currentBattleCol, updatedValue);
             Swal.fire('Incorrect!', 'Better luck next time.', 'error');
         }
 
@@ -226,6 +237,26 @@ const QuizBattle = () => {
         navigate('/quiz-battle-lobby');
     };
 
+    const toggleColors = () => {
+        setCellColors(prevColors =>
+            prevColors.map((row, rowIndex) =>
+                row.map((cellColor, colIndex) => {
+                    const cellValue = quizField[rowIndex][colIndex];
+                    if (cellValue === 10) {
+                        return cellColor === 'yellow.400' ? 'gray.100' : 'yellow.400';
+                    } else if (cellValue === 12) {
+                        return cellColor === 'red.400' ? 'yellow.400' : 'red.400';
+                    } else if (cellValue === 20) {
+                        return cellColor === 'gray.100' ? 'red.400' : 'gray.100';
+                    } else if (cellValue === 21) {
+                        return cellColor === 'yellow.400' ? 'red.400' : 'yellow.400';
+                    }
+                    return null;
+                })
+            )
+        );
+    };
+
     return (
         <Box p={6} marginTop="20" minH="100vh">
 
@@ -287,7 +318,7 @@ const QuizBattle = () => {
                                         {row.map((cell, colIndex) => (
                                             <Box
                                                 key={`${rowIndex}-${colIndex}`}
-                                                bg={cell === 0 ? 'gray.100' : playerColors[cell]}
+                                                bg={cellColors[rowIndex][colIndex] || playerColors[cell] || 'gray.100'}
                                                 w={hexagonSize}
                                                 h={hexagonSize}
                                                 m={3}
@@ -300,13 +331,13 @@ const QuizBattle = () => {
                                                 _hover={{
                                                     bg: playerNumber === currentPlayer
                                                         ? (isValidMove(rowIndex, colIndex, playerNumber) ? 'green.200' : 'red.200')
-                                                        : 'gray.200',
+                                                        : null,
                                                     transform: playerNumber === currentPlayer && isValidMove(rowIndex, colIndex, playerNumber) ? 'scale(1.1)' : 'scale(1.01)',
                                                 }}
                                                 onClick={() => handleFieldClick(rowIndex, colIndex)}
                                             >
                                                 <Text fontSize="2xl" fontWeight="bold" color={cell === 0 ? 'black' : 'white'}>
-                                                    {cell === 0 ? '' : cell === 1 ? 'P1' : 'P2'}
+                                                    {cell === 0 ? '' : cell === 1 || cell === 10  ? 'P1' : 'P2'}
                                                 </Text>
                                             </Box>
                                         ))}
