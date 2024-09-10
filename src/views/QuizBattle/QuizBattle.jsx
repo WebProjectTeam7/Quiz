@@ -8,7 +8,7 @@ import { getBattle, updateStatus, switchPlayer, updateField, updateQuestion, upd
 import PlayQuestionModal from '../../components/PlayQuestionModal/PlayQuestionModal';
 import { useParams } from 'react-router-dom';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
-import { getUserByUsername, updateUser } from '../../services/user.service';
+import { getUserByUsername, getUserPoints, updateUser } from '../../services/user.service';
 import { QUESTION_TIME_LIMIT } from '../../common/components.constants';
 
 const QuizBattle = () => {
@@ -227,7 +227,8 @@ const QuizBattle = () => {
         });
         const userFinalScore = playerNumber === 1 ? player1FinalScore : player2FinalScore;
 
-        const updatedUser = { ...userData, points: userData.points + userFinalScore };
+        const userPoints = await getUserPoints(userData.username);
+        const updatedUser = { ...userData, points: userPoints + userFinalScore };
         await updateUser(userData.uid, updatedUser);
 
         await updateStatus(battleId, userData.username, false);
