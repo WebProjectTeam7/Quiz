@@ -14,18 +14,12 @@ import {
     Input,
     FormControl,
     FormLabel,
-    IconButton,
     Progress,
 } from '@chakra-ui/react';
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Swal from 'sweetalert2';
-import { FaFlag } from 'react-icons/fa';
-import { sendBugReport } from '../../services/admin.service';
-import { AppContext } from '../../state/app.context';
 
 export default function PlayQuestionModal({ isOpen, onClose, question, onAnswerSubmit, timeLimit = 30 }) {
-    const { userData } = useContext(AppContext);
     const [selectedOption, setSelectedOption] = useState('');
     const [userInput, setUserInput] = useState('');
     const [timer, setTimer] = useState(timeLimit);
@@ -48,45 +42,24 @@ export default function PlayQuestionModal({ isOpen, onClose, question, onAnswerS
     }, [timer]);
 
     const handleSubmitAnswer = () => {
+        let answer = '';
+
         if (question.options && question.options.length > 1) {
-            onAnswerSubmit(question.id, selectedOption || null);
+            answer = selectedOption || '';
         } else {
-            onAnswerSubmit(question.id, userInput || null);
+            answer = userInput || '';
         }
+        onAnswerSubmit(question.id, answer);
         onClose();
     };
 
-    const handleReportBug = async () => {
-        const { value: reason } = await Swal.fire({
-            title: 'Report a Bug',
-            input: 'select',
-            inputOptions: {
-                'Wrong Question': 'Wrong Question',
-                'Wrong Answer': 'Wrong Answer',
-                'Doesn\'t Work': 'Doesn\'t Work',
-                'Something Else': 'Something Else',
-            },
-            inputPlaceholder: 'Select a reason',
-            showCancelButton: true,
-            inputValidator: (value) => !value && 'You need to select a reason for reporting!',
-        });
-
-        if (reason) {
-            try {
-                // await sendBugReport(quizId, question.id, userData.uid, userData.username, reason);
-                Swal.fire('Reported!', 'The bug has been reported to the admin.', 'success');
-            } catch (error) {
-                Swal.fire('Error', 'Failed to report the bug.', 'error');
-            }
-        }
-    };
 
     const getProgressValue = () => {
         return (timer / (timeLimit)) * 100;
     };
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <Modal isOpen={isOpen} onClose={() => { }} isCentered closeOnOverlayClick={false} closeOnEsc={false}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>{question.title}</ModalHeader>
@@ -126,14 +99,10 @@ export default function PlayQuestionModal({ isOpen, onClose, question, onAnswerS
                     </VStack>
                 </ModalBody>
                 <ModalFooter>
-                    <IconButton
-                        aria-label="Report Question"
-                        icon={<FaFlag />}
-                        onClick={handleReportBug}
-                        colorScheme="red"
-                        mr={3}
-                    />
-                    <Button colorScheme="blue" onClick={handleSubmitAnswer}>
+                    <Button
+                        colorScheme="blue"
+                        onClick={handleSubmitAnswer}
+                    >
                         Submit Answer
                     </Button>
                 </ModalFooter>
