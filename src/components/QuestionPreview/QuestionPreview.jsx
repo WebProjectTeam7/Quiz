@@ -16,6 +16,7 @@ import {
     IconButton,
     Switch,
     Image,
+    SimpleGrid,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
@@ -326,13 +327,13 @@ export default function QuestionPreview({ question }) {
                                     onChange={setSelectedOption}
                                     value={selectedOption}
                                 >
-                                    <VStack align="start">
+                                    <SimpleGrid columns={2} spacing={4}>
                                         {editableQuestion.options.map((option, index) => (
                                             <Radio key={index} value={option}>
                                                 {option}
                                             </Radio>
                                         ))}
-                                    </VStack>
+                                    </SimpleGrid>
                                 </RadioGroup>
                             </FormControl>
                         ) : (
@@ -347,11 +348,16 @@ export default function QuestionPreview({ question }) {
                                 />
                             </FormControl>
                         )}
-                        <Button onClick={handleCheckAnswer} colorScheme="blue">
-                            Check Answer
-                        </Button>
+                        <HStack spacing={4} mt={2}>
+                            <Button onClick={handleCheckAnswer} colorScheme="blue">
+                                Check Answer
+                            </Button>
+                            <Button onClick={handleToggleAnswer} colorScheme="yellow">
+                                {showAnswer ? 'Hide' : 'Show'} Answer
+                            </Button>
+                        </HStack>
                         {showIsCorrect && (isCorrect ? (
-                            <Text fontWeight="bold" color='green.500' >
+                            <Text fontWeight="bold" color='green.500'>
                                 Correct!
                             </Text>
                         ) : (
@@ -359,20 +365,19 @@ export default function QuestionPreview({ question }) {
                                 Incorrect!
                             </Text>
                         ))}
-                        <Button onClick={handleToggleAnswer} colorScheme="yellow">
-                            {showAnswer ? 'Hide' : 'Show'} Answer
-                        </Button>
                         {showAnswer && (
                             <Text fontWeight="bold" color='yellow.500'>
                                 The correct answer is: {editableQuestion.answer}
                             </Text>
                         )}
-                        <Button onClick={handleEditQuestion} colorScheme="green">
-                            Edit Question
-                        </Button>
-                        <Button onClick={handleDeleteQuestion} colorScheme="red">
-                            Delete From DB
-                        </Button>
+                        <HStack spacing={4} mt={4}>
+                            <Button onClick={handleEditQuestion} colorScheme="green">
+                                Edit Question
+                            </Button>
+                            <Button onClick={handleDeleteQuestion} colorScheme="red">
+                                Delete From DB
+                            </Button>
+                        </HStack>
                     </>
                 )}
             </VStack>

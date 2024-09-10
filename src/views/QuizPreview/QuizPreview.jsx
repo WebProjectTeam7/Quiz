@@ -387,19 +387,22 @@ export default function QuizPreview() {
                         Question from Database
                     </Button>
 
-                    <Button colorScheme="teal" onClick={handleTestQuiz}>
+                    <Button colorScheme="blue" onClick={handleTestQuiz}>
                         Test Quiz
+                    </Button>
+
+                </HStack>
+                <HStack spacing={4}>
+                    <Button colorScheme="blue" onClick={onParticipantsOpen}>
+                        Quiz Participants
                     </Button>
 
                     {quiz.type === QuizAccessEnum.PRIVATE && (
                         <Button colorScheme="blue" onClick={onInviteOpen}>
-                            Send Invitation
+                        Send Invitation
                         </Button>
                     )}
                 </HStack>
-                <Button colorScheme="blue" onClick={onParticipantsOpen}>
-                    Quiz Participants
-                </Button>
 
                 <HStack spacing={4}>
                     <Button colorScheme={quiz.isActive ? 'red' : 'green'} onClick={handleToggleActive}>

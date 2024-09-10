@@ -281,7 +281,7 @@ export default function RegistrationModal({ isVisible, onClose }) {
                                 />
                                 <FaEye
                                     onClick={togglePasswordVisibility}
-                                    style={{ cursor: 'pointer', marginTop: '5px', color: !hidePassword ? '#FF0054' : '#575454' }}
+                                    style={{ cursor: 'pointer', marginTop: '5px', color: !hidePassword ? '#FF0054' : 'rgb(237, 243, 182)' }}
                                 />
                                 <PasswordStrengthIndicator password={user.password} />
                             </FormControl>

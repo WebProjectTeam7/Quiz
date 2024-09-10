@@ -107,7 +107,7 @@ export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
                             borderColor="blue.400"
                         />
                     </FormControl>
-                    <Text mt={4}>
+                    <Text mt={4} color="black">
                         Don't have an account?{' '}
                         <Link color="teal.500" onClick={() => {
                             onClose();
