@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import StatusAvatar from '../StatusAvatar/StatusAvatar';
 import { getUserByUsername } from '../../services/user.service';
-import { CHAT_COMMENTS_LIMIT } from '../../common/components.constants';
+import { CHAT_COMMENTS_BUFFER, CHAT_COMMENTS_LIMIT } from '../../common/components.constants';
 import './ChatComponent.css';
 
 const ChatComponent = () => {
@@ -40,7 +40,7 @@ const ChatComponent = () => {
         try {
             const unsubscribe = getChatMessages(async (messages) => {
                 if (messages.length > CHAT_COMMENTS_LIMIT) {
-                    await chatCleanUp(CHAT_COMMENTS_LIMIT);
+                    await chatCleanUp(CHAT_COMMENTS_BUFFER);
                 }
                 const avatars = await loadAvatarsForMessages(messages);
                 setUserAvatars(avatars);
@@ -159,9 +159,7 @@ const ChatComponent = () => {
                                         </Text>
                                     </Box>
                                     {!isCurrentUser && (
-
                                         < StatusAvatar uid={user.uid} src={user.avatar || user.avatarUrl || ''} size="lg" />
-
                                     )}
                                 </HStack>
                             </Flex>
