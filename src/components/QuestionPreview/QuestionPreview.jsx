@@ -371,7 +371,7 @@ export default function QuestionPreview({ question }) {
                             Edit Question
                         </Button>
                         <Button onClick={handleDeleteQuestion} colorScheme="red">
-                            Delete Question From DB
+                            Delete From DB
                         </Button>
                     </>
                 )}
