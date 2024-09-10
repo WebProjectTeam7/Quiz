@@ -62,7 +62,7 @@ export default function Header({ registrationModal, loginModal }) {
                                     right="-3"
                                     px={2}
                                     py={1}
-                                    fontSize="0.75em"
+                                    fontSize="1.2em"
                                     sx={{
                                         clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
                                         backgroundColor: 'red.500',
