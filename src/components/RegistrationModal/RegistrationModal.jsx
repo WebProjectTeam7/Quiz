@@ -188,7 +188,7 @@ export default function RegistrationModal({ isVisible, onClose }) {
             });
 
             onClose();
-            navigate('/');
+            window.location.reload();
         } catch (error) {
             Swal.fire({
                 icon: 'error',

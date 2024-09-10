@@ -64,7 +64,7 @@ export default function LoginModal({ isVisible, onClose, openRegisterModal  }) {
             });
             monitorUserStatus(uid);
             onClose();
-            navigate('/');
+            window.location.reload();
         } catch (error) {
             Swal.fire({
                 icon: 'error',
