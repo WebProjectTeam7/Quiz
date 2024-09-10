@@ -7,6 +7,8 @@
     padding: 40px;
     color: rgb(237, 243, 182);
     box-shadow: 0 0 15px rgba(188, 16, 79, 0.945);
+    margin-top: 70px;
+    margin-bottom: 70px;
 }
 
 .organizer-dashboard-container h2 {
