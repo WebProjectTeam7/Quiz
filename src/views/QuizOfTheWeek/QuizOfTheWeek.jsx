@@ -13,7 +13,7 @@ export default function QuizOfTheWeek() {
     const [quizSummary, setQuizSummary] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
 
-    const hardcodedQuizId = '-O5CSRhJq5LJWGCKOxEh'; // Hardcoded quiz ID
+    const hardcodedQuizId = '-O6SHw4CWmQVdto1ojor'; // Hardcoded quiz ID
 
     const fetchQuizOfTheWeek = async () => {
         try {
