@@ -13,11 +13,21 @@ This is single-page application for creating, sharing and participating in quizz
 
 #### 1.1 Features
 
-* **Authentication:** Users can register, log in, and manage their profiles.
-* **Quizzes**: Users can view, create, and edit threads within various categories.
-* **Voting**: Users can upvote and downvote posts.
-* **Tags**: Support for tagging threads.
-* **Admin Functions**: Admins can manage users and apply bans.
+* **Authentication:**
+
+  * Users can register for an account.
+  * Users can log in to access their account.
+  * Users can manage their profiles (e.g., update information, change settings).
+* **Quizzes:**
+
+  * Users can view available quizzes.
+* **Report:**
+
+  * Users can report quizzes, presumably for issues like inaccuracies or inappropriate content.
+* **Admin Functions:**
+
+  * Admins have the ability to manage users (e.g., view user activity, handle account issues).
+  * Admins can apply bans to users who violate terms or policies.
 
 #### 1.2 Installation
 
