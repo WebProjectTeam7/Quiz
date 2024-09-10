@@ -46,7 +46,7 @@ export default function QuizOfTheWeek() {
                     quiz={{ ...quiz, isCompleted, summary: quizSummary }}
                 />
             )}
-            <button className="back-button" onClick={() => navigate('/quizzes')}>
+            <button className="back-button" onClick={() => navigate('/quiz-categories')}>
                 Back
             </button>
         </div>
