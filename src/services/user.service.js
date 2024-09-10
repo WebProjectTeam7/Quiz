@@ -57,6 +57,22 @@ export const getUserData = async (uid) => {
 };
 
 
+export const getUserPoints = async (username) => {
+    const userRef = ref(db, `users/${username}`);
+    try {
+        const snapshot = await get(userRef);
+        if (!snapshot.exists()) {
+            throw new Error('User not found');
+        }
+
+        const user = snapshot.val();
+        return user.points || 0;
+    } catch (error) {
+        console.error('Error retrieving user points:', error);
+        throw new Error('Failed to retrieve user points: ' + error.message);
+    }
+};
+
 export const getPhoneNumber = async (phoneNumber) => {
     const phoneRef = query(ref(db, 'users'), orderByChild('phoneNumber'), equalTo(phoneNumber));
     try {

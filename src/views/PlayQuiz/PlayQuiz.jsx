@@ -18,7 +18,7 @@ import { getQuestionById } from '../../services/question.service';
 import Swal from 'sweetalert2';
 import QuestionView from '../../components/QuestionView/QuestionView';
 import UserRoleEnum from '../../common/role-enum';
-import { updateUser } from '../../services/user.service';
+import { getUserPoints, updateUser } from '../../services/user.service';
 import './PlayQuiz.css';
 
 export default function PlayQuiz() {
@@ -187,8 +187,8 @@ export default function PlayQuiz() {
             };
 
             await saveQuizSummary(quizId, userData.username, summary);
-
-            const updatedUser = { ...userData, points: userData.points + finalScore };
+            const userPoints = await getUserPoints(userData.username);
+            const updatedUser = { ...userData, points: userPoints + finalScore };
             await updateUser(userData.uid, updatedUser);
 
             localStorage.removeItem(`quiz-${quizId}-timeLeft`);
