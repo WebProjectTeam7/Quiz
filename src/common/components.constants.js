@@ -20,9 +20,9 @@ export const MAX_NOTIFICATION_LENGTH = 50;
 
 export const MIN_QUIZ_TIME_LIMIT = 5; // minutes
 
-export const CHAT_COMMENTS_LIMIT = 10;
+export const CHAT_COMMENTS_LIMIT = 100;
 
-export const CHAT_COMMENTS_BUFFER = 5;
+export const CHAT_COMMENTS_BUFFER = 50;
 
 export const QUESTION_TIME_LIMIT = 20; // seconds
 
