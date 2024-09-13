@@ -1,6 +1,7 @@
 import { ref as dbRef, push, get, update, set, remove, query, orderByChild, equalTo } from 'firebase/database';
 import { ref as storageRef, deleteObject } from 'firebase/storage';
 import { db, storage } from '../config/firebase-config';
+import { ONE_WEEK_IN_MS } from '../common/components.constants';
 
 // CREATE
 
@@ -267,7 +268,56 @@ export const getInvitedUsers = async (quizId) => {
     }
 };
 
+export const getRandomActiveQuiz = async () => {
+    try {
+        const quizRef = dbRef(db, 'quizzes');
+        const activeQuizzesQuery = query(quizRef, orderByChild('isActive'), equalTo(true));
+        const snapshot = await get(activeQuizzesQuery);
 
+        if (snapshot.exists()) {
+            const activeQuizzes = [];
+            snapshot.forEach((childSnapshot) => {
+                activeQuizzes.push({ id: childSnapshot.key, ...childSnapshot.val() });
+            });
+
+            const randomIndex = Math.floor(Math.random() * activeQuizzes.length);
+            return activeQuizzes[randomIndex];
+        }
+        return null;
+    } catch (error) {
+        console.error('Error retrieving random active quiz:', error);
+        throw new Error('Failed to retrieve random active quiz');
+    }
+};
+
+export const getQuizOfTheWeek = async () => {
+    try {
+        const quizOfWeekRef = dbRef(db, 'quizOfTheWeek');
+        const snapshot = await get(quizOfWeekRef);
+        const currentTime = Date.now();
+
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            const selectedAt = new Date(data.selectedAt).getTime();
+            if (currentTime - selectedAt < ONE_WEEK_IN_MS) {
+                return data.quiz;
+            }
+        }
+
+        const newQuiz = await getRandomActiveQuiz();
+        const newQuizData = {
+            quiz: newQuiz,
+            selectedAt: new Date().toISOString(),
+        };
+
+        await set(quizOfWeekRef, newQuizData);
+
+        return newQuiz;
+    } catch (error) {
+        console.error('Error getting quiz of the week:', error);
+        throw new Error('Failed to retrieve or set quiz of the week');
+    }
+};
 // UPDATE
 
 export const editQuiz = async (quizId, updatedData) => {

@@ -27,3 +27,5 @@ export const CHAT_COMMENTS_BUFFER = 50;
 export const QUESTION_TIME_LIMIT = 20; // seconds
 
 export const QUIZ_BATTLE_MOVES_BY_PLAYER = 9;
+
+export const ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;

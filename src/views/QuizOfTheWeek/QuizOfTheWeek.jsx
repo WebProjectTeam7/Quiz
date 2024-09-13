@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getQuizById, checkIfQuizCompleted, fetchQuizSummary } from '../../services/quiz.service';
+import { checkIfQuizCompleted, fetchQuizSummary, getQuizOfTheWeek } from '../../services/quiz.service';
 import StartQuizModal from '../../components/StartQuizModal/StartQuizModal';
 import { useContext } from 'react';
 import { AppContext } from '../../state/app.context';
 import './QuizOfTheWeek.css';
+
 export default function QuizOfTheWeek() {
     const navigate = useNavigate();
     const { userData } = useContext(AppContext);
@@ -13,17 +14,15 @@ export default function QuizOfTheWeek() {
     const [quizSummary, setQuizSummary] = useState(null);
     const [isCompleted, setIsCompleted] = useState(false);
 
-    const hardcodedQuizId = '-O6SHw4CWmQVdto1ojor'; // Hardcoded quiz ID
-
     const fetchQuizOfTheWeek = async () => {
         try {
-            const fetchedQuiz = await getQuizById(hardcodedQuizId);
+            const fetchedQuiz = await getQuizOfTheWeek();
             if (fetchedQuiz) {
                 setQuiz(fetchedQuiz);
-                const completed = await checkIfQuizCompleted(hardcodedQuizId, userData.username);
+                const completed = await checkIfQuizCompleted(fetchedQuiz.id, userData.username);
                 setIsCompleted(completed);
                 if (completed) {
-                    const summary = await fetchQuizSummary(hardcodedQuizId, userData.username);
+                    const summary = await fetchQuizSummary(fetchedQuiz.id, userData.username);
                     setQuizSummary(summary);
                 }
                 setModalOpen(true);
