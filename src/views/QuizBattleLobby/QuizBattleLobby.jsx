@@ -1,11 +1,3 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
-import { AppContext } from '../../state/app.context';
-import { addUserToLobby, updateUserStatus, subscribeToLobbyUpdates, removeUserFromLobby, updateUserBattleId } from '../../services/lobby.service';
-import { createBattle } from '../../services/quiz-battle.service';
-import { getUserByUsername } from '../../services/user.service';
-import { useNavigate, useLocation } from 'react-router-dom';
-import ChatComponent from '../../components/ChatComponent/ChatComponent';
-import Swal from 'sweetalert2';
 import {
     Box,
     Heading,
@@ -19,11 +11,20 @@ import {
     VStack,
     HStack,
 } from '@chakra-ui/react';
+import { useContext, useEffect, useState, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { AppContext } from '../../state/app.context';
+import { addUserToLobby, updateUserStatus, subscribeToLobbyUpdates, removeUserFromLobby, updateUserBattleId } from '../../services/lobby.service';
+import { createBattle } from '../../services/quiz-battle.service';
+import { getUserByUsername } from '../../services/user.service';
+import { QUIZ_BATTLE_TURNS_BY_PLAYER, QUIZ_BATTLE_STARTING_FIELD } from '../../common/components.constants';
+import Swal from 'sweetalert2';
+import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
 import useModal from '../../custom-hooks/useModal';
+import ChatComponent from '../../components/ChatComponent/ChatComponent';
 import StatusAvatar from '../../components/StatusAvatar/StatusAvatar';
 import './QuizBattleLobby.css';
-import UserProfileModal from '../../components/UserProfileModal/UserProfileModal';
-import { QUIZ_BATTLE_MOVES_BY_PLAYER as QUIZ_BATTLE_MOVES_PER_PLAYER } from '../../common/components.constants';
+import LobbyStatusEnum from '../../common/lobby-status.enum';
 
 const QuizBattleLobby = () => {
     const { userData } = useContext(AppContext);
@@ -32,13 +33,13 @@ const QuizBattleLobby = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [lobbyUsers, setLobbyUsers] = useState([]);
-    const lobbyUsersRef = useRef(lobbyUsers);
-
     const [userDetails, setUserDetails] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [battleInProgress, setBattleInProgress] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const [lobbyUsers, setLobbyUsers] = useState([]);
+    const lobbyUsersRef = useRef(lobbyUsers);
 
     useEffect(() => {
         if (userData) {
@@ -52,17 +53,27 @@ const QuizBattleLobby = () => {
             }
         });
 
+        const handleBeforeUnload = (event) => {
+            if (userData) {
+                removeUserFromLobby(userData.username);
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
         return () => {
             if (unsubscribe) unsubscribe();
             if (userData) {
                 removeUserFromLobby(userData.username);
             }
+            window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, [userData, location.pathname, battleInProgress]);
 
     useEffect(() => {
         loadUsers();
     }, [lobbyUsers]);
+
 
     const loadUsers = async () => {
         try {
@@ -85,7 +96,7 @@ const QuizBattleLobby = () => {
 
     const handleQueueAndReadyUsers = (users) => {
         const sortedQueue = users.sort((a, b) => a.timestamp - b.timestamp);
-        const readyUsers = sortedQueue.filter((user) => user.status === 'ready');
+        const readyUsers = sortedQueue.filter((user) => user.status === LobbyStatusEnum.READY);
 
         if (readyUsers.length >= 2) {
             const [user1, user2] = readyUsers.slice(0, 2);
@@ -96,9 +107,9 @@ const QuizBattleLobby = () => {
     const toggleUserStatus = () => {
         if (userData) {
             const newStatus =
-                lobbyUsers.find((user) => user.username === userData.username)?.status === 'ready'
-                    ? 'waiting'
-                    : 'ready';
+                lobbyUsers.find((user) => user.username === userData.username)?.status === LobbyStatusEnum.READY
+                    ? LobbyStatusEnum.IDLE
+                    : LobbyStatusEnum.READY;
             updateUserStatus(userData.username, newStatus);
         }
     };
@@ -107,21 +118,19 @@ const QuizBattleLobby = () => {
         if (battleInProgress) return;
 
         setBattleInProgress(true);
-
+        setLoading(true);
         try {
             if (user1.username === userData.username) {
-                const battleId = await createBattle(user1.username, user2.username, [[1, 0, 0], [0, 0, 0], [0, 0, 2]], QUIZ_BATTLE_MOVES_PER_PLAYER * 2);
+                const battleId = await createBattle(user1.username, user2.username, QUIZ_BATTLE_STARTING_FIELD, QUIZ_BATTLE_TURNS_BY_PLAYER * 2);
                 await updateUserBattleId(user2.username, battleId);
                 navigateToBattle(battleId);
             } else if (user2.username === userData.username) {
-                setLoading(true);
                 setTimeout(() => {
                     const checkBattleId = async () => {
                         const currentLobbyUsers = lobbyUsersRef.current;
                         const user = currentLobbyUsers.find(user => user.username === user2.username);
 
                         if (user && user.battleId) {
-                            setLoading(false);
                             navigateToBattle(user.battleId);
                             return;
                         }
@@ -129,12 +138,12 @@ const QuizBattleLobby = () => {
                     };
 
                     checkBattleId();
-                }, 8000);
+                }, 6000);
             }
         } catch (error) {
             console.error('Error initiating quiz battle:', error);
-            setLoading(false);
         } finally {
+            setLoading(false);
             setBattleInProgress(false);
         }
     };
@@ -215,7 +224,7 @@ const QuizBattleLobby = () => {
                                             <StatusAvatar uid={user.uid} src={user.avatar} size="lg" />
                                             <Text color="black" fontSize="xl" >{user.username}</Text>
                                         </HStack>
-                                        <Badge colorScheme={user.status === 'ready' ? 'green' : 'orange'}>
+                                        <Badge colorScheme={user.status === LobbyStatusEnum.READY ? 'green' : 'orange'}>
                                             {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                                         </Badge>
                                     </Flex>
@@ -223,9 +232,9 @@ const QuizBattleLobby = () => {
                             ))}
                         </List>
 
-                        {lobbyUsers.find((user) => user.username === userData?.username)?.status === 'ready' ? (
+                        {lobbyUsers.find((user) => user.username === userData?.username)?.status === LobbyStatusEnum.READY ? (
                             <Button colorScheme="yellow" width="180px" onClick={toggleUserStatus}>
-                                Switch to Waiting
+                                Switch to Idle
                             </Button>
                         ) : (
                             <Button colorScheme="teal" width="100px" onClick={toggleUserStatus}>

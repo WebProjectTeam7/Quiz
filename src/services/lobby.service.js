@@ -1,3 +1,4 @@
+import LobbyStatusEnum from '../common/lobby-status.enum';
 import { db } from '../config/firebase-config';
 import { ref, set, get, onValue, update, remove } from 'firebase/database';
 
@@ -8,7 +9,7 @@ export const addUserToLobby = async (username) => {
         const userRef = ref(db, `lobby/${username}`);
         await set(userRef, {
             username: username,
-            status: 'waiting',
+            status: LobbyStatusEnum.IDLE,
             timestamp: Date.now(),
         });
     } catch (error) {
