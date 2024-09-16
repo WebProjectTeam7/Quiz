@@ -18,14 +18,16 @@ export const SMALL_PAGE = 5;
 
 export const MAX_NOTIFICATION_LENGTH = 50;
 
-export const MIN_QUIZ_TIME_LIMIT = 5; // minutes
-
 export const CHAT_COMMENTS_LIMIT = 100;
 
 export const CHAT_COMMENTS_BUFFER = 50;
 
+export const ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
+
+export const MIN_QUIZ_TIME_LIMIT = 5; // minutes
+
 export const QUESTION_TIME_LIMIT = 20; // seconds
 
-export const QUIZ_BATTLE_MOVES_BY_PLAYER = 9;
+export const QUIZ_BATTLE_TURNS_BY_PLAYER = 9;
 
-export const ONE_WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
+export const QUIZ_BATTLE_STARTING_FIELD = [[1, 0, 0], [0, 0, 0], [0, 0, 2]];
