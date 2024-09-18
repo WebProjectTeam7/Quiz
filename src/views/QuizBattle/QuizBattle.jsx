@@ -14,8 +14,11 @@ import { QUESTION_TIME_LIMIT } from '../../common/components.constants';
 const QuizBattle = () => {
     const { userData } = useContext(AppContext);
     const { battleId } = useParams();
+
     const navigate = useNavigate();
+
     const [currentPlayer, setCurrentPlayer] = useState(1);
+    const [playerNumber, setPlayerNumber] = useState(1);
     const [players, setPlayers] = useState({ 1: 'player1', 2: 'player2' });
     const [activeUser, setActiveUser] = useState('');
     const [quizField, setQuizField] = useState([[1, 0, 0], [0, 0, 0], [0, 0, 2]]);
@@ -27,7 +30,6 @@ const QuizBattle = () => {
     const [currentBattleRow, setCurrentBattleRow] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isProcessingMove, setIsProcessingMove] = useState(false);
-    const [playerNumber, setPlayerNumber] = useState(1);
     const [userDetails, setUserDetails] = useState([]);
     const [moves, setMoves] = useState(18);
     const [gameOver, setGameOver] = useState(false);
@@ -338,7 +340,7 @@ const QuizBattle = () => {
                                                 onClick={() => handleFieldClick(rowIndex, colIndex)}
                                             >
                                                 <Text fontSize="2xl" fontWeight="bold" color={cell === 0 ? 'black' : 'white'}>
-                                                    {cell === 0 ? '' : cell === 1 || cell === 10  ? 'P1' : 'P2'}
+                                                    {cell === 0 ? '' : cell === 1 || cell === 10 ? 'P1' : 'P2'}
                                                 </Text>
                                             </Box>
                                         ))}

@@ -35,6 +35,7 @@ export default function App() {
     const [appState, setAppState] = useState({
         user: null,
         userData: null,
+        loading: false,
     });
 
     const [user, loading, error] = useAuthState(auth);
@@ -51,18 +52,24 @@ export default function App() {
     useEffect(() => {
         if (!user) return;
         if (!appState.user) return;
+
+        setLoading(true);
         getUserData(appState.user.uid)
             .then((data) => {
                 const userData = data;
-                setAppState({ ...appState, userData });
+                setAppState((prevState) => ({ ...prevState, userData }));
             })
             .catch((e) => {
                 console.error(e.message);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     }, [user, appState.user]);
 
     useEffect(() => {
         if (user) {
+            setLoading(true);
             getUserData(user.uid)
                 .then((data) => {
                     setAppState((prevState) => ({
@@ -74,14 +81,19 @@ export default function App() {
                 })
                 .catch((e) => {
                     console.error('Error fetching user data:', e);
-                });
+                })
+                .finally(() => setLoading(false));
         }
     }, [user]);
+
+    const setLoading = (isLoading) => {
+        setAppState((prevState) => ({ ...prevState, loading: isLoading }));
+    };
 
     return (
         <ChakraProvider>
             <BrowserRouter>
-                <AppContext.Provider value={{ ...appState, setAppState, searchQuery, setSearchQuery }}>
+                <AppContext.Provider value={{ ...appState, setAppState, searchQuery, setSearchQuery, setLoading }}>
                     <Header
                         registrationModal={registrationModal}
                         loginModal={loginModal}

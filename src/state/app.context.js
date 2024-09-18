@@ -6,4 +6,5 @@ export const AppContext = createContext({
     setAppState: () => {},
     searchQuery: '',
     setSearchQuery: () => {},
+    loading: false,
 });

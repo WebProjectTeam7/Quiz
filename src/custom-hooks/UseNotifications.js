@@ -3,7 +3,7 @@ import { useEffect, useState, useContext } from 'react';
 import { listenForNotifications } from '../services/notification.service';
 import { AppContext } from '../state/app.context';
 
-const useNotifications = () => {
+export default function useNotifications() {
     const { userData } = useContext(AppContext);
     const [notifications, setNotifications] = useState([]);
     const [newNotifications, setNewNotifications] = useState([]);
@@ -23,6 +23,4 @@ const useNotifications = () => {
     }, [userData?.username]);
 
     return { notifications, newNotifications };
-};
-
-export default useNotifications;
+}
