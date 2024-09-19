@@ -102,16 +102,17 @@ export default function Header({ registrationModal, loginModal }) {
                         >
                             Ranking
                         </Button>
-                        <Button
-                            as={NavLink}
-                            to="/quiz-battle-lobby"
-                            leftIcon={<Icon as={FaGamepad} />}
-                            colorScheme="teal"
-                            variant="outline"
-                        >
-                            Quiz Battle
-                        </Button>
-                        {user && (
+
+                        {user && (<>
+                            <Button
+                                as={NavLink}
+                                to="/quiz-battle-lobby"
+                                leftIcon={<Icon as={FaGamepad} />}
+                                colorScheme="teal"
+                                variant="outline"
+                            >
+                                Quiz Battle
+                            </Button>
                             <Button
                                 as={NavLink}
                                 to="/my-profile"
@@ -121,6 +122,7 @@ export default function Header({ registrationModal, loginModal }) {
                             >
                                 My Profile
                             </Button>
+                        </>
                         )}
                         {(userData?.role === UserRoleEnum.ORGANIZER || userData?.role === UserRoleEnum.ADMIN) && (
                             <Button

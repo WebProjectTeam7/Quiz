@@ -5,7 +5,5 @@ import react from '@vitejs/plugin-react-swc';
 export default defineConfig({
     // base: '/Quiz/dist',
     plugins: [react()],
-    server: {
-        historyApiFallback: true,
-    },
+
 });
